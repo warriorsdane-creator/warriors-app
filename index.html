@@ -1,23 +1,20 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- 🔹 Manifest PWA -->
-  <link rel="manifest" href="manifest.json">
+  <base target="_top">
   <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="manifest.json">
 
-  <title>Warriors App</title>
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
       background-color: #000;
       color: #fff;
       text-align: center;
-      margin: 0;
-      padding: 0;
     }
+    .hidden { display: none; }
     .container { margin-top: 40px; }
     .login-box input {
       display: block;
@@ -26,13 +23,6 @@
       width: 200px;
       border-radius: 6px;
       border: none;
-    }
-    .card {
-      border: 1px solid #555;
-      border-radius: 10px;
-      padding: 10px;
-      margin: 10px;
-      background: #111;
     }
     button {
       padding: 8px 16px;
@@ -46,24 +36,25 @@
       background: gray !important;
       cursor: default;
     }
-    .hidden { display: none; }
-    .logo { width: 200px; margin-bottom: 20px; }
+    .card {
+      border: 1px solid #555;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 10px;
+      background: #111;
+    }
   </style>
 
   <script>
-    // ✅ Adres API (Apps Script)
-    const API_URL = "https://script.google.com/macros/s/AKfycbz7cdTq1i7SnZBm_u6PelvUif-GKgsRNzfJWWesL3X6O7hGTiDo-UUt7dXSscMcQnKo/exec";
-
     // 🔁 Auto-aktualizacja
-    const WERSJA_APKI = '1.0.6';
+    const WERSJA_APKI = '1.0.4';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
-      console.log(`🔄 Aktualizacja: ${poprzednia || 'brak'} → ${WERSJA_APKI}`);
       localStorage.setItem('wersjaApki', WERSJA_APKI);
       location.reload(true);
     }
 
-    // 🧱 Rejestracja Service Workera
+    // 🧱 Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(reg => console.log("✅ Service Worker zarejestrowany:", reg))
@@ -74,42 +65,60 @@
 
 <body>
 
-  <!-- 🧠 Logowanie -->
-  <div id="loginView" class="container">
-    <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo">
-    <h1>Logowanie Warriors</h1>
-    <div class="login-box">
-      <input id="numer" type="number" placeholder="Numer zawodnika">
-      <input id="haslo" type="password" placeholder="Hasło">
-      <button onclick="zaloguj()">Zaloguj</button>
+  <!-- 🧠 Splash screen -->
+  <div id="splash" style="display:flex;justify-content:center;align-items:center;height:100vh;background:#000;">
+    <img src="icon512.png" style="width:200px;" alt="Logo Warriors">
+  </div>
+
+  <!-- 🔐 Ekran logowania -->
+  <div id="app" class="hidden">
+    <div id="loginView" class="container">
+      <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" style="width:200px;margin-bottom:20px;">
+      <h1>Logowanie Warriors</h1>
+      <div class="login-box">
+        <input id="numer" type="number" placeholder="Numer zawodnika">
+        <input id="haslo" type="password" placeholder="Hasło">
+        <button onclick="zaloguj()">Zaloguj</button>
+      </div>
+      <p id="komunikat"></p>
     </div>
-    <p id="komunikat"></p>
-  </div>
 
-  <!-- 💳 Płatności -->
-  <div id="platnosciView" class="container hidden">
-    <h1>Płatności</h1>
-    <div id="listaPlatnosci">Ładowanie...</div>
-  </div>
+    <!-- 💳 Płatności -->
+    <div id="platnosciView" class="container hidden">
+      <h1>Płatności</h1>
+      <div id="listaPlatnosci">Ładowanie...</div>
+    </div>
 
-  <!-- 🏒 Treningi -->
-  <div id="homeView" class="container hidden">
-    <h1 id="tytulTreningow">Treningi</h1>
-    <div id="listaTreningow">Ładowanie...</div>
-    <button onclick="pokazStatystyki()" style="margin-top:20px;">📈 Pokaż moje statystyki</button>
-  </div>
+    <!-- 🏒 Treningi -->
+    <div id="homeView" class="container hidden">
+      <h1 id="tytulTreningow">Treningi</h1>
+      <div id="listaTreningow">Ładowanie...</div>
+      <button onclick="pokazStatystyki()" style="margin-top:20px;">📈 Pokaż moje statystyki</button>
+    </div>
 
-  <!-- 📈 Statystyki -->
-  <div id="statsView" class="container hidden">
-    <h1>Moje statystyki</h1>
-    <div id="listaStatystyk">Ładowanie...</div>
-    <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
+    <!-- 📈 Statystyki -->
+    <div id="statsView" class="container hidden">
+      <h1>Moje statystyki</h1>
+      <div id="listaStatystyk">Ładowanie...</div>
+      <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
+    </div>
   </div>
 
   <script>
+    // ⏳ Ukrywanie splash screena po 2 sekundach
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('splash').style.display = 'none';
+        document.getElementById('app').classList.remove('hidden');
+      }, 2000);
+    });
+
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7cdTq1i7SnZBm_u6PelvUif-GKgsRNzfJWWesL3X6O7hGTiDo-UUt7dXSscMcQnKo/exec";
+
+    // 🔐 Logowanie
     async function zaloguj() {
       const numer = document.getElementById("numer").value.trim();
       const haslo = document.getElementById("haslo").value.trim();
@@ -123,20 +132,18 @@
       komunikat.innerText = "Trwa logowanie...";
 
       try {
-        const res = await fetch(`${API_URL}?action=login&numer=${numer}&haslo=${haslo}`);
-        const data = await res.json();
-        if (data.success) {
-          komunikat.innerText = "✅ Zalogowano";
+        const res = await fetch(`${SCRIPT_URL}?action=login&numer=${numer}&haslo=${haslo}`);
+        const response = await res.json();
+        if (response.success) {
           numerZalogowanego = numer;
-          grupaZalogowanego = data.group;
-
+          grupaZalogowanego = response.group;
+          komunikat.innerText = "✅ Zalogowano";
           document.getElementById("loginView").classList.add("hidden");
           document.getElementById("platnosciView").classList.remove("hidden");
-
-          const platnosciRes = await fetch(`${API_URL}?action=platnosci&numer=${numer}`);
-          renderPlatnosci(await platnosciRes.json());
+          const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${numer}`)).json();
+          renderPlatnosci(platnosci);
         } else {
-          komunikat.innerText = "❌ " + data.message;
+          komunikat.innerText = "❌ " + response.message;
         }
       } catch (err) {
         komunikat.innerText = "⚠️ Błąd połączenia";
@@ -150,18 +157,16 @@
         div.innerHTML = "<p>Brak zaległości ✅</p><button onclick='pokazTreningi()'>Dalej ➡</button>";
         return;
       }
-      div.innerHTML = `<h3>Zaległe płatności:</h3>` + lista.map(p =>
-        `<div class="card" style="background:#a00;">🔴 ${p.nazwa} – ${p.kwota} zł</div>`
-      ).join('') + `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
+      div.innerHTML = `<h3>Zaległe płatności:</h3>` +
+        lista.map(p => `<div class='card' style='background:#a00;'>🔴 ${p.nazwa} – ${p.kwota} zł</div>`).join('') +
+        `<button onclick='pokazTreningi()' style='margin-top:20px;'>Dalej ➡</button>`;
     }
 
     async function pokazTreningi() {
       document.getElementById("platnosciView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
-      document.getElementById("tytulTreningow").innerText = "Treningi – " + grupaZalogowanego;
-
-      const res = await fetch(`${API_URL}?action=treningi&grupa=${grupaZalogowanego}&numer=${numerZalogowanego}`);
-      renderTreningi(await res.json());
+      const lista = await (await fetch(`${SCRIPT_URL}?action=treningi&grupa=${grupaZalogowanego}&numer=${numerZalogowanego}`)).json();
+      renderTreningi(lista);
     }
 
     function renderTreningi(lista) {
@@ -170,14 +175,12 @@
         div.innerHTML = "<p>Brak dostępnych treningów</p>";
         return;
       }
-
       div.innerHTML = lista.map(t => `
         <div class="card">
-          <p><b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>👨‍🏫 Trener: <b>${t.trener}</b><br>👥 Zapisanych: ${t.zapisanych}</p>
+          <p><b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>👨‍🏫 ${t.trener}<br>👥 ${t.zapisanych}</p>
         </div>
       `).join('');
     }
   </script>
-
 </body>
 </html>

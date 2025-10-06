@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Warriors App</title>
   <meta name="theme-color" content="#000000">
+  <title>Warriors App</title>
 
-  <!-- ✅ Manifest i Service Worker -->
+  <!-- 🔗 Manifest -->
   <link rel="manifest" href="manifest.json">
 
   <style>
@@ -50,11 +50,12 @@
     .logo { width: 200px; margin-bottom: 20px; }
   </style>
 </head>
+
 <body>
 
   <!-- 🧠 Logowanie -->
   <div id="loginView" class="container">
-    <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" alt="Logo Warriors">
+    <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" alt="Warriors logo">
     <h1>Logowanie Warriors</h1>
     <div class="login-box">
       <input id="numer" type="number" placeholder="Numer zawodnika">
@@ -85,11 +86,18 @@
   </div>
 
   <script>
-    // 🌍 Twój link Apps Script:
+    // 🔗 Twój Apps Script endpoint:
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzU1sMeFNoXc_zZ5CkExM8XBLnxz7Aknn7qXaddN2cWHIn252JBsFUjl9iYMNTsUvBE/exec";
 
-    // 🔁 Auto-aktualizacja wersji
-    const WERSJA_APKI = '1.0.4';
+    // 🧱 Rejestracja Service Workera
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log("✅ Service Worker zarejestrowany"))
+        .catch(err => console.error("❌ Błąd SW:", err));
+    }
+
+    // 🔁 Auto-aktualizacja
+    const WERSJA_APKI = '1.0.5';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       console.log(`🔄 Aktualizacja: ${poprzednia || 'brak'} → ${WERSJA_APKI}`);
@@ -115,68 +123,76 @@
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=login&numer=${numer}&haslo=${haslo}`);
-        const response = await res.json();
+        const data = await res.json();
 
-        if (response.success) {
+        if (data.success) {
           numerZalogowanego = numer;
-          grupaZalogowanego = response.group;
+          grupaZalogowanego = data.group;
           komunikat.innerText = "✅ Zalogowano";
 
           document.getElementById("loginView").classList.add("hidden");
           document.getElementById("platnosciView").classList.remove("hidden");
 
-          const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${numer}`)).json();
-          renderPlatnosci(platnosci);
+          pokazPlatnosci(numer);
         } else {
-          komunikat.innerText = "❌ " + response.message;
+          komunikat.innerText = "❌ " + data.message;
         }
       } catch (err) {
-        komunikat.innerText = "⚠️ Błąd połączenia: " + err;
+        komunikat.innerText = "⚠️ Błąd połączenia";
+        console.error(err);
       }
     }
 
-    // 💳 render płatności
+    async function pokazPlatnosci(numer) {
+      const res = await fetch(`${SCRIPT_URL}?action=platnosci&numer=${numer}`);
+      const lista = await res.json();
+      renderPlatnosci(lista);
+    }
+
     function renderPlatnosci(lista) {
       const div = document.getElementById("listaPlatnosci");
       if (!lista || !lista.length) {
-        div.innerHTML = "<p>Brak zaległości ✅</p>";
-        div.innerHTML += `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
+        div.innerHTML = "<p>Brak zaległości ✅</p><button onclick='pokazTreningi()'>Dalej ➡</button>";
         return;
       }
-      div.innerHTML = `<h3>Zaległe płatności:</h3>` + lista.map(p =>
-        `<div class="card" style="background:#a00;">🔴 ${p.nazwa} – ${p.kwota} zł</div>`
-      ).join('') + `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
+      div.innerHTML = `<h3>Zaległe płatności:</h3>` +
+        lista.map(p => `<div class='card' style='background:#a00;'>🔴 ${p.nazwa} – ${p.kwota} zł</div>`).join('') +
+        `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
     }
 
-    // 🏒 Przejście do treningów
     async function pokazTreningi() {
       document.getElementById("platnosciView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
       document.getElementById("tytulTreningow").innerText = "Treningi – " + grupaZalogowanego;
 
-      const lista = await (await fetch(`${SCRIPT_URL}?action=treningi&grupa=${grupaZalogowanego}&numer=${numerZalogowanego}`)).json();
+      const res = await fetch(`${SCRIPT_URL}?action=treningi&grupa=${grupaZalogowanego}&numer=${numerZalogowanego}`);
+      const lista = await res.json();
       renderTreningi(lista);
     }
 
-    // 🏒 render treningów
     function renderTreningi(lista) {
       const div = document.getElementById('listaTreningow');
       if (!lista || !lista.length) {
         div.innerHTML = "<p>Brak dostępnych treningów</p>";
         return;
       }
+
       div.innerHTML = lista.map(t => `
         <div class="card">
-          <p><b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>👨‍🏫 Trener: <b>${t.trener}</b><br>👥 Zapisanych: ${t.zapisanych}</p>
+          <p>
+            <b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>
+            👨‍🏫 Trener: <b>${t.trener}</b><br>
+            👥 Zapisanych: ${t.zapisanych}
+          </p>
         </div>
       `).join('');
     }
 
-    // 📈 Statystyki
     async function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("statsView").classList.remove("hidden");
-      const lista = await (await fetch(`${SCRIPT_URL}?action=statystyki&numer=${numerZalogowanego}`)).json();
+      const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${numerZalogowanego}`);
+      const lista = await res.json();
       renderStatystyki(lista);
     }
 
@@ -186,24 +202,15 @@
         div.innerHTML = "<p>Brak danych statystyk</p>";
         return;
       }
-      div.innerHTML = lista.map(s => `
-        <div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>
-      `).join('');
+      div.innerHTML = lista.map(s =>
+        `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`
+      ).join('');
     }
 
     function powrotDoTreningow() {
       document.getElementById("statsView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
     }
-
-    // ✅ Rejestracja service workera
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log("✅ SW zarejestrowany"))
-        .catch(err => console.error("❌ Błąd SW:", err));
-    }
   </script>
-
 </body>
 </html>
-

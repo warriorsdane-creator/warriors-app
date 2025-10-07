@@ -2,20 +2,18 @@
 <html lang="pl">
 <head>
   <base target="_top">
+  <!-- 🔹 Manifest PWA -->
   <link rel="manifest" href="?manifest">
   <meta name="theme-color" content="#000000">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial;
       background-color: #000;
       color: #fff;
       text-align: center;
       margin: 0;
       padding: 0;
-      height: 100vh;
-      overflow: hidden;
     }
     .container { margin-top: 40px; }
     .login-box input {
@@ -47,55 +45,51 @@
     }
     .hidden { display: none; }
     .logo { width: 200px; margin-bottom: 20px; }
-
-    /* 🌟 Ekran powitalny */
-    #splashView {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: #000;
-      z-index: 999;
-      opacity: 1;
-      transition: opacity 1s ease;
-    }
-    #splashView.fade-out {
-      opacity: 0;
-    }
   </style>
 
   <script>
-    // 🧱 Rejestracja Service Workera
+    /************ 🧱 Rejestracja Service Workera ************/
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('?sw')
         .then(reg => console.log("✅ Service Worker zarejestrowany:", reg))
         .catch(err => console.error("❌ Błąd SW:", err));
     }
+    /*******************************************************/
 
-    // 🔁 Auto-aktualizacja
-    const WERSJA_APKI = '1.0.4';
+    /************ 🔁 Auto-aktualizacja ************/
+    const WERSJA_APKI = '1.0.4'; // ← zwiększaj przy każdej zmianie
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       console.log(`🔄 Aktualizacja: ${poprzednia || 'brak'} → ${WERSJA_APKI}`);
       localStorage.setItem('wersjaApki', WERSJA_APKI);
       location.reload(true);
     }
+    /*********************************************/
   </script>
 </head>
 
 <body>
 
-  <!-- 🛡️ Ekran powitalny -->
-  <div id="splashView">
-    <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" alt="Logo Warriors">
-    <h1>Warriors Sosnowiec</h1>
+  <!-- 🟢 Ekran powitalny -->
+  <div id="splash" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  ">
+    <img src="icon-512.png" alt="Logo" style="width: 180px; height: 180px;">
+    <h1 style="color: white; font-size: 22px; margin-top: 20px;">Warriors App</h1>
   </div>
 
   <!-- 🧠 Logowanie -->
-  <div id="loginView" class="container hidden">
+  <div id="loginView" class="container">
     <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo">
     <h1>Logowanie Warriors</h1>
     <div class="login-box">
@@ -127,39 +121,43 @@
   </div>
 
   <script>
-    // ⏳ Pokazujemy splash screen z fade-out
-    window.addEventListener('load', () => {
-      const splash = document.getElementById('splashView');
-      const login = document.getElementById('loginView');
-      setTimeout(() => {
-        splash.classList.add('fade-out');
-        setTimeout(() => {
-          splash.classList.add('hidden');
-          login.classList.remove('hidden');
-          document.body.style.overflow = 'auto';
-        }, 1000); // czekamy aż efekt zgaśnie
-      }, 2000); // 2 sekundy wyświetlania
-    });
-
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
+    // 🕓 Usunięcie splash screen po załadowaniu
+    window.addEventListener('load', () => {
+      const splash = document.getElementById('splash');
+      if (splash) {
+        setTimeout(() => {
+          splash.style.opacity = 0;
+          splash.style.transition = 'opacity 0.8s ease';
+          setTimeout(() => splash.remove(), 800);
+        }, 1200); // widoczność przez 1.2 sekundy
+      }
+    });
+
+    // 🔐 Logowanie
     function zaloguj() {
       const numer = document.getElementById("numer").value.trim();
       const haslo = document.getElementById("haslo").value.trim();
       const komunikat = document.getElementById("komunikat");
+
       if (!numer || !haslo) {
         komunikat.innerText = "Podaj numer zawodnika i hasło.";
         return;
       }
+
       komunikat.innerText = "Trwa logowanie...";
+
       google.script.run.withSuccessHandler(function(response) {
         if (response.success) {
           numerZalogowanego = numer;
           grupaZalogowanego = response.group;
           komunikat.innerText = "✅ Zalogowano";
+
           document.getElementById("loginView").classList.add("hidden");
           document.getElementById("platnosciView").classList.remove("hidden");
+
           google.script.run.withSuccessHandler(renderPlatnosci).pobierzPlatnosci(numer);
         } else {
           komunikat.innerText = "❌ " + response.message;
@@ -167,37 +165,96 @@
       }).handleLogin(numer, haslo);
     }
 
+    // 💳 render płatności
     function renderPlatnosci(lista) {
       const div = document.getElementById("listaPlatnosci");
       if (!lista || !lista.length) {
-        div.innerHTML = "<p>Brak zaległości ✅</p><button onclick='pokazTreningi()'>Dalej ➡</button>";
+        div.innerHTML = "<p>Brak zaległości ✅</p>";
+        div.innerHTML += `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
         return;
       }
+
       div.innerHTML = `<h3>Zaległe płatności:</h3>` + lista.map(p =>
         `<div class="card" style="background:#a00;">🔴 ${p.nazwa} – ${p.kwota} zł</div>`
-      ).join('') + `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
+      ).join('');
+
+      div.innerHTML += `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
     }
 
+    // 🏒 Przejście do treningów
     function pokazTreningi() {
       document.getElementById("platnosciView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
       document.getElementById("tytulTreningow").innerText = "Treningi – " + grupaZalogowanego;
-      google.script.run.withSuccessHandler(renderTreningi).pobierzTreningi(grupaZalogowanego, numerZalogowanego);
+
+      google.script.run
+        .withSuccessHandler(renderTreningi)
+        .pobierzTreningi(grupaZalogowanego, numerZalogowanego);
     }
 
+    // 🏒 render treningów
     function renderTreningi(lista) {
       const div = document.getElementById('listaTreningow');
       if (!lista || !lista.length) {
         div.innerHTML = "<p>Brak dostępnych treningów</p>";
         return;
       }
+
       div.innerHTML = lista.map(t => `
-        <div class="card">
-          <p><b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>👨‍🏫 Trener: <b>${t.trener}</b><br>👥 Zapisanych: ${t.zapisanych}</p>
-        </div>
-      `).join('');
+       <div class="card">
+        <p>
+         <b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>
+         👨‍🏫 Trener: <b>${t.trener}</b><br>
+         👥 Zapisanych: ${t.zapisanych}
+       </p>
+       <div style="display:flex; justify-content:center; gap:10px;">
+         <button id="btn-${t.id}"
+          ${t.zapisany ? 'disabled' : ''}
+          onclick="zapiszSie('${t.id}')">
+          ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
+        </button>
+        <button id="wypisz-${t.id}"
+          ${t.zapisany ? '' : 'disabled'}
+          style="background:#444;"
+          onclick="wypiszSie('${t.id}')">
+          Wypisz się
+        </button>
+      </div>
+    </div>
+  `).join('');
     }
 
+    // 📥 zapis na trening
+    function zapiszSie(id) {
+      google.script.run.withSuccessHandler(resp => {
+        if (resp.ok) {
+          const btn = document.getElementById(`btn-${id}`);
+          const wypisz = document.getElementById(`wypisz-${id}`);
+          btn.innerText = "Zapisano ✅";
+          btn.disabled = true;
+          wypisz.disabled = false;
+        } else {
+          alert(resp.message);
+        }
+      }).zapiszNaTrening(numerZalogowanego, id);
+    }
+
+    // 🧽 wypisz się
+    function wypiszSie(id) {
+      google.script.run.withSuccessHandler(resp => {
+        if (resp.ok) {
+          const btn = document.getElementById(`btn-${id}`);
+          const wypisz = document.getElementById(`wypisz-${id}`);
+          btn.innerText = "Zapisz się";
+          btn.disabled = false;
+          wypisz.disabled = true;
+        } else {
+          alert(resp.message);
+        }
+      }).wypiszZTreningu(numerZalogowanego, id);
+    }
+
+    // 📈 Statystyki
     function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("statsView").classList.remove("hidden");
@@ -222,5 +279,6 @@
       document.getElementById("homeView").classList.remove("hidden");
     }
   </script>
+
 </body>
 </html>

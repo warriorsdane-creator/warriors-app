@@ -182,6 +182,37 @@
         </div>
       `).join('');
     }
+
+    // 📈 Statystyki
+    async function pokazStatystyki() {
+      document.getElementById("homeView").classList.add("hidden");
+      document.getElementById("statsView").classList.remove("hidden");
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${numerZalogowanego}`);
+        const lista = await res.json();
+        renderStatystyki(lista);
+      } catch (err) {
+        document.getElementById("listaStatystyk").innerHTML = "<p>⚠️ Błąd połączenia</p>";
+      }
+    }
+
+    function renderStatystyki(lista) {
+      const div = document.getElementById("listaStatystyk");
+      if (!lista || !lista.length) {
+        div.innerHTML = "<p>Brak danych statystyk</p>";
+        return;
+      }
+      div.innerHTML = lista.map(s => `
+        <div class="card">
+          📅 ${s.miesiac} — 🏒 ${s.treningi} treningów
+        </div>
+      `).join('');
+    }
+
+    function powrotDoTreningow() {
+      document.getElementById("statsView").classList.add("hidden");
+      document.getElementById("homeView").classList.remove("hidden");
+    }
   </script>
 </body>
 </html>

@@ -176,11 +176,15 @@
         div.innerHTML = "<p>Brak dostępnych treningów</p>";
         return;
       }
-      div.innerHTML = lista.map(t => `
-        <div class="card">
-          <p><b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>👨‍🏫 ${t.trener}<br>👥 ${t.zapisanych}</p>
-        </div>
-      `).join('');
+     div.innerHTML = lista.map(t => `
+  <div class="card">
+    <p>
+      <b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>
+      Trener: <b>${t.trener}</b><br>
+      Zapisanych: ${t.zapisanych}
+    </p>
+  </div>
+`).join('');
     }
 
     // 📈 Statystyki

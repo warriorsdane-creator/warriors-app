@@ -2,18 +2,20 @@
 <html lang="pl">
 <head>
   <base target="_top">
-  <!-- 🔹 Manifest PWA -->
   <link rel="manifest" href="?manifest">
   <meta name="theme-color" content="#000000">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       background-color: #000;
       color: #fff;
       text-align: center;
       margin: 0;
       padding: 0;
+      height: 100vh;
+      overflow: hidden;
     }
     .container { margin-top: 40px; }
     .login-box input {
@@ -46,42 +48,49 @@
     .hidden { display: none; }
     .logo { width: 200px; margin-bottom: 20px; }
 
-    /* 🔹 Ekran powitalny */
+    /* 🌟 Ekran powitalny */
     #splashView {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-      height: 100vh;
+      align-items: center;
+      background-color: #000;
+      z-index: 999;
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+    #splashView.fade-out {
+      opacity: 0;
     }
   </style>
 
   <script>
-    /************ 🧱 Rejestracja Service Workera ************/
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('?sw')
-    .then(reg => console.log("✅ Service Worker zarejestrowany:", reg))
-    .catch(err => console.error("❌ Błąd SW:", err));
-}
-    /*******************************************************/
+    // 🧱 Rejestracja Service Workera
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('?sw')
+        .then(reg => console.log("✅ Service Worker zarejestrowany:", reg))
+        .catch(err => console.error("❌ Błąd SW:", err));
+    }
 
-    /************ 🔁 Auto-aktualizacja ************/
-    const WERSJA_APKI = '1.0.3'; // ← 🔄 zwiększaj przy każdej aktualizacji
+    // 🔁 Auto-aktualizacja
+    const WERSJA_APKI = '1.0.4';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       console.log(`🔄 Aktualizacja: ${poprzednia || 'brak'} → ${WERSJA_APKI}`);
       localStorage.setItem('wersjaApki', WERSJA_APKI);
       location.reload(true);
     }
-    /*********************************************/
   </script>
 </head>
 
 <body>
 
   <!-- 🛡️ Ekran powitalny -->
-  <div id="splashView" class="container">
-    <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo">
+  <div id="splashView">
+    <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" alt="Logo Warriors">
     <h1>Warriors Sosnowiec</h1>
   </div>
 
@@ -118,41 +127,39 @@ if ('serviceWorker' in navigator) {
   </div>
 
   <script>
-    // 🕒 Pokazujemy ekran powitalny przez 2 sekundy
+    // ⏳ Pokazujemy splash screen z fade-out
     window.addEventListener('load', () => {
       const splash = document.getElementById('splashView');
       const login = document.getElementById('loginView');
       setTimeout(() => {
-        splash.classList.add('hidden');
-        login.classList.remove('hidden');
-      }, 2000); // 2000 ms = 2 sekundy
+        splash.classList.add('fade-out');
+        setTimeout(() => {
+          splash.classList.add('hidden');
+          login.classList.remove('hidden');
+          document.body.style.overflow = 'auto';
+        }, 1000); // czekamy aż efekt zgaśnie
+      }, 2000); // 2 sekundy wyświetlania
     });
 
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
-    // 🔐 Logowanie
     function zaloguj() {
       const numer = document.getElementById("numer").value.trim();
       const haslo = document.getElementById("haslo").value.trim();
       const komunikat = document.getElementById("komunikat");
-
       if (!numer || !haslo) {
         komunikat.innerText = "Podaj numer zawodnika i hasło.";
         return;
       }
-
       komunikat.innerText = "Trwa logowanie...";
-
       google.script.run.withSuccessHandler(function(response) {
         if (response.success) {
           numerZalogowanego = numer;
           grupaZalogowanego = response.group;
           komunikat.innerText = "✅ Zalogowano";
-
           document.getElementById("loginView").classList.add("hidden");
           document.getElementById("platnosciView").classList.remove("hidden");
-
           google.script.run.withSuccessHandler(renderPlatnosci).pobierzPlatnosci(numer);
         } else {
           komunikat.innerText = "❌ " + response.message;
@@ -160,96 +167,37 @@ if ('serviceWorker' in navigator) {
       }).handleLogin(numer, haslo);
     }
 
-    // 💳 render płatności
     function renderPlatnosci(lista) {
       const div = document.getElementById("listaPlatnosci");
       if (!lista || !lista.length) {
-        div.innerHTML = "<p>Brak zaległości ✅</p>";
-        div.innerHTML += `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
+        div.innerHTML = "<p>Brak zaległości ✅</p><button onclick='pokazTreningi()'>Dalej ➡</button>";
         return;
       }
-
       div.innerHTML = `<h3>Zaległe płatności:</h3>` + lista.map(p =>
         `<div class="card" style="background:#a00;">🔴 ${p.nazwa} – ${p.kwota} zł</div>`
-      ).join('');
-
-      div.innerHTML += `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
+      ).join('') + `<button onclick="pokazTreningi()" style="margin-top:20px;">Dalej ➡</button>`;
     }
 
-    // 🏒 Przejście do treningów
     function pokazTreningi() {
       document.getElementById("platnosciView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
       document.getElementById("tytulTreningow").innerText = "Treningi – " + grupaZalogowanego;
-
-      google.script.run
-        .withSuccessHandler(renderTreningi)
-        .pobierzTreningi(grupaZalogowanego, numerZalogowanego);
+      google.script.run.withSuccessHandler(renderTreningi).pobierzTreningi(grupaZalogowanego, numerZalogowanego);
     }
 
-    // 🏒 render treningów
     function renderTreningi(lista) {
       const div = document.getElementById('listaTreningow');
       if (!lista || !lista.length) {
         div.innerHTML = "<p>Brak dostępnych treningów</p>";
         return;
       }
-
       div.innerHTML = lista.map(t => `
-       <div class="card">
-        <p>
-         <b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>
-         👨‍🏫 Trener: <b>${t.trener}</b><br>
-         👥 Zapisanych: ${t.zapisanych}
-       </p>
-       <div style="display:flex; justify-content:center; gap:10px;">
-         <button id="btn-${t.id}"
-          ${t.zapisany ? 'disabled' : ''}
-          onclick="zapiszSie('${t.id}')">
-          ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
-        </button>
-        <button id="wypisz-${t.id}"
-          ${t.zapisany ? '' : 'disabled'}
-          style="background:#444;"
-          onclick="wypiszSie('${t.id}')">
-          Wypisz się
-        </button>
-      </div>
-    </div>
-  `).join('');
+        <div class="card">
+          <p><b>${t.data}</b> (${t.dzien}) – ${t.czas} h<br>👨‍🏫 Trener: <b>${t.trener}</b><br>👥 Zapisanych: ${t.zapisanych}</p>
+        </div>
+      `).join('');
     }
 
-    // 📥 zapis na trening
-    function zapiszSie(id) {
-      google.script.run.withSuccessHandler(resp => {
-        if (resp.ok) {
-          const btn = document.getElementById(`btn-${id}`);
-          const wypisz = document.getElementById(`wypisz-${id}`);
-          btn.innerText = "Zapisano ✅";
-          btn.disabled = true;
-          wypisz.disabled = false;
-        } else {
-          alert(resp.message);
-        }
-      }).zapiszNaTrening(numerZalogowanego, id);
-    }
-
-    // 🧽 wypisz się
-    function wypiszSie(id) {
-      google.script.run.withSuccessHandler(resp => {
-        if (resp.ok) {
-          const btn = document.getElementById(`btn-${id}`);
-          const wypisz = document.getElementById(`wypisz-${id}`);
-          btn.innerText = "Zapisz się";
-          btn.disabled = false;
-          wypisz.disabled = true;
-        } else {
-          alert(resp.message);
-        }
-      }).wypiszZTreningu(numerZalogowanego, id);
-    }
-
-    // 📈 Statystyki
     function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("statsView").classList.remove("hidden");
@@ -274,6 +222,5 @@ if ('serviceWorker' in navigator) {
       document.getElementById("homeView").classList.remove("hidden");
     }
   </script>
-
 </body>
 </html>

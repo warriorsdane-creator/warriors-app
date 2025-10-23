@@ -44,11 +44,24 @@
       margin: 10px;
       background: #111;
     }
+
+    /* 🔹 Wersja apki w rogu */
+    #wersjaApki {
+      position: fixed;
+      top: 8px;
+      right: 12px;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      font-family: Arial, sans-serif;
+      user-select: none;
+      z-index: 1000;
+      letter-spacing: 0.5px;
+    }
   </style>
 
   <script>
     // 🔁 Auto-aktualizacja
-    const WERSJA_APKI = '1.0.12';
+    const WERSJA_APKI = '1.1.12';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -65,6 +78,9 @@
 </head>
 
 <body>
+
+  <!-- 🔹 Numer wersji -->
+  <div id="wersjaApki">v<span id="wersjaNum"></span></div>
 
   <!-- 🧠 Splash screen -->
   <div id="splash" style="display:flex;justify-content:center;align-items:center;height:100vh;background:#000;">
@@ -111,6 +127,8 @@
       setTimeout(() => {
         document.getElementById('splash').style.display = 'none';
         document.getElementById('app').classList.remove('hidden');
+        const wersjaEl = document.getElementById("wersjaNum");
+        if (wersjaEl) wersjaEl.textContent = WERSJA_APKI;
       }, 2000);
     });
 
@@ -170,78 +188,74 @@
       renderTreningi(lista);
     }
 
-  function renderTreningi(lista) {
-    const div = document.getElementById('listaTreningow');
-    if (!lista || !lista.length) {
-      div.innerHTML = "<p>Brak dostępnych treningów</p>";
-      return;
-    }
-
-    div.innerHTML = lista.map(t => `
-      <div class="card">
-        <p>
-          <b>${t.data}</b> (${t.dzien}) – ${t.czas} <br>
-          Trener: <b>${t.trener}</b><br>
-          Zapisanych: ${t.zapisanych}
-        </p>
-        <div style="display:flex; justify-content:center; gap:10px;">
-          <button id="btn-${t.id}"
-            ${t.zapisany ? 'disabled' : ''}
-            onclick="zapiszSie('${t.id}')">
-            ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
-          </button>
-          <button id="wypisz-${t.id}"
-            ${t.zapisany ? '' : 'disabled'}
-            style="background:#444;"
-            onclick="wypiszSie('${t.id}')">
-            Wypisz się
-          </button>
+    function renderTreningi(lista) {
+      const div = document.getElementById('listaTreningow');
+      if (!lista || !lista.length) {
+        div.innerHTML = "<p>Brak dostępnych treningów</p>";
+        return;
+      }
+      div.innerHTML = lista.map(t => `
+        <div class="card">
+          <p>
+            <b>${t.data}</b> (${t.dzien}) – ${t.czas} <br>
+            Trener: <b>${t.trener}</b><br>
+            Zapisanych: ${t.zapisanych}
+          </p>
+          <div style="display:flex; justify-content:center; gap:10px;">
+            <button id="btn-${t.id}"
+              ${t.zapisany ? 'disabled' : ''}
+              onclick="zapiszSie('${t.id}')">
+              ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
+            </button>
+            <button id="wypisz-${t.id}"
+              ${t.zapisany ? '' : 'disabled'}
+              style="background:#444;"
+              onclick="wypiszSie('${t.id}')">
+              Wypisz się
+            </button>
+          </div>
         </div>
-      </div>
-    `).join('');
-  }
-
-  // 📥 zapis na trening
-  async function zapiszSie(id) {
-    try {
-      const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
-      const resp = await res.json();
-      if (resp.ok) {
-        const btn = document.getElementById(`btn-${id}`);
-        const wypisz = document.getElementById(`wypisz-${id}`);
-        btn.innerText = "Zapisano ✅";
-        btn.disabled = true;
-        wypisz.disabled = false;
-      } else {
-        alert(resp.message);
-      }
-    } catch (e) {
-      alert("Błąd połączenia przy zapisie");
-      console.error(e);
+      `).join('');
     }
-  }
 
-  // 🧽 wypisz się
-  async function wypiszSie(id) {
-    try {
-      const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
-      const resp = await res.json();
-      if (resp.ok) {
-        const btn = document.getElementById(`btn-${id}`);
-        const wypisz = document.getElementById(`wypisz-${id}`);
-        btn.innerText = "Zapisz się";
-        btn.disabled = false;
-        wypisz.disabled = true;
-      } else {
-        alert(resp.message);
+    async function zapiszSie(id) {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+        const resp = await res.json();
+        if (resp.ok) {
+          const btn = document.getElementById(`btn-${id}`);
+          const wypisz = document.getElementById(`wypisz-${id}`);
+          btn.innerText = "Zapisano ✅";
+          btn.disabled = true;
+          wypisz.disabled = false;
+        } else {
+          alert(resp.message);
+        }
+      } catch (e) {
+        alert("Błąd połączenia przy zapisie");
+        console.error(e);
       }
-    } catch (e) {
-      alert("Błąd połączenia przy wypisie");
-      console.error(e);
     }
-  }
 
-    // 📈 Statystyki
+    async function wypiszSie(id) {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+        const resp = await res.json();
+        if (resp.ok) {
+          const btn = document.getElementById(`btn-${id}`);
+          const wypisz = document.getElementById(`wypisz-${id}`);
+          btn.innerText = "Zapisz się";
+          btn.disabled = false;
+          wypisz.disabled = true;
+        } else {
+          alert(resp.message);
+        }
+      } catch (e) {
+        alert("Błąd połączenia przy wypisie");
+        console.error(e);
+      }
+    }
+
     async function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("statsView").classList.remove("hidden");

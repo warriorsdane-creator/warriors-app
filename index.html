@@ -65,7 +65,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.4.007';
+    const WERSJA_APKI = '1.5.007';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -211,10 +211,13 @@
           box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
           return;
         }
-        box.innerHTML = `<div class="card" style="background:#111;">
-          <b>Lista zapisanych:</b>
-          <ol>${lista.map((p,i)=>`<li>${i+1}. ${p.nazwisko}</li>`).join('')}</ol>
-        </div>`;
+      box.innerHTML = `<div class="card" style="background:#111;">
+        <b>Lista zapisanych:</b>
+       <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
+       ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
+  </ul>
+</div>`;
+
       } catch {
         box.innerHTML = '<div class="card" style="background:#700;">Błąd pobierania listy</div>';
       }

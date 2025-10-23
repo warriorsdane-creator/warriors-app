@@ -57,11 +57,53 @@
       z-index: 1000;
       letter-spacing: 0.5px;
     }
+
+    /* 👥 Lista zapisanych (modal) */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .modal-content {
+      background: #fff;
+      color: #000;
+      padding: 20px 30px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .modal-content ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0;
+      text-align: left;
+    }
+    .modal-content li {
+      border-bottom: 1px solid #ccc;
+      padding: 5px 0;
+    }
+    .btn-zapisani {
+      background: #444;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .btn-zapisani:hover {
+      background: #e60000;
+    }
   </style>
 
   <script>
     // 🔁 Auto-aktualizacja
-    const WERSJA_APKI = '1.1.002';
+    const WERSJA_APKI = '1.2.004';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -87,8 +129,9 @@
     <img src="icon-512.png" style="width:300px;" alt="Logo Warriors">
   </div>
 
-  <!-- 🔐 Ekran logowania -->
+  <!-- 🔐 APLIKACJA -->
   <div id="app" class="hidden">
+    <!-- Logowanie -->
     <div id="loginView" class="container">
       <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" style="width:200px;margin-bottom:20px;">
       <h1>Logowanie</h1>
@@ -122,51 +165,44 @@
   </div>
 
   <script>
-    // ⏳ Ukrywanie splash screena po 2 sekundach
+    // ⏳ Splash screen
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.getElementById('splash').style.display = 'none';
         document.getElementById('app').classList.remove('hidden');
-        const wersjaEl = document.getElementById("wersjaNum");
-        if (wersjaEl) wersjaEl.textContent = WERSJA_APKI;
+        document.getElementById("wersjaNum").textContent = WERSJA_APKI;
       }, 2000);
     });
 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxtXer_t_ECyFUZvyliNB5VgAvo5Do8drMO0knwjg9T0HlqaFqpXsoD8UsimnhEA4Y/exec";
+
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
-
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwF6ZCUlFmyxZZlBVRGgx-tPBIOO-KldtibZVwLnBSOACLTnXebEaiI5k1UOneTGvri/exec";
 
     // 🔐 Logowanie
     async function zaloguj() {
       const numer = document.getElementById("numer").value.trim();
       const haslo = document.getElementById("haslo").value.trim();
       const komunikat = document.getElementById("komunikat");
-
       if (!numer || !haslo) {
         komunikat.innerText = "Podaj numer zawodnika i hasło.";
         return;
       }
-
       komunikat.innerText = "Trwa logowanie...";
-
       try {
         const res = await fetch(`${SCRIPT_URL}?action=login&numer=${numer}&haslo=${haslo}`);
-        const response = await res.json();
-        if (response.success) {
+        const data = await res.json();
+        if (data.success) {
           numerZalogowanego = numer;
-          grupaZalogowanego = response.group;
+          grupaZalogowanego = data.group;
           komunikat.innerText = "✅ Zalogowano";
           document.getElementById("loginView").classList.add("hidden");
           document.getElementById("platnosciView").classList.remove("hidden");
           const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${numer}`)).json();
           renderPlatnosci(platnosci);
-        } else {
-          komunikat.innerText = "❌ " + response.message;
-        }
-      } catch (err) {
+        } else komunikat.innerText = "❌ " + data.message;
+      } catch {
         komunikat.innerText = "⚠️ Błąd połączenia";
-        console.error(err);
       }
     }
 
@@ -197,63 +233,66 @@
       div.innerHTML = lista.map(t => `
         <div class="card">
           <p>
-            <b>${t.data}</b> (${t.dzien}) – ${t.czas} <br>
+            <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
             Trener: <b>${t.trener}</b><br>
             Zapisanych: ${t.zapisanych}
           </p>
-          <div style="display:flex; justify-content:center; gap:10px;">
-            <button id="btn-${t.id}"
-              ${t.zapisany ? 'disabled' : ''}
-              onclick="zapiszSie('${t.id}')">
+          <div style="display:flex;justify-content:center;gap:8px;">
+            <button id="btn-${t.id}" ${t.zapisany ? 'disabled' : ''} onclick="zapiszSie('${t.id}')">
               ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
             </button>
-            <button id="wypisz-${t.id}"
-              ${t.zapisany ? '' : 'disabled'}
-              style="background:#444;"
-              onclick="wypiszSie('${t.id}')">
+            <button id="wypisz-${t.id}" ${t.zapisany ? '' : 'disabled'} style="background:#444;" onclick="wypiszSie('${t.id}')">
               Wypisz się
             </button>
+            <button class="btn-zapisani" onclick="pokazListeZapisanych('${t.id}')">👥</button>
           </div>
         </div>
       `).join('');
     }
 
+    // 👥 Lista zapisanych
+    function pokazListeZapisanych(treningId) {
+      const modal = document.createElement("div");
+      modal.className = "modal";
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h2>📋 Lista zapisanych</h2>
+          <div id="listaZapisanych">Ładowanie...</div>
+          <button onclick="document.body.removeChild(document.querySelector('.modal'))">Zamknij</button>
+        </div>`;
+      document.body.appendChild(modal);
+
+      fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(treningId)}`)
+        .then(r => r.json())
+        .then(dane => {
+          const box = modal.querySelector("#listaZapisanych");
+          if (!dane || dane.length === 0) {
+            box.innerHTML = "<p>Brak zapisanych uczestników.</p>";
+            return;
+          }
+          box.innerHTML = `<ul>${dane.map(x => `<li>${x.nazwisko}</li>`).join("")}</ul>`;
+        })
+        .catch(err => modal.querySelector("#listaZapisanych").innerHTML = `<p style="color:red">Błąd: ${err}</p>`);
+    }
+
     async function zapiszSie(id) {
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
-        const resp = await res.json();
-        if (resp.ok) {
-          const btn = document.getElementById(`btn-${id}`);
-          const wypisz = document.getElementById(`wypisz-${id}`);
-          btn.innerText = "Zapisano ✅";
-          btn.disabled = true;
-          wypisz.disabled = false;
-        } else {
-          alert(resp.message);
-        }
-      } catch (e) {
-        alert("Błąd połączenia przy zapisie");
-        console.error(e);
-      }
+      const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+      const r = await res.json();
+      if (r.ok) {
+        document.getElementById(`btn-${id}`).innerText = "Zapisano ✅";
+        document.getElementById(`btn-${id}`).disabled = true;
+        document.getElementById(`wypisz-${id}`).disabled = false;
+      } else alert(r.message);
     }
 
     async function wypiszSie(id) {
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
-        const resp = await res.json();
-        if (resp.ok) {
-          const btn = document.getElementById(`btn-${id}`);
-          const wypisz = document.getElementById(`wypisz-${id}`);
-          btn.innerText = "Zapisz się";
-          btn.disabled = false;
-          wypisz.disabled = true;
-        } else {
-          alert(resp.message);
-        }
-      } catch (e) {
-        alert("Błąd połączenia przy wypisie");
-        console.error(e);
-      }
+      const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+      const r = await res.json();
+      if (r.ok) {
+        document.getElementById(`btn-${id}`).innerText = "Zapisz się";
+        document.getElementById(`btn-${id}`).disabled = false;
+        document.getElementById(`wypisz-${id}`).disabled = true;
+      } else alert(r.message);
     }
 
     async function pokazStatystyki() {
@@ -263,7 +302,7 @@
         const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${numerZalogowanego}`);
         const lista = await res.json();
         renderStatystyki(lista);
-      } catch (err) {
+      } catch {
         document.getElementById("listaStatystyk").innerHTML = "<p>⚠️ Błąd połączenia</p>";
       }
     }
@@ -274,11 +313,7 @@
         div.innerHTML = "<p>Brak danych statystyk</p>";
         return;
       }
-      div.innerHTML = lista.map(s => `
-        <div class="card">
-          📅 ${s.miesiac} — 🏒 ${s.treningi} treningów
-        </div>
-      `).join('');
+      div.innerHTML = lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('');
     }
 
     function powrotDoTreningow() {

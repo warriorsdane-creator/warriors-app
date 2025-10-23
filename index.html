@@ -103,7 +103,7 @@
 
   <script>
     // 🔁 Auto-aktualizacja
-    const WERSJA_APKI = '1.2.004';
+    const WERSJA_APKI = '1.3.004';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -251,29 +251,48 @@
     }
 
     // 👥 Lista zapisanych
-    function pokazListeZapisanych(treningId) {
-      const modal = document.createElement("div");
-      modal.className = "modal";
-      modal.innerHTML = `
-        <div class="modal-content">
-          <h2>📋 Lista zapisanych</h2>
-          <div id="listaZapisanych">Ładowanie...</div>
-          <button onclick="document.body.removeChild(document.querySelector('.modal'))">Zamknij</button>
-        </div>`;
-      document.body.appendChild(modal);
+  function pokazListeZapisanych(treningId) {
+    const modal = document.createElement("div");
+    modal.className = "modal";
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h2>📋 Lista zapisanych</h2>
+        <div id="listaZapisanych">Ładowanie...</div>
+        <button onclick="document.body.removeChild(document.querySelector('.modal'))">Zamknij</button>
+      </div>`;
+    document.body.appendChild(modal);
 
-      fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(treningId)}`)
-        .then(r => r.json())
-        .then(dane => {
-          const box = modal.querySelector("#listaZapisanych");
-          if (!dane || dane.length === 0) {
-            box.innerHTML = "<p>Brak zapisanych uczestników.</p>";
-            return;
+    fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(treningId)}`)
+      .then(r => r.json())
+      .then(raw => {
+        // 🔧 Normalizacja odpowiedzi
+        let dane = raw;
+        // czasem backend zwróci obiekt z polami
+        if (!Array.isArray(dane)) {
+          if (Array.isArray(dane.result)) dane = dane.result;
+          else if (Array.isArray(dane.data)) dane = dane.data;
+          else if (typeof dane === "string") {
+            try { const parsed = JSON.parse(dane); if (Array.isArray(parsed)) dane = parsed; } catch {}
           }
-          box.innerHTML = `<ul>${dane.map(x => `<li>${x.nazwisko}</li>`).join("")}</ul>`;
-        })
-        .catch(err => modal.querySelector("#listaZapisanych").innerHTML = `<p style="color:red">Błąd: ${err}</p>`);
-    }
+        }
+        // jeśli nadal nie tablica — pokaż komunikat z message, ok itp.
+        if (!Array.isArray(dane)) {
+          const msg = (raw && (raw.message || raw.error || raw.status)) || "Nieprawidłowa odpowiedź API";
+          throw new Error(msg);
+        }
+
+        const box = modal.querySelector("#listaZapisanych");
+        if (!dane.length) {
+          box.innerHTML = "<p>Brak zapisanych uczestników.</p>";
+          return;
+        }
+        box.innerHTML = `<ul>${dane.map((x,i) => `<li>${i+1}. ${x.nazwisko || x.name || x}</li>`).join("")}</ul>`;
+      })
+      .catch(err => {
+        modal.querySelector("#listaZapisanych").innerHTML =
+          `<p style="color:red">Błąd: ${String(err.message || err)}</p>`;
+      });
+  }
 
     async function zapiszSie(id) {
       const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);

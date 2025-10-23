@@ -65,7 +65,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.5.007';
+    const WERSJA_APKI = '1.7.008';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -108,6 +108,7 @@
       <h1 id="tytulTreningow">Treningi</h1>
       <div id="listaTreningow">Ładowanie...</div>
       <button onclick="pokazStatystyki()" style="margin-top:20px;">📈 Pokaż statystyki</button>
+      <button onclick="powrotDoPlatnosci()" style="margin-top:10px;background:#333;">⬅ Powrót do płatności</button>
     </div>
 
     <div id="statsView" class="container hidden">
@@ -126,7 +127,7 @@
       }, 1500);
     });
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUede9fTqFAYILIix-5cr4h1x_8Sut9dAdNwnywKRwzOldoB_WDQKUQYw-Y8yyDBi0/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNfGjtduzaR-ccMmcPse7nL7I-6NkirZnpUC8lTGrYcGJLJNsHdJaYQ2xQXIm3DNUR/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -211,13 +212,12 @@
           box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
           return;
         }
-      box.innerHTML = `<div class="card" style="background:#111;">
-        <b>Lista zapisanych:</b>
-       <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
-       ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
-  </ul>
-</div>`;
-
+        box.innerHTML = `<div class="card" style="background:#111;">
+          <b>Lista zapisanych:</b>
+          <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
+            ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
+          </ul>
+        </div>`;
       } catch {
         box.innerHTML = '<div class="card" style="background:#700;">Błąd pobierania listy</div>';
       }
@@ -260,6 +260,11 @@
     function powrotDoTreningow() {
       document.getElementById("statsView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
+    }
+
+    function powrotDoPlatnosci() {
+      document.getElementById("homeView").classList.add("hidden");
+      document.getElementById("platnosciView").classList.remove("hidden");
     }
   </script>
 </body>

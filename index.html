@@ -65,7 +65,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.7.008';
+    const WERSJA_APKI = '1.8.008';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -243,15 +243,38 @@
     async function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("statsView").classList.remove("hidden");
-      const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${numerZalogowanego}`);
-      const lista = await res.json();
-      renderStatystyki(lista);
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${numerZalogowanego}`);
+        const lista = await res.json();
+        renderStatystyki(lista);
+      } catch (err) {
+        console.error("❌ Błąd pobierania statystyk:", err);
+        document.getElementById("listaStatystyk").innerHTML =
+          "<p style='color:#f55'>Błąd ładowania danych statystycznych</p>";
+      }
     }
 
     function renderStatystyki(lista) {
       const div = document.getElementById("listaStatystyk");
-      if (!lista?.length) return div.innerHTML = "<p>Brak danych</p>";
-      div.innerHTML = lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('');
+      console.log("📊 Dane statystyk:", lista);
+
+      if (!Array.isArray(lista) || lista.length === 0) {
+        div.innerHTML = "<p>Brak danych statystycznych</p>";
+        return;
+      }
+
+      const karty = lista.map(s =>
+        `<div class="card">📅 <b>${s.miesiac}</b> — 🏒 ${s.treningi} treningów</div>`
+      ).join('');
+
+      const suma = lista.reduce((a, b) => a + (Number(b.treningi) || 0), 0);
+      div.innerHTML = `
+        ${karty}
+        <hr style="margin:10px 0;border-color:#333;">
+        <div class="card" style="background:#111;">🔥 Łącznie: <b>${suma}</b> treningów</div>
+        <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
+      `;
     }
 
     function powrotDoTreningow() {
@@ -260,9 +283,9 @@
     }
 
     function powrotDoPlatnosci() {
-  document.getElementById("homeView").classList.add("hidden");
-  document.getElementById("platnosciView").classList.remove("hidden");
-}
+      document.getElementById("homeView").classList.add("hidden");
+      document.getElementById("platnosciView").classList.remove("hidden");
+    }
 
   </script>
 </body>

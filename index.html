@@ -65,7 +65,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.6.008';
+    const WERSJA_APKI = '1.7.008';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -258,6 +258,12 @@
       document.getElementById("statsView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
     }
+
+    function powrotDoPlatnosci() {
+  document.getElementById("homeView").classList.add("hidden");
+  document.getElementById("platnosciView").classList.remove("hidden");
+}
+
   </script>
 </body>
 </html>

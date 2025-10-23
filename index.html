@@ -65,7 +65,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.8.008';
+    const WERSJA_APKI = '1.5.007';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -104,15 +104,18 @@
       <div id="listaPlatnosci">Ładowanie...</div>
     </div>
 
-<div id="homeView" class="container hidden">
-  <h1 id="tytulTreningow">Treningi</h1>
-  <div id="listaTreningow">Ładowanie...</div>
-  
-  <div style="margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:10px;">
-    <button onclick="pokazStatystyki()">📈 Pokaż statystyki</button>
-    <button onclick="powrotDoPlatnosci()" style="background:#333;">⬅ Powrót do płatności</button>
+    <div id="homeView" class="container hidden">
+      <h1 id="tytulTreningow">Treningi</h1>
+      <div id="listaTreningow">Ładowanie...</div>
+      <button onclick="pokazStatystyki()" style="margin-top:20px;">📈 Pokaż statystyki</button>
+    </div>
+
+    <div id="statsView" class="container hidden">
+      <h1>Moje statystyki</h1>
+      <div id="listaStatystyk">Ładowanie...</div>
+      <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
+    </div>
   </div>
-</div>
 
   <script>
     window.addEventListener('load', () => {
@@ -123,7 +126,7 @@
       }, 1500);
     });
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyx6F6Y0OfK8iH4RITawKSRbjqak8XtnKwZ9mgAMzSE7_UlzQWwT7xDXy2yTRI5xsnP/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzUede9fTqFAYILIix-5cr4h1x_8Sut9dAdNwnywKRwzOldoB_WDQKUQYw-Y8yyDBi0/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -243,50 +246,21 @@
     async function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("statsView").classList.remove("hidden");
-
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${numerZalogowanego}`);
-        const lista = await res.json();
-        renderStatystyki(lista);
-      } catch (err) {
-        console.error("❌ Błąd pobierania statystyk:", err);
-        document.getElementById("listaStatystyk").innerHTML =
-          "<p style='color:#f55'>Błąd ładowania danych statystycznych</p>";
-      }
+      const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${numerZalogowanego}`);
+      const lista = await res.json();
+      renderStatystyki(lista);
     }
 
     function renderStatystyki(lista) {
       const div = document.getElementById("listaStatystyk");
-      console.log("📊 Dane statystyk:", lista);
-
-      if (!Array.isArray(lista) || lista.length === 0) {
-        div.innerHTML = "<p>Brak danych statystycznych</p>";
-        return;
-      }
-
-      const karty = lista.map(s =>
-        `<div class="card">📅 <b>${s.miesiac}</b> — 🏒 ${s.treningi} treningów</div>`
-      ).join('');
-
-      const suma = lista.reduce((a, b) => a + (Number(b.treningi) || 0), 0);
-      div.innerHTML = `
-        ${karty}
-        <hr style="margin:10px 0;border-color:#333;">
-        <div class="card" style="background:#111;">🔥 Łącznie: <b>${suma}</b> treningów</div>
-        <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
-      `;
+      if (!lista?.length) return div.innerHTML = "<p>Brak danych</p>";
+      div.innerHTML = lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('');
     }
 
     function powrotDoTreningow() {
       document.getElementById("statsView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
     }
-
-    function powrotDoPlatnosci() {
-      document.getElementById("homeView").classList.add("hidden");
-      document.getElementById("platnosciView").classList.remove("hidden");
-    }
-
   </script>
 </body>
 </html>

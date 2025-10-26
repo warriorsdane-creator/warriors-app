@@ -65,7 +65,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.8.024';
+    const WERSJA_APKI = '1.10.025';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -127,7 +127,7 @@
       }, 1500);
     });
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFZih3awjfHQIK6T3DFoikWOyYY354D8TGhgsdkd2QQ5AT-rGkhOjub9QLwK_rzNeV/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKC89pp5_TEdN6HPYscfHm6-OQ1d-9PGBJLPrcFftbFl50YiehiyaNh5Hj6PPLgTvl/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -143,10 +143,14 @@
 
       if (data.success) {
         numerZalogowanego = numer;
-        grupaZalogowanego = data.group;
+
+        // 🔧 obsługa wielu grup G1–G5
+        grupaZalogowanego = data.groups || data.group || "";
+
         komunikat.innerText = "✅ Zalogowano";
         document.getElementById("loginView").classList.add("hidden");
         document.getElementById("platnosciView").classList.remove("hidden");
+
         const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${numer}`)).json();
         renderPlatnosci(platnosci);
       } else komunikat.innerText = "❌ " + data.message;
@@ -166,7 +170,11 @@
     async function pokazTreningi() {
       document.getElementById("platnosciView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
-      const lista = await (await fetch(`${SCRIPT_URL}?action=treningi&grupa=${grupaZalogowanego}&numer=${numerZalogowanego}`)).json();
+
+      // 🔒 poprawione: bezpieczne przekazanie listy grup np. "G1, G3"
+      const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${numerZalogowanego}`;
+      const lista = await (await fetch(url)).json();
+
       renderTreningi(lista);
     }
 
@@ -182,6 +190,7 @@
           <p>
             <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
             Trener: <b>${t.trener}</b><br>
+            Grupy: <b>${t.grupy || '-'}</b><br>
             Zapisanych: ${t.zapisanych}
           </p>
           <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
@@ -251,22 +260,21 @@
       renderStatystyki(lista);
     }
 
-function renderStatystyki(lista) {
-  const div = document.getElementById("listaStatystyk");
-  if (!lista?.length) {
-    div.innerHTML = "<p>Brak danych</p>";
-    return;
-  }
+    function renderStatystyki(lista) {
+      const div = document.getElementById("listaStatystyk");
+      if (!lista?.length) {
+        div.innerHTML = "<p>Brak danych</p>";
+        return;
+      }
 
-  const suma = lista.reduce((acc, s) => acc + (Number(s.treningi) || 0), 0);
+      const suma = lista.reduce((acc, s) => acc + (Number(s.treningi) || 0), 0);
 
-  div.innerHTML =
-    lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('') +
-    `<div class="card" style="background:#222;margin-top:20px;font-weight:bold;">
-      🔥 Łącznie: ${suma} treningów w sezonie
-    </div>`;
-}
-
+      div.innerHTML =
+        lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('') +
+        `<div class="card" style="background:#222;margin-top:20px;font-weight:bold;">
+          🔥 Łącznie: ${suma} treningów w sezonie
+        </div>`;
+    }
 
     function powrotDoTreningow() {
       document.getElementById("statsView").classList.add("hidden");

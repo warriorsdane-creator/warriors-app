@@ -63,16 +63,43 @@
       z-index: 1000;
     }
  
-  button.loading {
+button.loading {
   background: #222 !important;
   opacity: 0.6;
   pointer-events: none;
   transition: background 0.2s ease, opacity 0.2s ease;
-}    
+}
+
+/* 👇 Wklej tutaj nowy kod animacji logo */
+.logo-fadein {
+  width: 300px;
+  opacity: 0;
+  filter: brightness(20%);
+  transform: scale(0.2);
+  animation: wjazdLogo 1.5s ease-out forwards;
+}
+
+@keyframes wjazdLogo {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+    filter: brightness(20%);
+  }
+  60% {
+    opacity: 1;
+    filter: brightness(120%);
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(100%);
+    transform: scale(1);
+  }
+}
   </style>
 
   <script>
-    const WERSJA_APKI = '1.14.025';
+    const WERSJA_APKI = '1.15.025';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -90,9 +117,9 @@
 <body>
   <div id="wersjaApki">v<span id="wersjaNum"></span></div>
 
-  <div id="splash" style="display:flex;justify-content:center;align-items:center;height:100vh;background:#000;">
-    <img src="icon-512.png" style="width:300px;" alt="Logo Warriors">
-  </div>
+<div id="splash" style="display:flex;justify-content:center;align-items:center;height:100vh;background:#000;">
+  <img src="icon-512.png" class="logo-fadein" alt="Logo Warriors">
+</div>
 
   <div id="app" class="hidden">
     <div id="loginView" class="container">

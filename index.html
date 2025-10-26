@@ -65,7 +65,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.11.025';
+    const WERSJA_APKI = '1.12.025';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -127,7 +127,7 @@
       }, 1500);
     });
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKC89pp5_TEdN6HPYscfHm6-OQ1d-9PGBJLPrcFftbFl50YiehiyaNh5Hj6PPLgTvl/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3lLi13_Js1oqZSyqeCE-kajWj1xLtFf5NSkZcjR56uqcqNZ9rhRzRavYWaq1lIGmJ/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -179,32 +179,34 @@
     }
 
     function renderTreningi(lista) {
-      const div = document.getElementById('listaTreningow');
-      if (!lista?.length) {
-        div.innerHTML = "<p>Brak treningów</p>";
-        return;
-      }
+  const div = document.getElementById('listaTreningow');
+  if (!lista?.length) {
+    div.innerHTML = "<p>Brak wydarzeń</p>";
+    return;
+  }
 
-      div.innerHTML = lista.map(t => `
-        <div class="card">
-          <p>
-            <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
-            Trener: <b>${t.trener}</b><br>
-            Zapisanych: ${t.zapisanych}
-          </p>
-          <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
-            <button id="btn-${t.id}" ${t.zapisany ? 'disabled' : ''} onclick="zapiszSie('${t.id}')">
-              ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
-            </button>
-            <button id="wypisz-${t.id}" ${t.zapisany ? '' : 'disabled'} style="background:#444;" onclick="wypiszSie('${t.id}')">
-              Wypisz się
-            </button>
-            <button style="background:#333;" onclick="toggleZapisani('${t.id}')">👥 Zapisani</button>
-          </div>
-          <div id="zapisani-${t.id}" class="hidden lista-zapisanych"></div>
-        </div>
-      `).join('');
-    }
+  div.innerHTML = lista.map(t => `
+    <div class="card">
+      <p>
+        ${t.rodzaj ? `<b>${t.rodzaj}</b><br>` : ``}
+        <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
+        Trener: <b>${t.trener}</b><br>
+        Zapisanych: ${t.zapisanych}
+      </p>
+      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+        <button id="btn-${t.id}" ${t.zapisany ? 'disabled' : ''} onclick="zapiszSie('${t.id}')">
+          ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
+        </button>
+        <button id="wypisz-${t.id}" ${t.zapisany ? '' : 'disabled'} style="background:#444;" onclick="wypiszSie('${t.id}')">
+          Wypisz się
+        </button>
+        <button style="background:#333;" onclick="toggleZapisani('${t.id}')">👥 Zapisani</button>
+      </div>
+      <div id="zapisani-${t.id}" class="hidden lista-zapisanych"></div>
+    </div>
+  `).join('');
+}
+
 
     async function toggleZapisani(id) {
       const box = document.getElementById(`zapisani-${id}`);

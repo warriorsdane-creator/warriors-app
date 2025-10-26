@@ -72,7 +72,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.13.025';
+    const WERSJA_APKI = '1.14.025';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -243,8 +243,9 @@
 async function zapiszSie(id) {
   const btn = document.getElementById(`btn-${id}`);
   const wypiszBtn = document.getElementById(`wypisz-${id}`);
+  const box = document.getElementById(`zapisani-${id}`);
 
-  btn.classList.add("loading"); // 🔸 przyciemnienie przycisku
+  btn.classList.add("loading");
 
   try {
     const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
@@ -254,21 +255,27 @@ async function zapiszSie(id) {
       btn.innerText = "Zapisano ✅";
       btn.disabled = true;
       wypiszBtn.disabled = false;
+
+      // 🔄 jeśli lista zapisanych była otwarta — odśwież ją
+      if (box && !box.classList.contains("hidden")) {
+        await odswiezListeZapisanych(id);
+      }
     } else {
       alert(r.message);
     }
   } catch (err) {
     alert("Błąd połączenia: " + err);
   } finally {
-    btn.classList.remove("loading"); // 🔹 po potwierdzeniu wraca kolor
+    btn.classList.remove("loading");
   }
 }
 
 async function wypiszSie(id) {
   const btn = document.getElementById(`wypisz-${id}`);
   const zapiszBtn = document.getElementById(`btn-${id}`);
+  const box = document.getElementById(`zapisani-${id}`);
 
-  btn.classList.add("loading"); // 🔸 przyciemnienie przycisku
+  btn.classList.add("loading");
 
   try {
     const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
@@ -278,15 +285,47 @@ async function wypiszSie(id) {
       zapiszBtn.innerText = "Zapisz się";
       zapiszBtn.disabled = false;
       btn.disabled = true;
+
+      // 🔄 jeśli lista zapisanych była otwarta — odśwież ją
+      if (box && !box.classList.contains("hidden")) {
+        await odswiezListeZapisanych(id);
+      }
     } else {
       alert(r.message);
     }
   } catch (err) {
     alert("Błąd połączenia: " + err);
   } finally {
-    btn.classList.remove("loading"); // 🔹 po potwierdzeniu wraca kolor
+    btn.classList.remove("loading");
   }
 }
+
+// 🆕 pomocnicza funkcja — odświeża tylko listę zapisanych
+async function odswiezListeZapisanych(id) {
+  const box = document.getElementById(`zapisani-${id}`);
+  if (!box) return;
+  box.innerHTML = '<div class="card" style="background:#222;">⏳ Odświeżanie...</div>';
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
+    const lista = await res.json();
+
+    if (!Array.isArray(lista) || lista.length === 0) {
+      box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
+      return;
+    }
+
+    box.innerHTML = `<div class="card" style="background:#111;">
+      <b>Lista zapisanych:</b>
+      <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
+        ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
+      </ul>
+    </div>`;
+  } catch {
+    box.innerHTML = '<div class="card" style="background:#700;">Błąd odświeżania</div>';
+  }
+}
+
 
 
     async function pokazStatystyki() {

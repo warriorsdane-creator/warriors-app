@@ -76,7 +76,7 @@ button.loading {
   opacity: 0;
   filter: brightness(20%);
   transform: scale(0.2);
-  animation: wjazdLogo 1.5s ease-out forwards;
+  animation: wjazdLogo 4s ease-out forwards;
 }
 
 @keyframes wjazdLogo {
@@ -99,7 +99,7 @@ button.loading {
   </style>
 
   <script>
-    const WERSJA_APKI = '1.15.025';
+    const WERSJA_APKI = '1.16.025';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);

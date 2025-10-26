@@ -70,13 +70,22 @@ button.loading {
   transition: background 0.2s ease, opacity 0.2s ease;
 }
 
-/* 👇 Wklej tutaj nowy kod animacji logo */
+/* === ANIMACJA FILMOWEGO WJAZDU LOGO Z CIEMNOŚCI === */
+#splash {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #000;
+  animation: tloRozjasnij 3s ease-out forwards;
+}
+
 .logo-fadein {
   width: 300px;
   opacity: 0;
   filter: brightness(20%);
   transform: scale(0.2);
-  animation: wjazdLogo 4s ease-out forwards;
+  animation: wjazdLogo 3s ease-out forwards;
 }
 
 @keyframes wjazdLogo {
@@ -87,7 +96,7 @@ button.loading {
   }
   60% {
     opacity: 1;
-    filter: brightness(120%);
+    filter: brightness(150%);
     transform: scale(1.1);
   }
   100% {
@@ -96,6 +105,19 @@ button.loading {
     transform: scale(1);
   }
 }
+
+@keyframes tloRozjasnij {
+  0% {
+    background: #000;
+  }
+  50% {
+    background: #111;
+  }
+  100% {
+    background: #000;
+  }
+}
+
   </style>
 
   <script>
@@ -117,7 +139,7 @@ button.loading {
 <body>
   <div id="wersjaApki">v<span id="wersjaNum"></span></div>
 
-<div id="splash" style="display:flex;justify-content:center;align-items:center;height:100vh;background:#000;">
+<div id="splash">
   <img src="icon-512.png" class="logo-fadein" alt="Logo Warriors">
 </div>
 

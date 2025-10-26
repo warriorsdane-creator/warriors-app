@@ -70,58 +70,51 @@ button.loading {
   transition: background 0.2s ease, opacity 0.2s ease;
 }
 
-/* === ANIMACJA FILMOWEGO WJAZDU LOGO Z CIEMNOŚCI === */
+/* === FILMOWY WJAZD LOGO Z CIEMNOŚCI (czarne tło, fade-out, 5s) === */
 #splash {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #000;
-  animation: tloRozjasnij 6s ease-out forwards;
+  background: #000; /* tło zostaje całkowicie czarne */
 }
 
 .logo-fadein {
   width: 300px;
   opacity: 0;
-  filter: brightness(20%);
+  filter: brightness(20%) blur(2px);
   transform: scale(0.2);
-  animation: wjazdLogo 6s ease-out forwards;
+  animation: wjazdLogo 5s ease-out forwards;
 }
 
 @keyframes wjazdLogo {
   0% {
     opacity: 0;
     transform: scale(0.2);
-    filter: brightness(20%);
+    filter: brightness(20%) blur(4px);
   }
   60% {
     opacity: 1;
-    filter: brightness(150%);
+    filter: brightness(160%) blur(0);
     transform: scale(1.1);
   }
-  100% {
+  85% {
     opacity: 1;
     filter: brightness(100%);
     transform: scale(1);
   }
+  100% {
+    opacity: 0;                /* 🔹 fade-out w końcówce */
+    filter: brightness(50%) blur(2px);
+    transform: scale(1);
+  }
 }
 
-@keyframes tloRozjasnij {
-  0% {
-    background: #000;
-  }
-  50% {
-    background: #111;
-  }
-  100% {
-    background: #000;
-  }
-}
 
   </style>
 
   <script>
-    const WERSJA_APKI = '1.17.025';
+    const WERSJA_APKI = '1.18.025';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -175,14 +168,13 @@ button.loading {
   </div>
 
   <script>
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        document.getElementById('splash').style.display = 'none';
-        document.getElementById('app').classList.remove('hidden');
-        document.getElementById("wersjaNum").textContent = WERSJA_APKI;
-      }, 1500);
-    });
-
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById("wersjaNum").textContent = WERSJA_APKI;
+  }, 5000); // ⏱️ dopasowane do animacji 5 sekund
+});
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3lLi13_Js1oqZSyqeCE-kajWj1xLtFf5NSkZcjR56uqcqNZ9rhRzRavYWaq1lIGmJ/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;

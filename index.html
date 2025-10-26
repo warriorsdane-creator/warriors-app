@@ -62,10 +62,17 @@
       user-select: none;
       z-index: 1000;
     }
+ 
+  button.loading {
+  background: #222 !important;
+  opacity: 0.6;
+  pointer-events: none;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}    
   </style>
 
   <script>
-    const WERSJA_APKI = '1.12.025';
+    const WERSJA_APKI = '1.13.025';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -233,25 +240,54 @@
       }
     }
 
-    async function zapiszSie(id) {
-      const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
-      const r = await res.json();
-      if (r.ok) {
-        document.getElementById(`btn-${id}`).innerText = "Zapisano ✅";
-        document.getElementById(`btn-${id}`).disabled = true;
-        document.getElementById(`wypisz-${id}`).disabled = false;
-      } else alert(r.message);
-    }
+async function zapiszSie(id) {
+  const btn = document.getElementById(`btn-${id}`);
+  const wypiszBtn = document.getElementById(`wypisz-${id}`);
 
-    async function wypiszSie(id) {
-      const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
-      const r = await res.json();
-      if (r.ok) {
-        document.getElementById(`btn-${id}`).innerText = "Zapisz się";
-        document.getElementById(`btn-${id}`).disabled = false;
-        document.getElementById(`wypisz-${id}`).disabled = true;
-      } else alert(r.message);
+  btn.classList.add("loading"); // 🔸 przyciemnienie przycisku
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+    const r = await res.json();
+
+    if (r.ok) {
+      btn.innerText = "Zapisano ✅";
+      btn.disabled = true;
+      wypiszBtn.disabled = false;
+    } else {
+      alert(r.message);
     }
+  } catch (err) {
+    alert("Błąd połączenia: " + err);
+  } finally {
+    btn.classList.remove("loading"); // 🔹 po potwierdzeniu wraca kolor
+  }
+}
+
+async function wypiszSie(id) {
+  const btn = document.getElementById(`wypisz-${id}`);
+  const zapiszBtn = document.getElementById(`btn-${id}`);
+
+  btn.classList.add("loading"); // 🔸 przyciemnienie przycisku
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+    const r = await res.json();
+
+    if (r.ok) {
+      zapiszBtn.innerText = "Zapisz się";
+      zapiszBtn.disabled = false;
+      btn.disabled = true;
+    } else {
+      alert(r.message);
+    }
+  } catch (err) {
+    alert("Błąd połączenia: " + err);
+  } finally {
+    btn.classList.remove("loading"); // 🔹 po potwierdzeniu wraca kolor
+  }
+}
+
 
     async function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");

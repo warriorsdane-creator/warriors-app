@@ -114,7 +114,7 @@ button.loading {
   </style>
 
   <script>
-    const WERSJA_APKI = '1.20.030';
+    const WERSJA_APKI = '1.21.030';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -307,11 +307,24 @@ async function zapiszSie(id) {
     const r = await res.json();
 
     if (r.ok) {
+
+      // ✅ WYWOŁANIE SORTOWANIA
+      fetch("https://script.google.com/macros/s/AKfycbxvW7QWlZTKVi4ff5W6FhPlWO4-vhNg7ojioIPW61j_TfS_wDy0q3_MOfD65p-uCPPP/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          mode: "zapisy",
+          miesiac: id.split("-")[0],
+          kolumna: kolumnaZapisu(id),
+          wiersz: znajdzWierszZapisu(id),
+          numer: numerZalogowanego
+        })
+      });
+
       btn.innerText = "Zapisano ✅";
       btn.disabled = true;
       wypiszBtn.disabled = false;
 
-      // 🔄 jeśli lista zapisanych była otwarta — odśwież ją
       if (box && !box.classList.contains("hidden")) {
         await odswiezListeZapisanych(id);
       }
@@ -323,6 +336,14 @@ async function zapiszSie(id) {
   } finally {
     btn.classList.remove("loading");
   }
+}
+
+function kolumnaZapisu(id) {
+  const num = parseInt(id.split("-").pop(), 10);
+  return num ? num : 5;
+}
+function znajdzWierszZapisu() {
+  return 8;
 }
 
 async function wypiszSie(id) {
@@ -337,11 +358,24 @@ async function wypiszSie(id) {
     const r = await res.json();
 
     if (r.ok) {
+
+      // ✅ WYWOŁANIE SORTOWANIA PO WYPISIE
+      fetch("https://script.google.com/macros/s/AKfycbxvW7QWlZTKVi4ff5W6FhPlWO4-vhNg7ojioIPW61j_TfS_wDy0q3_MOfD65p-uCPPP/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          mode: "zapisy",
+          miesiac: id.split("-")[0],
+          kolumna: kolumnaZapisu(id),
+          wiersz: znajdzWierszZapisu(id),
+          numer: ""   // ← puste = usuń numer
+        })
+      });
+
       zapiszBtn.innerText = "Zapisz się";
       zapiszBtn.disabled = false;
       btn.disabled = true;
 
-      // 🔄 jeśli lista zapisanych była otwarta — odśwież ją
       if (box && !box.classList.contains("hidden")) {
         await odswiezListeZapisanych(id);
       }
@@ -354,6 +388,7 @@ async function wypiszSie(id) {
     btn.classList.remove("loading");
   }
 }
+
 
 // 🆕 pomocnicza funkcja — odświeża tylko listę zapisanych
 async function odswiezListeZapisanych(id) {

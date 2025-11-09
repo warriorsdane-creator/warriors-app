@@ -94,7 +94,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.22.030';
+    const WERSJA_APKI = '1.23.031';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -402,35 +402,43 @@
       document.getElementById("registerView").classList.add("hidden");
       document.getElementById("loginView").classList.remove("hidden");
     }
+// 🔹 Rejestracja (po sukcesie auto-powrót do logowania po 2s)
+async function wyslijRejestracje() {
+  const numer = document.getElementById("regNumer").value.trim();
+  const nazwisko = document.getElementById("regNazwisko").value.trim();
+  const haslo = document.getElementById("regHaslo").value.trim();
+  const msg = document.getElementById("regMsg");
 
-    // 🔹 Rejestracja (po sukcesie auto-powrót do logowania po 2s)
-    async function wyslijRejestracje() {
-      const numer = document.getElementById("regNumer").value.trim();
-      const nazwisko = document.getElementById("regNazwisko").value.trim();
-      const haslo = document.getElementById("regHaslo").value.trim();
-      const msg = document.getElementById("regMsg");
+  if (!numer || !nazwisko || !haslo) {
+    msg.innerText = "Wypełnij wszystkie pola.";
+    return;
+  }
 
-      if (!numer || !nazwisko || !haslo) {
-        msg.innerText = "Wypełnij wszystkie pola.";
-        return;
-      }
+  msg.innerText = "⏳ Rejestracja...";
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({ mode: "rejestracja", numer, nazwisko, haslo })
+    });
+    const data = await res.json();
+    msg.innerText = data.msg || (data.ok ? "OK" : "Błąd");
 
-      msg.innerText = "⏳ Rejestracja...";
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: new URLSearchParams({ mode: "rejestracja", numer, nazwisko, haslo })
-        });
-        const data = await res.json();
-        msg.innerText = data.msg || (data.ok ? "OK" : "Błąd");
-        if (data.ok) {
-          msg.innerText = "✅ Rejestracja zakończona! Przekierowanie...";
-          setTimeout(() => pokazLogowanie(), 2000);
-        }
-      } catch (e) {
-        msg.innerText = "Błąd połączenia.";
-      }
+    if (data.ok) {
+      msg.innerText = "✅ Rejestracja zakończona! Przekierowanie...";
+
+      // ✅ TU DODALIŚMY CZYSZCZENIE POL
+      document.getElementById("regNumer").value = "";
+      document.getElementById("regNazwisko").value = "";
+      document.getElementById("regHaslo").value = "";
+
+      setTimeout(() => pokazLogowanie(), 2000);
     }
+
+  } catch (e) {
+    msg.innerText = "Błąd połączenia.";
+  }
+}
+
   </script>
 </body>
 </html>

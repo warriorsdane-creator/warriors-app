@@ -62,59 +62,39 @@
       user-select: none;
       z-index: 1000;
     }
- 
-button.loading {
-  background: #222 !important;
-  opacity: 0.6;
-  pointer-events: none;
-  transition: background 0.2s ease, opacity 0.2s ease;
-}
 
-/* === FILMOWY WJAZD LOGO Z CIEMNOŚCI (czarne tło, fade-out, 5s) === */
-#splash {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #000; /* tło zostaje całkowicie czarne */
-}
+    button.loading {
+      background: #222 !important;
+      opacity: 0.6;
+      pointer-events: none;
+      transition: background 0.2s ease, opacity 0.2s ease;
+    }
 
-.logo-fadein {
-  width: 300px;
-  opacity: 0;
-  filter: brightness(20%) blur(2px);
-  transform: scale(0.2);
-  animation: wjazdLogo 5s ease-out forwards;
-}
-
-@keyframes wjazdLogo {
-  0% {
-    opacity: 0;
-    transform: scale(0.2);
-    filter: brightness(20%) blur(4px);
-  }
-  60% {
-    opacity: 1;
-    filter: brightness(160%) blur(0);
-    transform: scale(1.1);
-  }
-  85% {
-    opacity: 1;
-    filter: brightness(100%);
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;                /* 🔹 fade-out w końcówce */
-    filter: brightness(50%) blur(2px);
-    transform: scale(1);
-  }
-}
-
-
+    /* Splash z animacją logo */
+    #splash {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #000;
+    }
+    .logo-fadein {
+      width: 300px;
+      opacity: 0;
+      filter: brightness(20%) blur(2px);
+      transform: scale(0.2);
+      animation: wjazdLogo 5s ease-out forwards;
+    }
+    @keyframes wjazdLogo {
+      0%   { opacity: 0;   transform: scale(0.2); filter: brightness(20%) blur(4px); }
+      60%  { opacity: 1;   transform: scale(1.1); filter: brightness(160%) blur(0); }
+      85%  { opacity: 1;   transform: scale(1);   filter: brightness(100%); }
+      100% { opacity: 0;   transform: scale(1);   filter: brightness(50%) blur(2px); }
+    }
   </style>
 
   <script>
-    const WERSJA_APKI = '1.21.030';
+    const WERSJA_APKI = '1.22.030';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -132,11 +112,12 @@ button.loading {
 <body>
   <div id="wersjaApki">v<span id="wersjaNum"></span></div>
 
-<div id="splash">
-  <img src="icon-512.png" class="logo-fadein" alt="Logo Warriors">
-</div>
+  <div id="splash">
+    <img src="icon-512.png" class="logo-fadein" alt="Logo Warriors">
+  </div>
 
   <div id="app" class="hidden">
+    <!-- LOGOWANIE -->
     <div id="loginView" class="container">
       <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" style="width:200px;margin-bottom:20px;">
       <h1>Logowanie</h1>
@@ -146,13 +127,18 @@ button.loading {
         <button onclick="zaloguj()">Zaloguj</button>
       </div>
       <p id="komunikat"></p>
+
+      <!-- 🔹 DODANY przycisk rejestracji -->
+      <button style="margin-top:25px;background:#333;" onclick="pokazRejestracje()">Rejestracja</button>
     </div>
 
+    <!-- PŁATNOŚCI -->
     <div id="platnosciView" class="container hidden">
       <h1>Płatności</h1>
       <div id="listaPlatnosci">Ładowanie...</div>
     </div>
 
+    <!-- WYDARZENIA -->
     <div id="homeView" class="container hidden">
       <h1 id="tytulTreningow">TWOJE WYDARZENIA</h1>
       <div id="listaTreningow">Ładowanie...</div>
@@ -160,39 +146,53 @@ button.loading {
       <button onclick="powrotDoPlatnosci()" style="margin-top:10px;background:#333;">⬅ Powrót do płatności</button>
     </div>
 
+    <!-- STATYSTYKI -->
     <div id="statsView" class="container hidden">
       <h1>Moje statystyki</h1>
       <div id="listaStatystyk">Ładowanie...</div>
       <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
     </div>
+
+    <!-- 🔹 WIDOK REJESTRACJI -->
+    <div id="registerView" class="container hidden">
+      <h1>Rejestracja</h1>
+      <div class="login-box">
+        <input id="regNumer" type="number" placeholder="Numer zawodnika">
+        <input id="regNazwisko" type="text" placeholder="Imię i nazwisko">
+        <input id="regHaslo" type="password" placeholder="Ustaw hasło">
+        <button onclick="wyslijRejestracje()">Zarejestruj</button>
+      </div>
+      <p id="regMsg"></p>
+      <button style="margin-top:20px;background:#333;" onclick="pokazLogowanie()">⬅ Powrót</button>
+    </div>
   </div>
 
   <script>
-    // 🎧 DŹWIĘK STARTOWY LOGO WARRIORS
-function odtworzIntroSound() {
-  try {
-    const audio = new Audio("sound.mp3"); // 🔸 Twoja nazwa pliku
-    audio.volume = 0.7; // 🔉 głośność (0.0–1.0)
-    audio.play().catch(e => console.warn("Nie można odtworzyć dźwięku:", e));
-  } catch (err) {
-    console.error("Błąd dźwięku:", err);
-  }
-}
+    // 🎧 Dźwięk intra
+    function odtworzIntroSound() {
+      try {
+        const audio = new Audio("sound.mp3");
+        audio.volume = 0.7;
+        audio.play().catch(e => console.warn("Nie można odtworzyć dźwięku:", e));
+      } catch (err) {
+        console.error("Błąd dźwięku:", err);
+      }
+    }
 
-window.addEventListener('load', () => {
-  odtworzIntroSound(); // 🔊 start dźwięku równocześnie z animacją
+    window.addEventListener('load', () => {
+      odtworzIntroSound();
+      setTimeout(() => {
+        document.getElementById('splash').style.display = 'none';
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById("wersjaNum").textContent = WERSJA_APKI;
+      }, 5000);
+    });
 
-  setTimeout(() => {
-    document.getElementById('splash').style.display = 'none';
-    document.getElementById('app').classList.remove('hidden');
-    document.getElementById("wersjaNum").textContent = WERSJA_APKI;
-  }, 5000);
-});
-
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvW7QWlZTKVi4ff5W6FhPlWO4-vhNg7ojioIPW61j_TfS_wDy0q3_MOfD65p-uCPPP/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby35BpA2OW9Ijool7KiAwp2UyvfaIvU5I6cR57hGeCjMxGeA-5rFtgZhQ93d8q7GW-G/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
+    // LOGOWANIE
     async function zaloguj() {
       const numer = document.getElementById("numer").value.trim();
       const haslo = document.getElementById("haslo").value.trim();
@@ -205,17 +205,16 @@ window.addEventListener('load', () => {
 
       if (data.success) {
         numerZalogowanego = numer;
-
-        // 🔧 obsługa wielu grup G1–G5
         grupaZalogowanego = data.groups || data.group || "";
-
         komunikat.innerText = "✅ Zalogowano";
         document.getElementById("loginView").classList.add("hidden");
         document.getElementById("platnosciView").classList.remove("hidden");
 
         const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${numer}`)).json();
         renderPlatnosci(platnosci);
-      } else komunikat.innerText = "❌ " + data.message;
+      } else {
+        komunikat.innerText = "❌ " + data.message;
+      }
     }
 
     function renderPlatnosci(lista) {
@@ -232,43 +231,38 @@ window.addEventListener('load', () => {
     async function pokazTreningi() {
       document.getElementById("platnosciView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
-
-      // 🔒 poprawione: bezpieczne przekazanie listy grup np. "G1, G3"
       const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${numerZalogowanego}`;
       const lista = await (await fetch(url)).json();
-
       renderTreningi(lista);
     }
 
     function renderTreningi(lista) {
-  const div = document.getElementById('listaTreningow');
-  if (!lista?.length) {
-    div.innerHTML = "<p>Brak wydarzeń</p>";
-    return;
-  }
-
-  div.innerHTML = lista.map(t => `
-    <div class="card">
-      <p>
-        ${t.rodzaj ? `<b>${t.rodzaj}</b><br>` : ``}
-        <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
-        Trener: <b>${t.trener}</b><br>
-        Zapisanych: ${t.zapisanych}
-      </p>
-      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
-        <button id="btn-${t.id}" ${t.zapisany ? 'disabled' : ''} onclick="zapiszSie('${t.id}')">
-          ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
-        </button>
-        <button id="wypisz-${t.id}" ${t.zapisany ? '' : 'disabled'} style="background:#444;" onclick="wypiszSie('${t.id}')">
-          Wypisz się
-        </button>
-        <button style="background:#333;" onclick="toggleZapisani('${t.id}')">👥 Zapisani</button>
-      </div>
-      <div id="zapisani-${t.id}" class="hidden lista-zapisanych"></div>
-    </div>
-  `).join('');
-}
-
+      const div = document.getElementById('listaTreningow');
+      if (!lista?.length) {
+        div.innerHTML = "<p>Brak wydarzeń</p>";
+        return;
+      }
+      div.innerHTML = lista.map(t => `
+        <div class="card">
+          <p>
+            ${t.rodzaj ? `<b>${t.rodzaj}</b><br>` : ``}
+            <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
+            Trener: <b>${t.trener}</b><br>
+            Zapisanych: ${t.zapisanych}
+          </p>
+          <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+            <button id="btn-${t.id}" ${t.zapisany ? 'disabled' : ''} onclick="zapiszSie('${t.id}')">
+              ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
+            </button>
+            <button id="wypisz-${t.id}" ${t.zapisany ? '' : 'disabled'} style="background:#444;" onclick="wypiszSie('${t.id}')">
+              Wypisz się
+            </button>
+            <button style="background:#333;" onclick="toggleZapisani('${t.id}')">👥 Zapisani</button>
+          </div>
+          <div id="zapisani-${t.id}" class="hidden lista-zapisanych"></div>
+        </div>
+      `).join('');
+    }
 
     async function toggleZapisani(id) {
       const box = document.getElementById(`zapisani-${id}`);
@@ -295,128 +289,77 @@ window.addEventListener('load', () => {
       }
     }
 
-async function zapiszSie(id) {
-  const btn = document.getElementById(`btn-${id}`);
-  const wypiszBtn = document.getElementById(`wypisz-${id}`);
-  const box = document.getElementById(`zapisani-${id}`);
+    // ZAPIS (bez żadnych dodatkowych fetchy do sortowania)
+    async function zapiszSie(id) {
+      const btn = document.getElementById(`btn-${id}`);
+      const wypiszBtn = document.getElementById(`wypisz-${id}`);
+      const box = document.getElementById(`zapisani-${id}`);
 
-  btn.classList.add("loading");
-
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
-    const r = await res.json();
-
-    if (r.ok) {
-
-      // ✅ WYWOŁANIE SORTOWANIA
-      fetch("https://script.google.com/macros/s/AKfycbxvW7QWlZTKVi4ff5W6FhPlWO4-vhNg7ojioIPW61j_TfS_wDy0q3_MOfD65p-uCPPP/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          mode: "zapisy",
-          miesiac: id.split("-")[0],
-          kolumna: kolumnaZapisu(id),
-          wiersz: znajdzWierszZapisu(id),
-          numer: numerZalogowanego
-        })
-      });
-
-      btn.innerText = "Zapisano ✅";
-      btn.disabled = true;
-      wypiszBtn.disabled = false;
-
-      if (box && !box.classList.contains("hidden")) {
-        await odswiezListeZapisanych(id);
+      btn.classList.add("loading");
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+        const r = await res.json();
+        if (r.ok) {
+          btn.innerText = "Zapisano ✅";
+          btn.disabled = true;
+          wypiszBtn.disabled = false;
+          if (box && !box.classList.contains("hidden")) await odswiezListeZapisanych(id);
+        } else {
+          alert(r.message);
+        }
+      } catch (err) {
+        alert("Błąd połączenia: " + err);
+      } finally {
+        btn.classList.remove("loading");
       }
-    } else {
-      alert(r.message);
     }
-  } catch (err) {
-    alert("Błąd połączenia: " + err);
-  } finally {
-    btn.classList.remove("loading");
-  }
-}
 
-function kolumnaZapisu(id) {
-  const num = parseInt(id.split("-").pop(), 10);
-  return num ? num : 5;
-}
-function znajdzWierszZapisu() {
-  return 8;
-}
+    // WYPIS (również bez dodatkowych fetchy do sortowania)
+    async function wypiszSie(id) {
+      const btn = document.getElementById(`wypisz-${id}`);
+      const zapiszBtn = document.getElementById(`btn-${id}`);
+      const box = document.getElementById(`zapisani-${id}`);
 
-async function wypiszSie(id) {
-  const btn = document.getElementById(`wypisz-${id}`);
-  const zapiszBtn = document.getElementById(`btn-${id}`);
-  const box = document.getElementById(`zapisani-${id}`);
-
-  btn.classList.add("loading");
-
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
-    const r = await res.json();
-
-    if (r.ok) {
-
-      // ✅ WYWOŁANIE SORTOWANIA PO WYPISIE
-      fetch("https://script.google.com/macros/s/AKfycbxvW7QWlZTKVi4ff5W6FhPlWO4-vhNg7ojioIPW61j_TfS_wDy0q3_MOfD65p-uCPPP/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          mode: "zapisy",
-          miesiac: id.split("-")[0],
-          kolumna: kolumnaZapisu(id),
-          wiersz: znajdzWierszZapisu(id),
-          numer: ""   // ← puste = usuń numer
-        })
-      });
-
-      zapiszBtn.innerText = "Zapisz się";
-      zapiszBtn.disabled = false;
-      btn.disabled = true;
-
-      if (box && !box.classList.contains("hidden")) {
-        await odswiezListeZapisanych(id);
+      btn.classList.add("loading");
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+        const r = await res.json();
+        if (r.ok) {
+          zapiszBtn.innerText = "Zapisz się";
+          zapiszBtn.disabled = false;
+          btn.disabled = true;
+          if (box && !box.classList.contains("hidden")) await odswiezListeZapisanych(id);
+        } else {
+          alert(r.message);
+        }
+      } catch (err) {
+        alert("Błąd połączenia: " + err);
+      } finally {
+        btn.classList.remove("loading");
       }
-    } else {
-      alert(r.message);
-    }
-  } catch (err) {
-    alert("Błąd połączenia: " + err);
-  } finally {
-    btn.classList.remove("loading");
-  }
-}
-
-
-// 🆕 pomocnicza funkcja — odświeża tylko listę zapisanych
-async function odswiezListeZapisanych(id) {
-  const box = document.getElementById(`zapisani-${id}`);
-  if (!box) return;
-  box.innerHTML = '<div class="card" style="background:#222;">⏳ Odświeżanie...</div>';
-
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
-    const lista = await res.json();
-
-    if (!Array.isArray(lista) || lista.length === 0) {
-      box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
-      return;
     }
 
-    box.innerHTML = `<div class="card" style="background:#111;">
-      <b>Lista zapisanych:</b>
-      <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
-        ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
-      </ul>
-    </div>`;
-  } catch {
-    box.innerHTML = '<div class="card" style="background:#700;">Błąd odświeżania</div>';
-  }
-}
-
-
+    async function odswiezListeZapisanych(id) {
+      const box = document.getElementById(`zapisani-${id}`);
+      if (!box) return;
+      box.innerHTML = '<div class="card" style="background:#222;">⏳ Odświeżanie...</div>';
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
+        const lista = await res.json();
+        if (!Array.isArray(lista) || lista.length === 0) {
+          box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
+          return;
+        }
+        box.innerHTML = `<div class="card" style="background:#111;">
+          <b>Lista zapisanych:</b>
+          <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
+            ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
+          </ul>
+        </div>`;
+      } catch {
+        box.innerHTML = '<div class="card" style="background:#700;">Błąd odświeżania</div>';
+      }
+    }
 
     async function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");
@@ -432,9 +375,7 @@ async function odswiezListeZapisanych(id) {
         div.innerHTML = "<p>Brak danych</p>";
         return;
       }
-
       const suma = lista.reduce((acc, s) => acc + (Number(s.treningi) || 0), 0);
-
       div.innerHTML =
         lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('') +
         `<div class="card" style="background:#222;margin-top:20px;font-weight:bold;">
@@ -450,6 +391,45 @@ async function odswiezListeZapisanych(id) {
     function powrotDoPlatnosci() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("platnosciView").classList.remove("hidden");
+    }
+
+    // 🔹 Nawigacja login <-> rejestracja
+    function pokazRejestracje() {
+      document.getElementById("loginView").classList.add("hidden");
+      document.getElementById("registerView").classList.remove("hidden");
+    }
+    function pokazLogowanie() {
+      document.getElementById("registerView").classList.add("hidden");
+      document.getElementById("loginView").classList.remove("hidden");
+    }
+
+    // 🔹 Rejestracja (po sukcesie auto-powrót do logowania po 2s)
+    async function wyslijRejestracje() {
+      const numer = document.getElementById("regNumer").value.trim();
+      const nazwisko = document.getElementById("regNazwisko").value.trim();
+      const haslo = document.getElementById("regHaslo").value.trim();
+      const msg = document.getElementById("regMsg");
+
+      if (!numer || !nazwisko || !haslo) {
+        msg.innerText = "Wypełnij wszystkie pola.";
+        return;
+      }
+
+      msg.innerText = "⏳ Rejestracja...";
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: new URLSearchParams({ mode: "rejestracja", numer, nazwisko, haslo })
+        });
+        const data = await res.json();
+        msg.innerText = data.msg || (data.ok ? "OK" : "Błąd");
+        if (data.ok) {
+          msg.innerText = "✅ Rejestracja zakończona! Przekierowanie...";
+          setTimeout(() => pokazLogowanie(), 2000);
+        }
+      } catch (e) {
+        msg.innerText = "Błąd połączenia.";
+      }
     }
   </script>
 </body>

@@ -94,7 +94,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.23.032';
+    const WERSJA_APKI = '1.24.033';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -188,7 +188,7 @@
       }, 5000);
     });
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTC8_k_UsPcrOB5eFbja7Thb6hWW9PgB06BenPaimhZU-AKEJLLUOMokkF1_QL_V_P/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzl4Q91on_5NSOirZCrSj6rEXVJbgxbCR3Z-UvZ-N7L7XjdAAF-ZI5rrkNmKpPqYKhi/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -403,6 +403,7 @@
       document.getElementById("loginView").classList.remove("hidden");
     }
 // 🔹 Rejestracja (po sukcesie auto-powrót do logowania po 2s)
+// 🔹 Rejestracja (po sukcesie auto-powrót do logowania po 2s)
 async function wyslijRejestracje() {
   const numer = document.getElementById("regNumer").value.trim();
   const nazwisko = document.getElementById("regNazwisko").value.trim();
@@ -421,23 +422,30 @@ async function wyslijRejestracje() {
       body: new URLSearchParams({ mode: "rejestracja", numer, nazwisko, haslo })
     });
     const data = await res.json();
-    msg.innerText = data.msg || (data.ok ? "OK" : "Błąd");
 
     if (data.ok) {
-      msg.innerText = "✅ Rejestracja zakończona! Przekierowanie...";
 
-      // ✅ TU DODALIŚMY CZYSZCZENIE POL
+      // ✅ Czyścimy pola
       document.getElementById("regNumer").value = "";
       document.getElementById("regNazwisko").value = "";
       document.getElementById("regHaslo").value = "";
 
-      setTimeout(() => pokazLogowanie(), 2000);
-    }
+      msg.innerText = "✅ Rejestracja zakończona!";
 
+      // ✅ Po 2s wracamy do logowania + czyścimy komunikat
+      setTimeout(() => {
+        msg.innerText = "";
+        pokazLogowanie();
+      }, 2000);
+
+    } else {
+      msg.innerText = "❌ " + (data.msg || "Błąd");
+    }
   } catch (e) {
     msg.innerText = "Błąd połączenia.";
   }
 }
+
 
   </script>
 </body>

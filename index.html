@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.27.035';
+    const WERSJA_APKI = '1.28.035';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -166,16 +166,16 @@
     </div>
 
     <!-- ✅ REJESTRACJA TRENERA (placeholder) -->
-    <div id="registerTrenerView" class="container hidden">
-      <h1>Rejestracja trenera</h1>
-      <div class="login-box">
-        <input id="regT_Nazwisko" type="text" placeholder="Imię i nazwisko">
-        <input id="regT_Haslo" type="password" placeholder="Ustaw hasło">
-        <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
-      </div>
-      <p id="regT_Msg"></p>
-      <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
-    </div>
+<div id="rejestracjaTrenerView" class="container hidden">
+  <h1>Rejestracja trenera</h1>
+  <div class="login-box">
+    <input id="regNazwiskoTrener" type="text" placeholder="Imię i nazwisko">
+    <input id="regHasloTrener" type="password" placeholder="Ustaw hasło">
+    <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
+    <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+  </div>
+  <p id="regMsgTrener"></p>
+</div>
 
     <!-- ✅ PŁATNOŚCI -->
     <div id="platnosciView" class="container hidden">
@@ -484,12 +484,37 @@
       }
     }
 
-    // Placeholder – zrobimy backend dla trenerów w kolejnym kroku
-    function wyslijRejestracjeTrener() {
-      const msg = document.getElementById("regT_Msg");
-      msg.innerText = "🚧 Funkcja w trakcie budowy";
-      setTimeout(() => { msg.innerText = ""; pokazRejestracjaSelect(); }, 1200);
+async function wyslijRejestracjeTrener() {
+  const nazwisko = document.getElementById("regNazwiskoTrener").value.trim();
+  const haslo = document.getElementById("regHasloTrener").value.trim();
+  const msg = document.getElementById("regMsgTrener");
+
+  if (!nazwisko || !haslo) {
+    msg.innerText = "Wypełnij wszystkie pola.";
+    return;
+  }
+
+  msg.innerText = "⏳ Rejestracja...";
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({ mode: "rejestracjaTrener", nazwisko, haslo })
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      document.getElementById("regNazwiskoTrener").value = "";
+      document.getElementById("regHasloTrener").value = "";
+      msg.innerText = "✅ Zarejestrowano!";
+      setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 2000);
+    } else {
+      msg.innerText = "❌ " + data.msg;
     }
+  } catch {
+    msg.innerText = "Błąd połączenia.";
+  }
+}
+
   </script>
 </body>
 </html>

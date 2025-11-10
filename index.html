@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.29.037';
+    const WERSJA_APKI = '1.30.037';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -485,10 +485,12 @@
       }
     }
 async function wyslijRejestracjeTrener() {
-  const nazwisko = document.getElementById("regNazwiskoTrener").value.trim();
-  const haslo = document.getElementById("regHasloTrener").value.trim();
+  const poleNazw = document.getElementById("regNazwiskoTrener");
+  const poleHaslo = document.getElementById("regHasloTrener");
   const msg = document.getElementById("regMsgTrener");
 
+  const nazwisko = poleNazw.value.trim();
+  const haslo = poleHaslo.value.trim();
   if (!nazwisko || !haslo) {
     msg.innerText = "Wypełnij wszystkie pola.";
     return;
@@ -503,17 +505,21 @@ async function wyslijRejestracjeTrener() {
     const data = await res.json();
 
     if (data.ok) {
-      document.getElementById("regNazwiskoTrener").value = "";
-      document.getElementById("regHasloTrener").value = "";
+      const inic = data.inic || "(?)";
 
-      // ✅ Pokazujemy informację o loginie (inicjały)
-      msg.innerText = data.msg || "✅ Zarejestrowano!";
+      msg.innerHTML = `
+        ✅ <b>Zarejestrowano trenera!</b><br>
+        Login do systemu: <b>${inic}</b><br><br>
+        <button class="full-btn" onclick="navigator.clipboard.writeText('${inic}')">📋 Skopiuj login</button>
+      `;
 
-      // ✅ Powrót do logowania po chwili
-      setTimeout(() => {
-        msg.innerText = "";
-        pokazLogowanie();
-      }, 2000);
+      // Czyścimy pola
+      poleNazw.value = "";
+      poleHaslo.value = "";
+
+      // po 3s wracamy do logowania
+      setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 3000);
+
     } else {
       msg.innerText = "❌ " + (data.msg || "Błąd");
     }
@@ -521,8 +527,6 @@ async function wyslijRejestracjeTrener() {
     msg.innerText = "Błąd połączenia.";
   }
 }
-
-
 
   </script>
 </body>

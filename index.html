@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.31.038';
+    const WERSJA_APKI = '1.32.038';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -136,7 +136,7 @@
       <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" style="width:200px;margin-bottom:20px;">
       <h1>Logowanie</h1>
       <div class="login-box">
-        <input id="numer" type="number" placeholder="Numer zawodnika">
+        <input id="numer" type="text" placeholder="Numer / Inicjały">
         <input id="haslo" type="password" placeholder="Hasło">
         <button class="full-btn" onclick="zaloguj()">Zaloguj</button>
         <button class="full-btn alt" onclick="pokazRejestracjaSelect()">Rejestracja</button>

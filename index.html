@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.32.038';
+    const WERSJA_APKI = '1.33.039';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -198,6 +198,13 @@
       <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
     </div>
 
+    <!-- ✅ PANEL TRENERA -->
+    <div id="trainerPanelView" class="container hidden">
+      <h1>Panel trenera</h1>
+      <p>🔧 W trakcie rozbudowy</p>
+      <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Wyloguj</button>
+    </div>
+
   </div>
 
   <script>
@@ -222,7 +229,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJcvA03-KuluDf-mpCvOzWTKXxYj9MMkIIlYu0ERCxadXA9fOGLzpJLUnfkQ1W_xJ9/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5M6vMz9UFplFDnZ7dBMis2gmZ7ZeXFD-5aTnzmeCWoimATFf7Px05su8GLQCt8bOs/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -250,36 +257,58 @@
 
     /* =================== LOGOWANIE =================== */
     async function zaloguj() {
-      const numer = document.getElementById("numer").value.trim();
+      const login = document.getElementById("numer").value.trim();  // ← teraz login, nie numer
       const haslo = document.getElementById("haslo").value.trim();
       const komunikat = document.getElementById("komunikat");
-      if (!numer || !haslo) { komunikat.innerText = "Podaj numer i hasło."; return; }
 
-      komunikat.innerText = "Trwa logowanie...";
-      try {
-       const res = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: new URLSearchParams({ mode:"login", numer:login, haslo })
-      });
+  if (!login || !haslo) {
+    komunikat.innerText = "Podaj login i hasło.";
+    return;
+  }
 
-        const data = await res.json();
+  komunikat.innerText = "Trwa logowanie...";
 
-        if (data.success) {
-          numerZalogowanego = numer;
-          grupaZalogowanego = data.groups || data.group || "";
-          komunikat.innerText = "✅ Zalogowano";
-          document.getElementById("loginView").classList.add("hidden");
-          document.getElementById("platnosciView").classList.remove("hidden");
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({ mode:"login", numer:login, haslo })
+    });
 
-          const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numer)}`)).json();
-          renderPlatnosci(platnosci);
-        } else {
-          komunikat.innerText = "❌ " + (data.message || "Błąd logowania");
-        }
-      } catch (e) {
-        komunikat.innerText = "Błąd połączenia.";
-      }
+    const data = await res.json();
+
+    if (!data.success) {
+      komunikat.innerText = "❌ " + (data.message || "Błąd logowania");
+      return;
     }
+
+    // ✅ Sukces logowania
+    komunikat.innerText = "✅ Zalogowano";
+
+    if (data.role === "zawodnik") {
+      // Zapamiętujemy dane zawodnika
+      numerZalogowanego = data.login;
+      grupaZalogowanego = data.grupa || "";
+
+      ukryjWszystkie();
+      document.getElementById("platnosciView").classList.remove("hidden");
+
+      const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(data.login)}`)).json();
+      renderPlatnosci(platnosci);
+      return;
+    }
+
+    if (data.role === "trener") {
+      // 🔥 trener – przejście do panelu trenera
+      ukryjWszystkie();
+      document.getElementById("trainerPanelView").classList.remove("hidden");
+      return;
+    }
+
+  } catch (e) {
+    komunikat.innerText = "Błąd połączenia.";
+  }
+}
+
 
     /* =================== PŁATNOŚCI =================== */
     function renderPlatnosci(lista) {

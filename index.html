@@ -94,7 +94,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.24.034';
+    const WERSJA_APKI = '1.25.034';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -117,7 +117,8 @@
   </div>
 
   <div id="app" class="hidden">
-    <!-- LOGOWANIE -->
+
+    <!-- ✅ LOGOWANIE -->
     <div id="loginView" class="container">
       <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" style="width:200px;margin-bottom:20px;">
       <h1>Logowanie</h1>
@@ -128,34 +129,25 @@
       </div>
       <p id="komunikat"></p>
 
-      <!-- 🔹 DODANY przycisk rejestracji -->
-      <button style="margin-top:25px;background:#333;" onclick="pokazRejestracje()">Rejestracja</button>
+      <!-- 🔹 przycisk przejścia do wyboru rejestracji -->
+      <button style="margin-top:25px;background:#333;" onclick="pokazRejestracjaSelect()">Rejestracja</button>
     </div>
 
-    <!-- PŁATNOŚCI -->
-    <div id="platnosciView" class="container hidden">
-      <h1>Płatności</h1>
-      <div id="listaPlatnosci">Ładowanie...</div>
-    </div>
 
-    <!-- WYDARZENIA -->
-    <div id="homeView" class="container hidden">
-      <h1 id="tytulTreningow">TWOJE WYDARZENIA</h1>
-      <div id="listaTreningow">Ładowanie...</div>
-      <button onclick="pokazStatystyki()" style="margin-top:20px;">📈 Pokaż statystyki</button>
-      <button onclick="powrotDoPlatnosci()" style="margin-top:10px;background:#333;">⬅ Powrót do płatności</button>
-    </div>
-
-    <!-- STATYSTYKI -->
-    <div id="statsView" class="container hidden">
-      <h1>Moje statystyki</h1>
-      <div id="listaStatystyk">Ładowanie...</div>
-      <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
-    </div>
-
-    <!-- 🔹 WIDOK REJESTRACJI -->
-    <div id="registerView" class="container hidden">
+    <!-- ✅ WYBÓR TYP REJESTRACJI -->
+    <div id="rejestracjaSelectView" class="container hidden">
       <h1>Rejestracja</h1>
+      <p>Wybierz typ konta:</p>
+      <button onclick="pokazRejestracjaZawodnik()">Zawodnik</button>
+      <button onclick="pokazRejestracjaTrener()" style="margin-left:12px;">Trener</button>
+      <br><br>
+      <button style="margin-top:20px;background:#333;" onclick="pokazLogowanie()">⬅ Powrót</button>
+    </div>
+
+
+    <!-- ✅ REJESTRACJA ZAWODNIKA (funkcjonalna) -->
+    <div id="rejestracjaZawodnikView" class="container hidden">
+      <h1>Rejestracja zawodnika</h1>
       <div class="login-box">
         <input id="regNumer" type="number" placeholder="Numer zawodnika">
         <input id="regNazwisko" type="text" placeholder="Imię i nazwisko">
@@ -163,9 +155,41 @@
         <button onclick="wyslijRejestracje()">Zarejestruj</button>
       </div>
       <p id="regMsg"></p>
-      <button style="margin-top:20px;background:#333;" onclick="pokazLogowanie()">⬅ Powrót</button>
+      <button style="margin-top:20px;background:#333;" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
     </div>
+
+
+    <!-- ✅ REJESTRACJA TRENERA (placeholder) -->
+    <div id="rejestracjaTrenerView" class="container hidden">
+      <h1>Rejestracja trenera</h1>
+      <p>🚧 W trakcie budowy (przechodzimy dalej po zrobieniu backendu)</p>
+      <button style="margin-top:20px;background:#333;" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+    </div>
+
+
+    <!-- ✅ PŁATNOŚCI -->
+    <div id="platnosciView" class="container hidden">
+      <h1>Płatności</h1>
+      <div id="listaPlatnosci">Ładowanie...</div>
+    </div>
+
+    <!-- ✅ WYDARZENIA -->
+    <div id="homeView" class="container hidden">
+      <h1 id="tytulTreningow">TWOJE WYDARZENIA</h1>
+      <div id="listaTreningow">Ładowanie...</div>
+      <button onclick="pokazStatystyki()" style="margin-top:20px;">📈 Pokaż statystyki</button>
+      <button onclick="powrotDoPlatnosci()" style="margin-top:10px;background:#333;">⬅ Powrót do płatności</button>
+    </div>
+
+    <!-- ✅ STATYSTYKI -->
+    <div id="statsView" class="container hidden">
+      <h1>Moje statystyki</h1>
+      <div id="listaStatystyk">Ładowanie...</div>
+      <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
+    </div>
+
   </div>
+
 
   <script>
     // 🎧 Dźwięk intra
@@ -403,7 +427,7 @@
       document.getElementById("loginView").classList.remove("hidden");
     }
 // 🔹 Rejestracja (po sukcesie auto-powrót do logowania po 2s)
-// 🔹 Rejestracja (po sukcesie auto-powrót do logowania po 2s)
+
 async function wyslijRejestracje() {
   const numer = document.getElementById("regNumer").value.trim();
   const nazwisko = document.getElementById("regNazwisko").value.trim();
@@ -446,6 +470,31 @@ async function wyslijRejestracje() {
   }
 }
 
+/* === NAWIGACJA WIDOKÓW REJESTRACJI === */
+
+function ukryjWszystkie() {
+  document.querySelectorAll(".container").forEach(v => v.classList.add("hidden"));
+}
+
+function pokazLogowanie() {
+  ukryjWszystkie();
+  document.getElementById("loginView").classList.remove("hidden");
+}
+
+function pokazRejestracjaSelect() {
+  ukryjWszystkie();
+  document.getElementById("rejestracjaSelectView").classList.remove("hidden");
+}
+
+function pokazRejestracjaZawodnik() {
+  ukryjWszystkie();
+  document.getElementById("rejestracjaZawodnikView").classList.remove("hidden");
+}
+
+function pokazRejestracjaTrener() {
+  ukryjWszystkie();
+  document.getElementById("rejestracjaTrenerView").classList.remove("hidden");
+}
 
   </script>
 </body>

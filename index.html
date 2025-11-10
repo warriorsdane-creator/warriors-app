@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.28.035';
+    const WERSJA_APKI = '1.29.035';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -244,8 +244,9 @@
     }
     function pokazRejestracjaTrener() {
       ukryjWszystkie();
-      document.getElementById("registerTrenerView").classList.remove("hidden");
-    }
+      document.getElementById("rejestracjaTrenerView").classList.remove("hidden");
+}
+
 
     /* =================== LOGOWANIE =================== */
     async function zaloguj() {
@@ -484,18 +485,9 @@
       }
     }
 async function wyslijRejestracjeTrener() {
-  const poleNazw = document.getElementById("regNazwiskoTrener");
-  const poleHaslo = document.getElementById("regHasloTrener");
+  const nazwisko = document.getElementById("regNazwiskoTrener").value.trim();
+  const haslo = document.getElementById("regHasloTrener").value.trim();
   const msg = document.getElementById("regMsgTrener");
-
-  // ochronka gdyby elementów nie było
-  if (!poleNazw || !poleHaslo || !msg) {
-    alert("Brak pól formularza rejestracji trenera w HTML.");
-    return;
-  }
-
-  const nazwisko = poleNazw.value.trim();
-  const haslo = poleHaslo.value.trim();
 
   if (!nazwisko || !haslo) {
     msg.innerText = "Wypełnij wszystkie pola.";
@@ -511,11 +503,17 @@ async function wyslijRejestracjeTrener() {
     const data = await res.json();
 
     if (data.ok) {
-      // czyścimy pola + komunikat i wracamy do logowania
-      poleNazw.value = "";
-      poleHaslo.value = "";
-      msg.innerText = "✅ Zarejestrowano!";
-      setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 1500);
+      document.getElementById("regNazwiskoTrener").value = "";
+      document.getElementById("regHasloTrener").value = "";
+
+      // ✅ Pokazujemy informację o loginie (inicjały)
+      msg.innerText = data.msg || "✅ Zarejestrowano!";
+
+      // ✅ Powrót do logowania po chwili
+      setTimeout(() => {
+        msg.innerText = "";
+        pokazLogowanie();
+      }, 2000);
     } else {
       msg.innerText = "❌ " + (data.msg || "Błąd");
     }

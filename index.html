@@ -140,7 +140,9 @@
       <div class="login-box">
         <input id="numer" type="number" placeholder="Numer zawodnika">
         <input id="haslo" type="password" placeholder="Hasło">
-        <button onclick="zaloguj()">Zaloguj</button>
+        <button class="full-btn" onclick="zaloguj()">Zaloguj</button>
+        <button class="full-btn alt" onclick="pokazRejestracjaSelect()">Rejestracja</button>
+
       </div>
       <p id="komunikat"></p>
 
@@ -150,14 +152,14 @@
 
 
     <!-- ✅ WYBÓR TYP REJESTRACJI -->
-    <div id="rejestracjaSelectView" class="container hidden">
+    <div id="registerSelectView" class="container hidden">
       <h1>Rejestracja</h1>
-      <p>Wybierz typ konta:</p>
-      <button onclick="pokazRejestracjaZawodnik()">Zawodnik</button>
-      <button onclick="pokazRejestracjaTrener()" style="margin-left:12px;">Trener</button>
-      <br><br>
-      <button style="margin-top:20px;background:#333;" onclick="pokazLogowanie()">⬅ Powrót</button>
+
+        <button class="full-btn" onclick="pokazRejestracjaZawodnik()">Zawodnik</button>
+        <button class="full-btn" onclick="pokazRejestracjaTrener()">Trener</button>
+        <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Powrót</button>
     </div>
+
 
 
     <!-- ✅ REJESTRACJA ZAWODNIKA (funkcjonalna) -->
@@ -167,10 +169,9 @@
         <input id="regNumer" type="number" placeholder="Numer zawodnika">
         <input id="regNazwisko" type="text" placeholder="Imię i nazwisko">
         <input id="regHaslo" type="password" placeholder="Ustaw hasło">
-        <button onclick="wyslijRejestracje()">Zarejestruj</button>
-      </div>
-      <p id="regMsg"></p>
-      <button style="margin-top:20px;background:#333;" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+        <button class="full-btn" onclick="wyslijRejestracje()">Zarejestruj</button>
+        <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+
     </div>
 
 
@@ -178,7 +179,9 @@
     <div id="rejestracjaTrenerView" class="container hidden">
       <h1>Rejestracja trenera</h1>
       <p>🚧 W trakcie budowy (przechodzimy dalej po zrobieniu backendu)</p>
-      <button style="margin-top:20px;background:#333;" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+       <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
+        <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+
     </div>
 
 

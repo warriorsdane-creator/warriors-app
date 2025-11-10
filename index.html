@@ -21,7 +21,7 @@
       display: block;
       margin: 10px auto;
       padding: 8px;
-      width: 200px;
+      width: 200px;          /* referencja szerokości dla przycisków */
       border-radius: 6px;
       border: none;
     }
@@ -62,7 +62,6 @@
       user-select: none;
       z-index: 1000;
     }
-
     button.loading {
       background: #222 !important;
       opacity: 0.6;
@@ -91,25 +90,24 @@
       85%  { opacity: 1;   transform: scale(1);   filter: brightness(100%); }
       100% { opacity: 0;   transform: scale(1);   filter: brightness(50%) blur(2px); }
     }
-    .full-btn {
-  display: block;
-  width: 200px;       /* taka jak input */
-  margin: 10px auto;
-  padding: 8px;
-  border-radius: 6px;
-  background: red;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-.full-btn.alt {
-  background: #333;
-}
 
+    /* Przyciski o szerokości jak input */
+    .full-btn {
+      display: block;
+      width: 200px;   /* identycznie jak .login-box input */
+      margin: 10px auto;
+      padding: 8px;
+      border-radius: 6px;
+      background: red;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .full-btn.alt { background: #333; }
   </style>
 
   <script>
-    const WERSJA_APKI = '1.26.034';
+    const WERSJA_APKI = '1.27.035';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -142,48 +140,42 @@
         <input id="haslo" type="password" placeholder="Hasło">
         <button class="full-btn" onclick="zaloguj()">Zaloguj</button>
         <button class="full-btn alt" onclick="pokazRejestracjaSelect()">Rejestracja</button>
-
       </div>
       <p id="komunikat"></p>
-
-      <!-- 🔹 przycisk przejścia do wyboru rejestracji -->
-      <button style="margin-top:25px;background:#333;" onclick="pokazRejestracjaSelect()">Rejestracja</button>
     </div>
-
 
     <!-- ✅ WYBÓR TYP REJESTRACJI -->
     <div id="registerSelectView" class="container hidden">
       <h1>Rejestracja</h1>
-
-        <button class="full-btn" onclick="pokazRejestracjaZawodnik()">Zawodnik</button>
-        <button class="full-btn" onclick="pokazRejestracjaTrener()">Trener</button>
-        <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Powrót</button>
+      <button class="full-btn" onclick="pokazRejestracjaZawodnik()">Zawodnik</button>
+      <button class="full-btn" onclick="pokazRejestracjaTrener()">Trener</button>
+      <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Powrót</button>
     </div>
 
-
-
     <!-- ✅ REJESTRACJA ZAWODNIKA (funkcjonalna) -->
-    <div id="rejestracjaZawodnikView" class="container hidden">
+    <div id="registerZawodnikView" class="container hidden">
       <h1>Rejestracja zawodnika</h1>
       <div class="login-box">
         <input id="regNumer" type="number" placeholder="Numer zawodnika">
         <input id="regNazwisko" type="text" placeholder="Imię i nazwisko">
         <input id="regHaslo" type="password" placeholder="Ustaw hasło">
         <button class="full-btn" onclick="wyslijRejestracje()">Zarejestruj</button>
-        <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
-
+      </div>
+      <p id="regMsg"></p>
+      <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
     </div>
-
 
     <!-- ✅ REJESTRACJA TRENERA (placeholder) -->
-    <div id="rejestracjaTrenerView" class="container hidden">
+    <div id="registerTrenerView" class="container hidden">
       <h1>Rejestracja trenera</h1>
-      <p>🚧 W trakcie budowy (przechodzimy dalej po zrobieniu backendu)</p>
-       <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
-        <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
-
+      <div class="login-box">
+        <input id="regT_Nazwisko" type="text" placeholder="Imię i nazwisko">
+        <input id="regT_Haslo" type="password" placeholder="Ustaw hasło">
+        <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
+      </div>
+      <p id="regT_Msg"></p>
+      <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
     </div>
-
 
     <!-- ✅ PŁATNOŚCI -->
     <div id="platnosciView" class="container hidden">
@@ -208,7 +200,6 @@
 
   </div>
 
-
   <script>
     // 🎧 Dźwięk intra
     function odtworzIntroSound() {
@@ -230,54 +221,82 @@
       }, 5000);
     });
 
+    /* =================== KONFIG =================== */
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzkCTQg6owjx6T1zsxIOcCguJ_RIepHyeT0tvtdHASQx95It64yTKRhsbxMzp2rXrgR/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
-    // LOGOWANIE
+    /* =================== NAWIGACJA =================== */
+    function ukryjWszystkie() {
+      document.querySelectorAll(".container").forEach(v => v.classList.add("hidden"));
+    }
+    function pokazLogowanie() {
+      ukryjWszystkie();
+      document.getElementById("loginView").classList.remove("hidden");
+    }
+    function pokazRejestracjaSelect() {
+      ukryjWszystkie();
+      document.getElementById("registerSelectView").classList.remove("hidden");
+    }
+    function pokazRejestracjaZawodnik() {
+      ukryjWszystkie();
+      document.getElementById("registerZawodnikView").classList.remove("hidden");
+    }
+    function pokazRejestracjaTrener() {
+      ukryjWszystkie();
+      document.getElementById("registerTrenerView").classList.remove("hidden");
+    }
+
+    /* =================== LOGOWANIE =================== */
     async function zaloguj() {
       const numer = document.getElementById("numer").value.trim();
       const haslo = document.getElementById("haslo").value.trim();
       const komunikat = document.getElementById("komunikat");
-      if (!numer || !haslo) return komunikat.innerText = "Podaj numer i hasło.";
+      if (!numer || !haslo) { komunikat.innerText = "Podaj numer i hasło."; return; }
 
       komunikat.innerText = "Trwa logowanie...";
-      const res = await fetch(`${SCRIPT_URL}?action=login&numer=${numer}&haslo=${haslo}`);
-      const data = await res.json();
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=login&numer=${encodeURIComponent(numer)}&haslo=${encodeURIComponent(haslo)}`);
+        const data = await res.json();
 
-      if (data.success) {
-        numerZalogowanego = numer;
-        grupaZalogowanego = data.groups || data.group || "";
-        komunikat.innerText = "✅ Zalogowano";
-        document.getElementById("loginView").classList.add("hidden");
-        document.getElementById("platnosciView").classList.remove("hidden");
+        if (data.success) {
+          numerZalogowanego = numer;
+          grupaZalogowanego = data.groups || data.group || "";
+          komunikat.innerText = "✅ Zalogowano";
+          document.getElementById("loginView").classList.add("hidden");
+          document.getElementById("platnosciView").classList.remove("hidden");
 
-        const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${numer}`)).json();
-        renderPlatnosci(platnosci);
-      } else {
-        komunikat.innerText = "❌ " + data.message;
+          const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numer)}`)).json();
+          renderPlatnosci(platnosci);
+        } else {
+          komunikat.innerText = "❌ " + (data.message || "Błąd logowania");
+        }
+      } catch (e) {
+        komunikat.innerText = "Błąd połączenia.";
       }
     }
 
+    /* =================== PŁATNOŚCI =================== */
     function renderPlatnosci(lista) {
       const div = document.getElementById("listaPlatnosci");
       if (!lista?.length) {
-        div.innerHTML = "<p>Brak zaległości ✅</p><button onclick='pokazTreningi()'>Dalej ➡</button>";
+        div.innerHTML = "<p>Brak zaległości ✅</p><button class='full-btn' onclick='pokazTreningi()'>Dalej ➡</button>";
         return;
       }
       div.innerHTML = `<h3>Zaległe płatności:</h3>` +
         lista.map(p => `<div class='card' style='background:#a00;'>🔴 ${p.nazwa} – ${p.kwota} zł</div>`).join('') +
-        `<button onclick='pokazTreningi()' style='margin-top:20px;'>Dalej ➡</button>`;
+        `<button class='full-btn' onclick='pokazTreningi()' style='margin-top:20px;'>Dalej ➡</button>`;
     }
 
     async function pokazTreningi() {
       document.getElementById("platnosciView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
-      const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${numerZalogowanego}`;
+      const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${encodeURIComponent(numerZalogowanego)}`;
       const lista = await (await fetch(url)).json();
       renderTreningi(lista);
     }
 
+    /* =================== WYDARZENIA =================== */
     function renderTreningi(lista) {
       const div = document.getElementById('listaTreningow');
       if (!lista?.length) {
@@ -331,7 +350,6 @@
       }
     }
 
-    // ZAPIS (bez żadnych dodatkowych fetchy do sortowania)
     async function zapiszSie(id) {
       const btn = document.getElementById(`btn-${id}`);
       const wypiszBtn = document.getElementById(`wypisz-${id}`);
@@ -339,7 +357,7 @@
 
       btn.classList.add("loading");
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+        const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${encodeURIComponent(numerZalogowanego)}&treningId=${encodeURIComponent(id)}`);
         const r = await res.json();
         if (r.ok) {
           btn.innerText = "Zapisano ✅";
@@ -356,7 +374,6 @@
       }
     }
 
-    // WYPIS (również bez dodatkowych fetchy do sortowania)
     async function wypiszSie(id) {
       const btn = document.getElementById(`wypisz-${id}`);
       const zapiszBtn = document.getElementById(`btn-${id}`);
@@ -364,7 +381,7 @@
 
       btn.classList.add("loading");
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${numerZalogowanego}&treningId=${encodeURIComponent(id)}`);
+        const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${encodeURIComponent(numerZalogowanego)}&treningId=${encodeURIComponent(id)}`);
         const r = await res.json();
         if (r.ok) {
           zapiszBtn.innerText = "Zapisz się";
@@ -403,20 +420,17 @@
       }
     }
 
+    /* =================== STATYSTYKI =================== */
     async function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("statsView").classList.remove("hidden");
-      const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${numerZalogowanego}`);
+      const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${encodeURIComponent(numerZalogowanego)}`);
       const lista = await res.json();
       renderStatystyki(lista);
     }
-
     function renderStatystyki(lista) {
       const div = document.getElementById("listaStatystyk");
-      if (!lista?.length) {
-        div.innerHTML = "<p>Brak danych</p>";
-        return;
-      }
+      if (!lista?.length) { div.innerHTML = "<p>Brak danych</p>"; return; }
       const suma = lista.reduce((acc, s) => acc + (Number(s.treningi) || 0), 0);
       div.innerHTML =
         lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('') +
@@ -424,96 +438,58 @@
           🔥 Łącznie: ${suma} treningów w sezonie
         </div>`;
     }
-
     function powrotDoTreningow() {
       document.getElementById("statsView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
     }
-
     function powrotDoPlatnosci() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("platnosciView").classList.remove("hidden");
     }
 
-    // 🔹 Nawigacja login <-> rejestracja
-    function pokazRejestracje() {
-      document.getElementById("loginView").classList.add("hidden");
-      document.getElementById("registerView").classList.remove("hidden");
+    /* =================== REJESTRACJA =================== */
+    async function wyslijRejestracje() {
+      const numer = document.getElementById("regNumer").value.trim();
+      const nazwisko = document.getElementById("regNazwisko").value.trim();
+      const haslo = document.getElementById("regHaslo").value.trim();
+      const msg = document.getElementById("regMsg");
+
+      if (!numer || !nazwisko || !haslo) {
+        msg.innerText = "Wypełnij wszystkie pola.";
+        return;
+      }
+
+      msg.innerText = "⏳ Rejestracja...";
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: new URLSearchParams({ mode: "rejestracja", numer, nazwisko, haslo })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          // Czyść pola
+          document.getElementById("regNumer").value = "";
+          document.getElementById("regNazwisko").value = "";
+          document.getElementById("regHaslo").value = "";
+
+          msg.innerText = "✅ Rejestracja zakończona!";
+          // Zniknij komunikat i wróć do logowania
+          setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 1500);
+        } else {
+          msg.innerText = "❌ " + (data.msg || "Błąd");
+        }
+      } catch (e) {
+        msg.innerText = "Błąd połączenia.";
+      }
     }
-    function pokazLogowanie() {
-      document.getElementById("registerView").classList.add("hidden");
-      document.getElementById("loginView").classList.remove("hidden");
+
+    // Placeholder – zrobimy backend dla trenerów w kolejnym kroku
+    function wyslijRejestracjeTrener() {
+      const msg = document.getElementById("regT_Msg");
+      msg.innerText = "🚧 Funkcja w trakcie budowy";
+      setTimeout(() => { msg.innerText = ""; pokazRejestracjaSelect(); }, 1200);
     }
-// 🔹 Rejestracja (po sukcesie auto-powrót do logowania po 2s)
-
-async function wyslijRejestracje() {
-  const numer = document.getElementById("regNumer").value.trim();
-  const nazwisko = document.getElementById("regNazwisko").value.trim();
-  const haslo = document.getElementById("regHaslo").value.trim();
-  const msg = document.getElementById("regMsg");
-
-  if (!numer || !nazwisko || !haslo) {
-    msg.innerText = "Wypełnij wszystkie pola.";
-    return;
-  }
-
-  msg.innerText = "⏳ Rejestracja...";
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: new URLSearchParams({ mode: "rejestracja", numer, nazwisko, haslo })
-    });
-    const data = await res.json();
-
-    if (data.ok) {
-
-      // ✅ Czyścimy pola
-      document.getElementById("regNumer").value = "";
-      document.getElementById("regNazwisko").value = "";
-      document.getElementById("regHaslo").value = "";
-
-      msg.innerText = "✅ Rejestracja zakończona!";
-
-      // ✅ Po 2s wracamy do logowania + czyścimy komunikat
-      setTimeout(() => {
-        msg.innerText = "";
-        pokazLogowanie();
-      }, 2000);
-
-    } else {
-      msg.innerText = "❌ " + (data.msg || "Błąd");
-    }
-  } catch (e) {
-    msg.innerText = "Błąd połączenia.";
-  }
-}
-
-/* === NAWIGACJA WIDOKÓW REJESTRACJI === */
-
-function ukryjWszystkie() {
-  document.querySelectorAll(".container").forEach(v => v.classList.add("hidden"));
-}
-
-function pokazLogowanie() {
-  ukryjWszystkie();
-  document.getElementById("loginView").classList.remove("hidden");
-}
-
-function pokazRejestracjaSelect() {
-  ukryjWszystkie();
-  document.getElementById("rejestracjaSelectView").classList.remove("hidden");
-}
-
-function pokazRejestracjaZawodnik() {
-  ukryjWszystkie();
-  document.getElementById("rejestracjaZawodnikView").classList.remove("hidden");
-}
-
-function pokazRejestracjaTrener() {
-  ukryjWszystkie();
-  document.getElementById("rejestracjaTrenerView").classList.remove("hidden");
-}
-
   </script>
 </body>
 </html>

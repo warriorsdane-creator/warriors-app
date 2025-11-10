@@ -222,7 +222,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYhzrNyof7lBwjkPV9hzt48-NVg8x12b0BCKQ_UoeeEi5dw10cUqmoNA-o4JaxoUF4/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJcvA03-KuluDf-mpCvOzWTKXxYj9MMkIIlYu0ERCxadXA9fOGLzpJLUnfkQ1W_xJ9/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -257,7 +257,11 @@
 
       komunikat.innerText = "Trwa logowanie...";
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=login&numer=${encodeURIComponent(numer)}&haslo=${encodeURIComponent(haslo)}`);
+       const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: new URLSearchParams({ mode:"login", numer:login, haslo })
+      });
+
         const data = await res.json();
 
         if (data.success) {

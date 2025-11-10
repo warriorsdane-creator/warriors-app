@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.33.039';
+    const WERSJA_APKI = '1.34.40';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -199,12 +199,27 @@
     </div>
 
     <!-- ✅ PANEL TRENERA -->
-    <div id="trainerPanelView" class="container hidden">
-      <h1>Panel trenera</h1>
-      <p>🔧 W trakcie rozbudowy</p>
+      <div id="trainerPanelView" class="container hidden">
+        <h1>Panel trenera</h1>
+
+      <button class="full-btn" onclick="trainerPokazZawodnicy()">👥 Zawodnicy</button>
+      <button class="full-btn" onclick="trainerPokazWydarzenia()">🏒 Wydarzenia</button>
       <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Wyloguj</button>
     </div>
 
+    <!-- WIDOK LISTY ZAWODNIKÓW -->
+      <div id="trainerZawodnicyView" class="container hidden">
+        <h1>Lista zawodników</h1>
+        <div id="trainerListaZawodnikow">Ładowanie...</div>
+      <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
+    </div>
+
+    <!-- WIDOK WYDARZEŃ TRENERA -->
+      <div id="trainerWydarzeniaView" class="container hidden">
+        <h1>Wydarzenia</h1>
+        <div id="trainerListaWydarzen">Ładowanie...</div>
+      <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
+    </div>
   </div>
 
   <script>
@@ -229,7 +244,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5M6vMz9UFplFDnZ7dBMis2gmZ7ZeXFD-5aTnzmeCWoimATFf7Px05su8GLQCt8bOs/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQTHFCsC6PKgI6-pw5buCv6BvDELM8ewsUpx1mAUCO5ZNbLbUq96bvi6OEueLJsG4F/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -309,6 +324,46 @@
   }
 }
 
+   /* =================== PANEL TRENERA =================== */
+
+function trainerPowrot() {
+  ukryjWszystkie();
+  document.getElementById("trainerPanelView").classList.remove("hidden");
+}
+
+async function trainerPokazZawodnicy() {
+  ukryjWszystkie();
+  document.getElementById("trainerZawodnicyView").classList.remove("hidden");
+  document.getElementById("trainerListaZawodnikow").innerHTML = "⏳ Ładowanie...";
+
+  const res = await fetch(`${SCRIPT_URL}?action=listaZawodnikow`);
+  const lista = await res.json();
+
+  document.getElementById("trainerListaZawodnikow").innerHTML =
+    lista.map(z => `<div class="card">#${z.nr} — ${z.nazwisko} — grupa ${z.grupa}</div>`).join('');
+}
+
+async function trainerPokazWydarzenia() {
+  ukryjWszystkie();
+  document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
+  const res = await fetch(`${SCRIPT_URL}?action=treningiTrener`);
+  const lista = await res.json();
+  renderTreningiTrainer(lista);
+}
+
+function renderTreningiTrainer(lista) {
+  const div = document.getElementById("trainerListaWydarzen");
+  if (!lista?.length) { div.innerHTML = "<p>Brak wydarzeń</p>"; return; }
+  div.innerHTML = lista.map(t => `
+    <div class="card">
+      <b>${t.rodzaj}</b><br>
+      ${t.data} (${t.dzien}) – ${t.czas}<br>
+      Grupy: ${t.grupy}<br>
+      Zapisanych: ${t.zapisanych}
+    </div>
+  `).join('');
+}
+ 
 
     /* =================== PŁATNOŚCI =================== */
     function renderPlatnosci(lista) {

@@ -91,10 +91,25 @@
       85%  { opacity: 1;   transform: scale(1);   filter: brightness(100%); }
       100% { opacity: 0;   transform: scale(1);   filter: brightness(50%) blur(2px); }
     }
+    .full-btn {
+  display: block;
+  width: 200px;       /* taka jak input */
+  margin: 10px auto;
+  padding: 8px;
+  border-radius: 6px;
+  background: red;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+.full-btn.alt {
+  background: #333;
+}
+
   </style>
 
   <script>
-    const WERSJA_APKI = '1.25.034';
+    const WERSJA_APKI = '1.26.034';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);

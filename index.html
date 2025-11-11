@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.36.40';
+    const WERSJA_APKI = '1.37.40';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -311,7 +311,15 @@
       renderPlatnosci(platnosci);
       return;
     }
+      
+      if (data.role === "trener") {
+      // Zapamiętujemy login trenera
+      numerZalogowanego = data.login;
 
+      ukryjWszystkie();
+        document.getElementById("trainerPanelView").classList.remove("hidden");
+      return;
+    }
 
   } catch (e) {
     komunikat.innerText = "Błąd połączenia.";

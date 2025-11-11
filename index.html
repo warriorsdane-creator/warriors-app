@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.39.45';
+    const WERSJA_APKI = '1.40.45';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -342,13 +342,12 @@ async function trainerPokazZawodnicy() {
   const res = await fetch(`${SCRIPT_URL}?action=statystykiPelne`);
   const lista = await res.json();
 
-  box.innerHTML = lista.map(z => `
-    <div class="card">
-      <b>#${z.nr}</b> — ${z.nazwisko}<br>
-      Obecności: <b>${z.obec}</b><br>
-      Dopłata: <b>${z.kwota > 0 ? z.kwota + " zł" : "—"}</b>
-    </div>
-  `).join('');
+box.innerHTML = lista.map(z => `
+  <div class="card">
+    <b>${z.nr}</b> — ${z.nazwisko}<br>
+    ${z.obec} treningów
+  </div>
+`).join('');
 }
 
 async function trainerPokazWydarzenia() {

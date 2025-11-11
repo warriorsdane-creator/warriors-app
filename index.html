@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.40.45';
+    const WERSJA_APKI = '1.41.45';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -336,18 +336,18 @@ function trainerPowrot() {
 async function trainerPokazZawodnicy() {
   ukryjWszystkie();
   document.getElementById("trainerZawodnicyView").classList.remove("hidden");
-  const box = document.getElementById("trainerListaZawodnikow");
-  box.innerHTML = "⏳ Ładowanie...";
 
-  const res = await fetch(`${SCRIPT_URL}?action=statystykiPelne`);
+  const box = document.getElementById("trainerZawodnicyList");
+  box.innerHTML = "<div class='card' style='background:#222;'>⏳ Ładowanie...</div>";
+
+  const res = await fetch(`${SCRIPT_URL}?action=statystykiSum`);
   const lista = await res.json();
 
-box.innerHTML = lista.map(z => `
-  <div class="card">
-    <b>${z.nr}</b> — ${z.nazwisko}<br>
-    ${z.obec} treningów
-  </div>
-`).join('');
+  box.innerHTML = lista.map(z => `
+    <div class="card" style="text-align:left;">
+      <b>${z.nr}</b> — ${z.nazwisko} — <b>${z.suma}</b> treningów
+    </div>
+  `).join('');
 }
 
 async function trainerPokazWydarzenia() {

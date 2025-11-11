@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.38.44';
+    const WERSJA_APKI = '1.39.45';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -244,7 +244,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzjU5YCv0tebkeelypql4yedOQMrFTvQyfPKhzwYC9zgqH5F51ZJEXGf4djSSEQN1Ad/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9wGDcTYqJ0KHHsSa8LKvRl9q-OTduM0X5gPmF-40of3CyvD22pwD0SQpslMk7pZKY/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -336,13 +336,19 @@ function trainerPowrot() {
 async function trainerPokazZawodnicy() {
   ukryjWszystkie();
   document.getElementById("trainerZawodnicyView").classList.remove("hidden");
-  document.getElementById("trainerListaZawodnikow").innerHTML = "⏳ Ładowanie...";
+  const box = document.getElementById("trainerListaZawodnikow");
+  box.innerHTML = "⏳ Ładowanie...";
 
-  const res = await fetch(`${SCRIPT_URL}?action=listaZawodnikow`);
+  const res = await fetch(`${SCRIPT_URL}?action=statystykiPelne`);
   const lista = await res.json();
 
-  document.getElementById("trainerListaZawodnikow").innerHTML =
-    lista.map(z => `<div class="card">#${z.nr} — ${z.nazwisko} — grupa ${z.grupa}</div>`).join('');
+  box.innerHTML = lista.map(z => `
+    <div class="card">
+      <b>#${z.nr}</b> — ${z.nazwisko}<br>
+      Obecności: <b>${z.obec}</b><br>
+      Dopłata: <b>${z.kwota > 0 ? z.kwota + " zł" : "—"}</b>
+    </div>
+  `).join('');
 }
 
 async function trainerPokazWydarzenia() {

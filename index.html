@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.35.40';
+    const WERSJA_APKI = '1.36.40';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -312,23 +312,6 @@
       return;
     }
 
-if (data.role === "trener") {
-  ukryjWszystkie();
-  document.getElementById("trainerPanelView").classList.remove("hidden");
-
-  // przycisk wejścia w wydarzenia
-  if (!document.getElementById("btnWydarzeniaTrener")) {
-    const btn = document.createElement("button");
-    btn.id = "btnWydarzeniaTrener";
-    btn.className = "full-btn";
-    btn.innerText = "Wydarzenia";
-    btn.onclick = pokazTreningiTrener;
-    document.getElementById("trainerPanelView").appendChild(btn);
-  }
-
-  return;
-}
-
 
   } catch (e) {
     komunikat.innerText = "Błąd połączenia.";
@@ -397,11 +380,11 @@ function renderTreningiTrainer(lista) {
     }
 
     async function pokazTreningiTrener() {
-  ukryjWszystkie();
-  document.getElementById("homeView").classList.remove("hidden");
+      ukryjWszystkie();
+      document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
 
-  const lista = await (await fetch(`${SCRIPT_URL}?action=treningiTrener`)).json();
-  renderTreningi(lista);
+      const lista = await (await fetch(`${SCRIPT_URL}?action=treningiTrener`)).json();
+      renderTreningi(lista);
 
   // Zablokuj przyciski zapisu i wypisu
   document.querySelectorAll("button[id^='btn-']").forEach(b => {

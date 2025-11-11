@@ -348,7 +348,7 @@ async function trainerPokazZawodnicy() {
 async function trainerPokazWydarzenia() {
   ukryjWszystkie();
   document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
-  const res = await fetch(`${SCRIPT_URL}?action=treningiTrener`);
+  const res = await fetch(`${SCRIPT_URL}?action=treningiWszystkie`);
   const lista = await res.json();
   renderTreningiTrainer(lista);
 }

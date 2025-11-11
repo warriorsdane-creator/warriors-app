@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.37.42';
+    const WERSJA_APKI = '1.38.43';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -244,7 +244,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1oD_2L6fuEpN38ctTd1kTu2_dNYBgDVb7MrYZfPOQV_thngvMu_SVESDZ6Kbr3QTA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXn_KemIFQB58_97UsC7EvQvVQ0M6Sm8TyFaPp3dA1gWnE1xGDUtk9KEAPshSHeigY/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -356,16 +356,51 @@ async function trainerPokazWydarzenia() {
 function renderTreningiTrainer(lista) {
   const div = document.getElementById("trainerListaWydarzen");
   if (!lista?.length) { div.innerHTML = "<p>Brak wydarzeń</p>"; return; }
+
   div.innerHTML = lista.map(t => `
     <div class="card">
       <b>${t.rodzaj}</b><br>
-      ${t.data} (${t.dzien}) – ${t.czas}<br>
+      <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
+      Trener: <b>${t.trener}</b><br>
       Grupy: ${t.grupy}<br>
-      Zapisanych: ${t.zapisanych}
+      Zapisanych: ${t.zapisanych}<br><br>
+
+      <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
+      <div id="trainer-zapisani-${t.id}" class="hidden"></div>
     </div>
   `).join('');
 }
- 
+async function trainerToggleZapisani(id) {
+  const box = document.getElementById(`trainer-zapisani-${id}`);
+  if (!box) return;
+
+  if (!box.classList.contains('hidden')) {
+    box.classList.add('hidden');
+    return;
+  }
+
+  box.classList.remove('hidden');
+  box.innerHTML = '<div class="card" style="background:#222;">⏳ Ładowanie...</div>';
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
+    const lista = await res.json();
+
+    if (!Array.isArray(lista) || !lista.length) {
+      box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
+      return;
+    }
+
+    box.innerHTML = `<div class="card" style="background:#111;">
+      <b>Lista zapisanych:</b>
+      <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
+        ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
+      </ul>
+    </div>`;
+  } catch {
+    box.innerHTML = '<div class="card" style="background:#700;">Błąd pobierania listy</div>';
+  }
+}
 
     /* =================== PŁATNOŚCI =================== */
     function renderPlatnosci(lista) {

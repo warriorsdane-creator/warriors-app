@@ -307,7 +307,7 @@
       ukryjWszystkie();
       document.getElementById("platnosciView").classList.remove("hidden");
 
-      const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(data.login)}`)).json();
+      const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numerZalogowanego)}`)).json();
       renderPlatnosci(platnosci);
       return;
     }

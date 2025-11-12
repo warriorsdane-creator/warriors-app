@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.45.49';
+    const WERSJA_APKI = '1.46.50';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -177,6 +177,30 @@
   <p id="regMsgTrener"></p>
 </div>
 
+    <!-- ✅ DODAJ WYDARZENIE -->
+<div id="trainerDodajWydarzenieView" class="container hidden">
+  <h1>Dodaj wydarzenie</h1>
+
+  <div class="login-box">
+    <input id="eventData" type="date" placeholder="Data">
+    <input id="eventStart" type="time" placeholder="Godzina startu">
+    <input id="eventEnd" type="time" placeholder="Godzina zakończenia">
+    <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
+    <input id="eventTrener1" type="text" placeholder="Trener 1">
+    <input id="eventTrener2" type="text" placeholder="Trener 2 (opcjonalnie)">
+    <input id="eventGrupy" type="text" placeholder="Grupy (np. G1,G2)">
+    <label style="display:block;margin-top:10px;">
+      <input id="eventStat" type="checkbox"> Liczyć do statystyk
+    </label>
+  </div>
+
+  <button class="full-btn" onclick="wyslijNoweWydarzenie()">💾 Dodaj wydarzenie</button>
+  <button class="full-btn alt" onclick="trainerPokazWydarzenia()">⬅ Powrót</button>
+
+  <p id="eventMsg" style="margin-top:10px;"></p>
+</div>
+
+    
     <!-- ✅ PŁATNOŚCI -->
     <div id="platnosciView" class="container hidden">
       <h1>Płatności</h1>
@@ -204,6 +228,7 @@
 
       <button class="full-btn" onclick="trainerPokazZawodnicy()">👥 Zawodnicy</button>
       <button class="full-btn" onclick="trainerPokazWydarzenia()">🏒 Wydarzenia</button>
+      <button class="full-btn" onclick="trainerPokazDodajWydarzenie()">➕ Dodaj wydarzenie</button>
       <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Wyloguj</button>
     </div>
 
@@ -244,7 +269,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVQbD0TEDGGgBGkU16rnlHIuPs7oYsDgGyvGMY32hhuWn7jZ4RTNGhEqFrHVD5CQGj/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdEXGvZPZPmzjfTZ9_lh62PhtBRrFGm_9DGFdj5wf2-2Ava8IQ5ID_WvLpa7-6GmTE/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -385,7 +410,8 @@ function renderTreningiTrainer(lista) {
     </div>
   `).join('');
 }
-async function trainerToggleZapisani(id) {
+
+    async function trainerToggleZapisani(id) {
   const box = document.getElementById(`trainer-zapisani-${id}`);
   if (!box) return;
 
@@ -417,6 +443,62 @@ async function trainerToggleZapisani(id) {
   }
 }
 
+    function trainerPokazDodajWydarzenie() {
+  ukryjWszystkie();
+  document.getElementById("trainerDodajWydarzenieView").classList.remove("hidden");
+}
+
+async function wyslijNoweWydarzenie() {
+  const data = document.getElementById("eventData").value;
+  const start = document.getElementById("eventStart").value;
+  const end = document.getElementById("eventEnd").value;
+  const rodzaj = document.getElementById("eventRodzaj").value;
+  const trener1 = document.getElementById("eventTrener1").value;
+  const trener2 = document.getElementById("eventTrener2").value;
+  const grupy = document.getElementById("eventGrupy").value;
+  const liczDoStat = document.getElementById("eventStat").checked;
+  const msg = document.getElementById("eventMsg");
+
+  if (!data || !start || !rodzaj || !trener1) {
+    msg.innerText = "Uzupełnij wymagane pola: Data, Godzina, Rodzaj, Trener 1.";
+    return;
+  }
+
+  msg.innerText = "⏳ Dodawanie wydarzenia...";
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "dodajWydarzenie",
+        data,
+        godzStart: start,
+        godzKoniec: end,
+        rodzaj,
+        trener1,
+        trener2,
+        grupy,
+        liczDoStatystyk: liczDoStat
+      })
+    });
+
+    const r = await res.json();
+    msg.innerText = r.message || "Nieznany wynik.";
+
+    if (r.success) {
+      // wyczyść pola po sukcesie
+      document.querySelectorAll("#trainerDodajWydarzenieView input").forEach(i => {
+        if (i.type !== "checkbox") i.value = "";
+        else i.checked = false;
+      });
+      setTimeout(() => trainerPokazWydarzenia(), 1500);
+    }
+
+  } catch (err) {
+    msg.innerText = "❌ Błąd połączenia: " + err;
+  }
+}
+
+    
     /* =================== PŁATNOŚCI =================== */
     function renderPlatnosci(lista) {
       const div = document.getElementById("listaPlatnosci");

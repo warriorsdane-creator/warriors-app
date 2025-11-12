@@ -376,12 +376,9 @@ function renderTreningiTrainer(lista) {
 
   div.innerHTML = lista.map(t => `
     <div class="card">
-      <b>${t.rodzaj}</b><br>
-      <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
-      Trener: <b>${t.trener}</b><br>
-      Grupy: ${t.grupy}<br>
-      Zapisanych: ${t.zapisanych}<br><br>
-
+      <b>${t.rodzaj}</b><br> <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
+      Trener: <b>${t.trener}</b><br> Zapisanych: ${t.zapisanych}<br><br>
+      
       <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
       <div id="trainer-zapisani-${t.id}" class="hidden"></div>
     </div>

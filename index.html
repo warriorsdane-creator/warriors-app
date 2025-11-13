@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.46.53';
+    const WERSJA_APKI = '1.47.54';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -269,7 +269,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznqQE9GsEAEz4juidcOyE5P1WLrz_GTkfvoxxfO6HS40HifwDKa3_cxVpLijp_MFCH/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVjkwcnAs77HXMOrcU8oaIDAWiVfGleoYqonIStlTKgO3Y9c30TUfycTl4DuIJFBkb/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -338,11 +338,12 @@
     }
       
       if (data.role === "trener") {
-      // Zapamiętujemy login trenera
-      numerZalogowanego = data.login;
-
       ukryjWszystkie();
-        document.getElementById("trainerPanelView").classList.remove("hidden");
+      document.getElementById("trainerPanelView").classList.remove("hidden");
+
+          // 🔹 zapisz grupy trenera z backendu
+      window.grupyTrenera = data.grupa || "";
+
       return;
     }
 
@@ -390,8 +391,11 @@ async function trainerPokazZawodnicy() {
 async function trainerPokazWydarzenia() {
   ukryjWszystkie();
   document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
-  const res = await fetch(`${SCRIPT_URL}?action=treningiWszystkie`);
+
+  const grupa = encodeURIComponent(window.grupyTrenera || "");
+  const res = await fetch(`${SCRIPT_URL}?action=treningiTrener&grupa=${grupa}`);
   const lista = await res.json();
+
   renderTreningiTrainer(lista);
 }
 

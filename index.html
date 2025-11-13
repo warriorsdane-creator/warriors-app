@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.47.57';
+    const WERSJA_APKI = '1.48.58';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -269,7 +269,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxineKR1HpOGOPa9_KNbjNKDxil5bj5DxVIC-cnvDOWTDwq-hUip27SA7dlh6Cb4gOH/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOFmfx78g9OGWG4WDjYSN-1tG8O1zI_bRfpE3hGge7Rn9AsERpukDBtHDfvYZjICYA/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -401,19 +401,24 @@ async function trainerPokazWydarzenia() {
 
 function renderTreningiTrainer(lista) {
   const div = document.getElementById("trainerListaWydarzen");
-  if (!lista?.length) { div.innerHTML = "<p>Brak wydarzeń</p>"; return; }
+  if (!lista?.length) { 
+    div.innerHTML = "<p>Brak wydarzeń</p>"; 
+    return; 
+  }
 
   div.innerHTML = lista.map(t => `
     <div class="card">
-    <b>${t.rodzaj}</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${t.data} (${t.dzien}) – ${t.czas}<br>
-    Trener: <b>${t.trener}</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Zapisanych: ${t.zapisanych}<br><br>
+      <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
+      Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
+      Grupy: <b>${t.grupy}</b><br>
+      Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
 
-      
       <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
       <div id="trainer-zapisani-${t.id}" class="hidden"></div>
     </div>
   `).join('');
 }
+
 
     async function trainerToggleZapisani(id) {
   const box = document.getElementById(`trainer-zapisani-${id}`);

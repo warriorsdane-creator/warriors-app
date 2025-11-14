@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.49.61';
+    const WERSJA_APKI = '1.50.62';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -228,7 +228,7 @@
 
       <button class="full-btn" onclick="trainerPokazZawodnicy()">👥 Zawodnicy</button>
       <button class="full-btn" onclick="trainerPokazWydarzenia()">🏒 Wydarzenia</button>
-      <button class="full-btn" onclick="trainerPokazDodajWydarzenie()">➕ Dodaj wydarzenie</button>
+      
       <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Wyloguj</button>
     </div>
 
@@ -239,13 +239,21 @@
       <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
     </div>
 
-    <!-- WIDOK WYDARZEŃ TRENERA -->
-      <div id="trainerWydarzeniaView" class="container hidden">
-        <h1>Wydarzenia</h1>
-        <div id="trainerListaWydarzen">Ładowanie...</div>
-      <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
-    </div>
-  </div>
+<!-- WIDOK WYDARZEŃ TRENERA -->
+<div id="trainerWydarzeniaView" class="container hidden">
+  <h1>Wydarzenia</h1>
+
+  <div id="trainerListaWydarzen">Ładowanie...</div>
+
+  <!-- PRZYCISK DODAJ WYDARZENIE NA DOLE -->
+  <button class="full-btn" style="margin-top:20px;"
+          onclick="pokazDodajWydarzenie()">
+    ➕ Dodaj wydarzenie
+  </button>
+
+  <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
+</div>
+
 
   <script>
     // 🎧 Dźwięk intra
@@ -269,7 +277,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzSOjX5_JlRyxSd_oxvUW1G-iATX16_HQE1M5DwbcKe6fXCb91EYhbQPUZUxXVImd-D/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycK4-243xUoSHhEVY7IOso1bM-G7Y9lw8v1y9zTufwhx2YR7TTuXpju5y6q475KzvH/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -454,6 +462,10 @@ function renderTreningiTrainer(lista) {
   ukryjWszystkie();
   document.getElementById("trainerDodajWydarzenieView").classList.remove("hidden");
 }
+    
+function validHour(hhmm) {
+  return /^\d{2}:\d{2}$/.test(hhmm);
+}
 
 async function wyslijNoweWydarzenie() {
   const data = document.getElementById("eventData").value;
@@ -466,12 +478,25 @@ async function wyslijNoweWydarzenie() {
   const liczDoStat = document.getElementById("eventStat").checked;
   const msg = document.getElementById("eventMsg");
 
+  // ❗ Pola wymagane
   if (!data || !start || !rodzaj || !trener1) {
     msg.innerText = "Uzupełnij wymagane pola: Data, Godzina, Rodzaj, Trener 1.";
     return;
   }
 
+  // ⏱ Walidacja godzin
+  if (!validHour(start) || !validHour(end)) {
+    msg.innerText = "❌ Niepoprawny format godziny. Wpisz w formacie HH:MM.";
+    return;
+  }
+
+  if (start >= end) {
+    msg.innerText = "❌ Godzina zakończenia musi być później niż rozpoczęcia.";
+    return;
+  }
+
   msg.innerText = "⏳ Dodawanie wydarzenia...";
+
   try {
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
@@ -492,19 +517,20 @@ async function wyslijNoweWydarzenie() {
     msg.innerText = r.message || "Nieznany wynik.";
 
     if (r.success) {
-      // wyczyść pola po sukcesie
+      // 🧹 Czyścimy form
       document.querySelectorAll("#trainerDodajWydarzenieView input").forEach(i => {
         if (i.type !== "checkbox") i.value = "";
         else i.checked = false;
       });
-      setTimeout(() => trainerPokazWydarzenia(), 1500);
+
+      // 🔄 odświeżenie listy
+      setTimeout(() => trainerPokazWydarzenia(), 800);
     }
 
   } catch (err) {
     msg.innerText = "❌ Błąd połączenia: " + err;
   }
 }
-
     
     /* =================== PŁATNOŚCI =================== */
     function renderPlatnosci(lista) {

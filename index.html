@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.48.59';
+    const WERSJA_APKI = '1.50.60';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -269,7 +269,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDOdzyw7Y6eIicHGX4D31GpD4OVL4h-YSNoa3BRH0jxifdP2V5MT0rt3gdv4kWu8aq/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygz_FI1JwKd8cyHy2Jb6yVZZ41O3HbwpQ_nnf-mpok3uXQQTpypATvrOP8nU0fgo6k/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -552,12 +552,12 @@ async function wyslijNoweWydarzenie() {
       }
       div.innerHTML = lista.map(t => `
         <div class="card">
-          <p>
-            ${t.rodzaj ? `<b>${t.rodzaj}</b><br>` : ``}
-            <b>${t.data}</b> (${t.dzien}) – ${t.czas}<br>
-            Trener: <b>${t.trener}</b><br>
-            Zapisanych: ${t.zapisanych}
-          </p>
+        <p>
+          <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
+          Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
+          Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}
+        </p>
+
           <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
             <button id="btn-${t.id}" ${t.zapisany ? 'disabled' : ''} onclick="zapiszSie('${t.id}')">
               ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}

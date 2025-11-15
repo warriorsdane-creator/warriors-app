@@ -186,15 +186,20 @@
     <input id="eventStart" type="time" placeholder="Godzina startu">
     <input id="eventEnd" type="time" placeholder="Godzina zakończenia">
     <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
-    <input id="eventTrener1" type="text" placeholder="Trener 1">
-    <input id="eventTrener2" type="text" placeholder="Trener 2 (opcjonalnie)">
-    <select id="eventGrupy" multiple size="5" style="width:200px;">
+    <select id="eventTrener1" style="width:200px;">
+      <option value="">— wybierz —</option>
+        </select>
+    <select id="eventTrener2" style="width:200px;">
+      <option value="">— brak —</option>
+        </select>
+    <select id="eventGrupy" multiple style="width:200px; height:110px;">
   <option value="G1">G1</option>
   <option value="G2">G2</option>
   <option value="G3">G3</option>
   <option value="G4">G4</option>
   <option value="G5">G5</option>
 </select>
+
 
     <label style="display:block;margin-top:10px;">
       <input id="eventStat" type="checkbox"> Liczyć do statystyk

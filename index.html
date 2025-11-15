@@ -17,7 +17,7 @@
     }
     .hidden { display: none; }
     .container { margin-top: 40px; }
-    .login-box input, .login-box select {
+    .login-box input {
       display: block;
       margin: 10px auto;
       padding: 8px;
@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.52.63';
+    const WERSJA_APKI = '1.51.63';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -152,7 +152,7 @@
       <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Powrót</button>
     </div>
 
-    <!-- ✅ REJESTRACJA ZAWODNIKA -->
+    <!-- ✅ REJESTRACJA ZAWODNIKA (funkcjonalna) -->
     <div id="registerZawodnikView" class="container hidden">
       <h1>Rejestracja zawodnika</h1>
       <div class="login-box">
@@ -165,64 +165,61 @@
       <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
     </div>
 
-    <!-- ✅ REJESTRACJA TRENERA -->
-    <div id="rejestracjaTrenerView" class="container hidden">
-      <h1>Rejestracja trenera</h1>
-      <div class="login-box">
-        <input id="regNazwiskoTrener" type="text" placeholder="Imię i nazwisko">
-        <input id="regHasloTrener" type="password" placeholder="Ustaw hasło">
-        <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
-        <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
-      </div>
-      <p id="regMsgTrener"></p>
-    </div>
+    <!-- ✅ REJESTRACJA TRENERA (placeholder) -->
+<div id="rejestracjaTrenerView" class="container hidden">
+  <h1>Rejestracja trenera</h1>
+  <div class="login-box">
+    <input id="regNazwiskoTrener" type="text" placeholder="Imię i nazwisko">
+    <input id="regHasloTrener" type="password" placeholder="Ustaw hasło">
+    <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
+    <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+  </div>
+  <p id="regMsgTrener"></p>
+</div>
 
     <!-- ✅ DODAJ WYDARZENIE -->
-    <div id="trainerDodajWydarzenieView" class="container hidden">
-      <h1>Dodaj wydarzenie</h1>
+<div id="trainerDodajWydarzenieView" class="container hidden">
+  <h1>Dodaj wydarzenie</h1>
 
-      <div class="login-box">
-        <input id="eventData" type="date" placeholder="Data">
-        <input id="eventStart" type="time" placeholder="Godzina startu">
-        <input id="eventEnd" type="time" placeholder="Godzina zakończenia">
-        <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
-
-        <!-- lista trenerów z backendu -->
-        <select id="eventTrener1">
-          <option value="">— wybierz —</option>
+  <div class="login-box">
+    <input id="eventData" type="date" placeholder="Data">
+    <input id="eventStart" type="time" placeholder="Godzina startu">
+    <input id="eventEnd" type="time" placeholder="Godzina zakończenia">
+    <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
+    <select id="eventTrener1" style="width:200px;">
+      <option value="">— wybierz —</option>
         </select>
-
-        <select id="eventTrener2">
-          <option value="">— brak —</option>
+    <select id="eventTrener2" style="width:200px;">
+      <option value="">— brak —</option>
         </select>
+    <select id="eventGrupy" multiple style="width:200px; height:110px;">
+  <option value="G1">G1</option>
+  <option value="G2">G2</option>
+  <option value="G3">G3</option>
+  <option value="G4">G4</option>
+  <option value="G5">G5</option>
+</select>
 
-        <!-- multiselect grup -->
-        <select id="eventGrupy" multiple style="width:200px; height:110px;">
-          <option value="G1">G1</option>
-          <option value="G2">G2</option>
-          <option value="G3">G3</option>
-          <option value="G4">G4</option>
-          <option value="G5">G5</option>
-        </select>
 
-        <label style="display:block;margin-top:10px;">
-          <input id="eventStat" type="checkbox"> Liczyć do statystyk
-        </label>
-      </div>
+    <label style="display:block;margin-top:10px;">
+      <input id="eventStat" type="checkbox"> Liczyć do statystyk
+    </label>
+  </div>
 
-      <button class="full-btn" onclick="wyslijNoweWydarzenie()">💾 Dodaj wydarzenie</button>
-      <button class="full-btn alt" onclick="trainerPokazWydarzenia()">⬅ Powrót</button>
+  <button class="full-btn" onclick="wyslijNoweWydarzenie()">💾 Dodaj wydarzenie</button>
+  <button class="full-btn alt" onclick="trainerPokazWydarzenia()">⬅ Powrót</button>
 
-      <p id="eventMsg" style="margin-top:10px;"></p>
-    </div>
+  <p id="eventMsg" style="margin-top:10px;"></p>
+</div>
 
+    
     <!-- ✅ PŁATNOŚCI -->
     <div id="platnosciView" class="container hidden">
       <h1>Płatności</h1>
       <div id="listaPlatnosci">Ładowanie...</div>
     </div>
 
-    <!-- ✅ WYDARZENIA (widok zawodnika) -->
+    <!-- ✅ WYDARZENIA -->
     <div id="homeView" class="container hidden">
       <h1 id="tytulTreningow">TWOJE WYDARZENIA</h1>
       <div id="listaTreningow">Ładowanie...</div>
@@ -238,590 +235,612 @@
     </div>
 
     <!-- ✅ PANEL TRENERA -->
-    <div id="trainerPanelView" class="container hidden">
-      <h1>Panel trenera</h1>
+      <div id="trainerPanelView" class="container hidden">
+        <h1>Panel trenera</h1>
+
       <button class="full-btn" onclick="trainerPokazZawodnicy()">👥 Zawodnicy</button>
       <button class="full-btn" onclick="trainerPokazWydarzenia()">🏒 Wydarzenia</button>
+      
       <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Wyloguj</button>
     </div>
 
     <!-- WIDOK LISTY ZAWODNIKÓW -->
-    <div id="trainerZawodnicyView" class="container hidden">
-      <h1>Lista zawodników</h1>
-      <div id="trainerListaZawodnikow">Ładowanie...</div>
+      <div id="trainerZawodnicyView" class="container hidden">
+        <h1>Lista zawodników</h1>
+        <div id="trainerListaZawodnikow">Ładowanie...</div>
       <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
     </div>
 
-    <!-- WIDOK WYDARZEŃ TRENERA -->
-    <div id="trainerWydarzeniaView" class="container hidden">
-      <h1>Wydarzenia</h1>
+<!-- WIDOK WYDARZEŃ TRENERA -->
+<div id="trainerWydarzeniaView" class="container hidden">
+  <h1>Wydarzenia</h1>
 
-      <div id="trainerListaWydarzen">Ładowanie...</div>
+  <div id="trainerListaWydarzen">Ładowanie...</div>
 
-      <!-- PRZYCISK DODAJ WYDARZENIE NA DOLE -->
-      <button class="full-btn" style="margin-top:20px;" onclick="pokazDodajWydarzenie()">
-        ➕ Dodaj wydarzenie
-      </button>
+  <!-- PRZYCISK DODAJ WYDARZENIE NA DOLE -->
+<button class="full-btn" style="margin-top:20px;"
+          onclick="pokazDodajWydarzenie()"
+    ➕ Dodaj wydarzenie
+</button>
 
-      <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
-    </div>
+  <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
+</div>
 
-    <script>
-      // 🎧 Dźwięk intra
-      function odtworzIntroSound() {
-        try {
-          const audio = new Audio("sound.mp3");
-          audio.volume = 0.7;
-          audio.play().catch(e => console.warn("Nie można odtworzyć dźwięku:", e));
-        } catch (err) {
-          console.error("Błąd dźwięku:", err);
-        }
+
+  <script>
+    // 🎧 Dźwięk intra
+    function odtworzIntroSound() {
+      try {
+        const audio = new Audio("sound.mp3");
+        audio.volume = 0.7;
+        audio.play().catch(e => console.warn("Nie można odtworzyć dźwięku:", e));
+      } catch (err) {
+        console.error("Błąd dźwięku:", err);
       }
+    }
 
-      window.addEventListener('load', () => {
-        odtworzIntroSound();
-        setTimeout(() => {
-          document.getElementById('splash').style.display = 'none';
-          document.getElementById('app').classList.remove('hidden');
-          document.getElementById("wersjaNum").textContent = WERSJA_APKI;
-        }, 5000);
+    window.addEventListener('load', () => {
+      odtworzIntroSound();
+      setTimeout(() => {
+        document.getElementById('splash').style.display = 'none';
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById("wersjaNum").textContent = WERSJA_APKI;
+      }, 5000);
+    });
+
+    /* =================== KONFIG =================== */
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8fW026DVgjt4b_xwzvgyGyLlWedonFz6GxVjTmcqTKT7sqGpAFsNdf7gC025UtiCU/exec";
+    let numerZalogowanego = null;
+    let grupaZalogowanego = null;
+
+    /* =================== NAWIGACJA =================== */
+    function ukryjWszystkie() {
+      document.querySelectorAll(".container").forEach(v => v.classList.add("hidden"));
+    }
+    function pokazLogowanie() {
+      ukryjWszystkie();
+      document.getElementById("loginView").classList.remove("hidden");
+    }
+    function pokazRejestracjaSelect() {
+      ukryjWszystkie();
+      document.getElementById("registerSelectView").classList.remove("hidden");
+    }
+    function pokazRejestracjaZawodnik() {
+      ukryjWszystkie();
+      document.getElementById("registerZawodnikView").classList.remove("hidden");
+    }
+    function pokazRejestracjaTrener() {
+      ukryjWszystkie();
+      document.getElementById("rejestracjaTrenerView").classList.remove("hidden");
+}
+
+
+    /* =================== LOGOWANIE =================== */
+    async function zaloguj() {
+      const login = document.getElementById("numer").value.trim();  // ← teraz login, nie numer
+      const haslo = document.getElementById("haslo").value.trim();
+      const komunikat = document.getElementById("komunikat");
+
+  if (!login || !haslo) {
+    komunikat.innerText = "Podaj login i hasło.";
+    return;
+  }
+
+  komunikat.innerText = "Trwa logowanie...";
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({ mode:"login", numer:login, haslo })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      komunikat.innerText = "❌ " + (data.message || "Błąd logowania");
+      return;
+    }
+
+    // ✅ Sukces logowania
+    komunikat.innerText = "✅ Zalogowano";
+
+    if (data.role === "zawodnik") {
+      // Zapamiętujemy dane zawodnika
+      numerZalogowanego = data.login;
+      grupaZalogowanego = data.grupa || "";
+
+      ukryjWszystkie();
+      document.getElementById("platnosciView").classList.remove("hidden");
+
+      const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numerZalogowanego)}`)).json();
+      renderPlatnosci(platnosci);
+      return;
+    }
+      
+      if (data.role === "trener") {
+      ukryjWszystkie();
+      document.getElementById("trainerPanelView").classList.remove("hidden");
+
+          // 🔹 zapisz grupy trenera z backendu
+      window.grupyTrenera = data.grupa || "";
+
+      return;
+    }
+
+  } catch (e) {
+    komunikat.innerText = "Błąd połączenia.";
+  }
+}
+
+   /* =================== PANEL TRENERA =================== */
+
+function trainerPowrot() {
+  ukryjWszystkie();
+  document.getElementById("trainerPanelView").classList.remove("hidden");
+}
+
+async function trainerPokazZawodnicy() {
+  ukryjWszystkie();
+  document.getElementById("trainerZawodnicyView").classList.remove("hidden");
+  const box = document.getElementById("trainerListaZawodnikow");
+
+  box.innerHTML = "<div class='card' style='background:#222;'>⏳ Ładowanie...</div>";
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=statystykiSum`, { cache: "no-store" });
+    const lista = await res.json();
+
+    if (!Array.isArray(lista) || lista.length === 0) {
+      box.innerHTML = "<div class='card' style='background:#111;'>Brak danych</div>";
+      return;
+    }
+
+    box.innerHTML = lista.map(z => `
+      <div class="card" style="text-align:left;">
+        <b>#${z.nr}</b> — ${z.nazwisko}<br>
+        <span style="opacity:0.8;">${z.suma} treningów łącznie</span>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    box.innerHTML = "<div class='card' style='background:#700;'>Błąd pobierania danych</div>";
+  }
+}
+
+
+async function trainerPokazWydarzenia() {
+  ukryjWszystkie();
+  document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
+
+  const grupa = encodeURIComponent(window.grupyTrenera || "");
+  const res = await fetch(`${SCRIPT_URL}?action=treningiTrener&grupa=${grupa}`);
+  const lista = await res.json();
+
+  renderTreningiTrainer(lista);
+}
+
+function renderTreningiTrainer(lista) {
+  const div = document.getElementById("trainerListaWydarzen");
+  if (!lista?.length) { 
+    div.innerHTML = "<p>Brak wydarzeń</p>"; 
+    return; 
+  }
+
+  div.innerHTML = lista.map(t => `
+    <div class="card">
+      <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
+      Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
+      Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
+       <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
+      <div id="trainer-zapisani-${t.id}" class="hidden"></div>
+    </div>
+  `).join('');
+}
+
+
+    async function trainerToggleZapisani(id) {
+  const box = document.getElementById(`trainer-zapisani-${id}`);
+  if (!box) return;
+
+  if (!box.classList.contains('hidden')) {
+    box.classList.add('hidden');
+    return;
+  }
+
+  box.classList.remove('hidden');
+  box.innerHTML = '<div class="card" style="background:#222;">⏳ Ładowanie...</div>';
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
+    const lista = await res.json();
+
+    if (!Array.isArray(lista) || !lista.length) {
+      box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
+      return;
+    }
+
+    box.innerHTML = `<div class="card" style="background:#111;">
+      <b>Lista zapisanych:</b>
+      <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
+        ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
+      </ul>
+    </div>`;
+  } catch {
+    box.innerHTML = '<div class="card" style="background:#700;">Błąd pobierania listy</div>';
+  }
+}
+
+async function zaladujListeTrenerow() {
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getTrenerzy`);
+    const lista = await res.json();
+
+    const t1 = document.getElementById("eventTrener1");
+    const t2 = document.getElementById("eventTrener2");
+
+    t1.innerHTML = "";
+    t2.innerHTML = "<option value=''>— Brak —</option>";
+
+    lista.forEach(nazw => {
+      t1.innerHTML += `<option value="${nazw}">${nazw}</option>`;
+      t2.innerHTML += `<option value="${nazw}">${nazw}</option>`;
+    });
+
+  } catch (err) {
+    console.error("Błąd pobierania trenerów:", err);
+  }
+}
+   
+    function pokazDodajWydarzenie() {
+  ukryjWszystkie();
+  document.getElementById("trainerDodajWydarzenieView").classList.remove("hidden");
+  zaladujListeTrenerow();    // ← automatyczne załadowanie trenerów
+}
+
+    function validHour(hhmm) {
+    return /^\d{2}:\d{2}$/.test(hhmm);
+}
+
+async function wyslijNoweWydarzenie() {
+  const data = document.getElementById("eventData").value;
+  const start = document.getElementById("eventStart").value;
+  const end = document.getElementById("eventEnd").value;
+  const rodzaj = document.getElementById("eventRodzaj").value;
+  const trener1 = document.getElementById("eventTrener1").value;
+  const trener2 = document.getElementById("eventTrener2").value;
+
+  // ⬇⬇⬇ TUTAJ poprawiona obsługa grup ⬇⬇⬇
+  const grupy = [...document.querySelectorAll("#eventGrupy option:checked")]
+                  .map(o => o.value)
+                  .join(",");
+  // ⬆⬆⬆ KONIEC poprawki ⬆⬆⬆
+
+  const liczDoStat = document.getElementById("eventStat").checked;
+  const msg = document.getElementById("eventMsg");
+
+
+  // ❗ Pola wymagane
+  if (!data || !start || !rodzaj || !trener1) {
+    msg.innerText = "Uzupełnij wymagane pola: Data, Godzina, Rodzaj, Trener 1.";
+    return;
+  }
+
+  // ⏱ Walidacja godzin
+  if (!validHour(start) || !validHour(end)) {
+    msg.innerText = "❌ Niepoprawny format godziny. Wpisz w formacie HH:MM.";
+    return;
+  }
+
+  if (start >= end) {
+    msg.innerText = "❌ Godzina zakończenia musi być później niż rozpoczęcia.";
+    return;
+  }
+
+  msg.innerText = "⏳ Dodawanie wydarzenia...";
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "dodajWydarzenie",
+        data,
+        godzStart: start,
+        godzKoniec: end,
+        rodzaj,
+        trener1,
+        trener2,
+        grupy,
+        liczDoStatystyk: liczDoStat
+      })
+    });
+
+    const r = await res.json();
+    msg.innerText = r.message || "Nieznany wynik.";
+
+    if (r.success) {
+      // 🧹 Czyścimy form
+      document.querySelectorAll("#trainerDodajWydarzenieView input").forEach(i => {
+        if (i.type !== "checkbox") i.value = "";
+        else i.checked = false;
       });
 
-      /* =================== KONFIG =================== */
-      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8fW026DVgjt4b_xwzvgyGyLlWedonFz6GxVjTmcqTKT7sqGpAFsNdf7gC025UtiCU/exec";
-      let numerZalogowanego = null;
-      let grupaZalogowanego = null;
+      // 🔄 odświeżenie listy
+      setTimeout(() => trainerPokazWydarzenia(), 800);
+    }
 
-      /* =================== NAWIGACJA =================== */
-      function ukryjWszystkie() {
-        document.querySelectorAll(".container").forEach(v => v.classList.add("hidden"));
+  } catch (err) {
+    msg.innerText = "❌ Błąd połączenia: " + err;
+  }
+}
+    
+    /* =================== PŁATNOŚCI =================== */
+    function renderPlatnosci(lista) {
+      const div = document.getElementById("listaPlatnosci");
+      if (!lista?.length) {
+        div.innerHTML = "<p>Brak zaległości ✅</p><button class='full-btn' onclick='pokazTreningi()'>Dalej ➡</button>";
+        return;
       }
-      function pokazLogowanie() {
-        ukryjWszystkie();
-        document.getElementById("loginView").classList.remove("hidden");
+      div.innerHTML = `<h3>Zaległe płatności:</h3>` +
+        lista.map(p => `<div class='card' style='background:#a00;'>🔴 ${p.nazwa} – ${p.kwota} zł</div>`).join('') +
+        `<button class='full-btn' onclick='pokazTreningi()' style='margin-top:20px;'>Dalej ➡</button>`;
+    }
+
+    async function pokazTreningi() {
+      document.getElementById("platnosciView").classList.add("hidden");
+      document.getElementById("homeView").classList.remove("hidden");
+      const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${encodeURIComponent(numerZalogowanego)}`;
+      const lista = await (await fetch(url)).json();
+      renderTreningi(lista);
+    }
+
+    async function pokazTreningiTrener() {
+      ukryjWszystkie();
+      document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
+
+      const lista = await (await fetch(`${SCRIPT_URL}?action=treningiTrener`)).json();
+      renderTreningi(lista);
+
+  // Zablokuj przyciski zapisu i wypisu
+  document.querySelectorAll("button[id^='btn-']").forEach(b => {
+    b.disabled = true;
+    b.innerText = "Podgląd";
+  });
+  document.querySelectorAll("button[id^='wypisz-']").forEach(b => {
+    b.disabled = true;
+  });
+}
+
+    /* =================== WYDARZENIA =================== */
+    function renderTreningi(lista) {
+      const div = document.getElementById('listaTreningow');
+      if (!lista?.length) {
+        div.innerHTML = "<p>Brak wydarzeń</p>";
+        return;
       }
-      function pokazRejestracjaSelect() {
-        ukryjWszystkie();
-        document.getElementById("registerSelectView").classList.remove("hidden");
-      }
-      function pokazRejestracjaZawodnik() {
-        ukryjWszystkie();
-        document.getElementById("registerZawodnikView").classList.remove("hidden");
-      }
-      function pokazRejestracjaTrener() {
-        ukryjWszystkie();
-        document.getElementById("rejestracjaTrenerView").classList.remove("hidden");
-      }
+      div.innerHTML = lista.map(t => `
+        <div class="card">
+        <p>
+          <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
+          Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
+          Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}
+        </p>
 
-      /* =================== LOGOWANIE =================== */
-      async function zaloguj() {
-        const login = document.getElementById("numer").value.trim();
-        const haslo = document.getElementById("haslo").value.trim();
-        const komunikat = document.getElementById("komunikat");
-
-        if (!login || !haslo) {
-          komunikat.innerText = "Podaj login i hasło.";
-          return;
-        }
-
-        komunikat.innerText = "Trwa logowanie...";
-
-        try {
-          const res = await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: new URLSearchParams({ mode:"login", numer:login, haslo })
-          });
-
-          const data = await res.json();
-
-          if (!data.success) {
-            komunikat.innerText = "❌ " + (data.message || "Błąd logowania");
-            return;
-          }
-
-          komunikat.innerText = "✅ Zalogowano";
-
-          if (data.role === "zawodnik") {
-            numerZalogowanego = data.login;
-            grupaZalogowanego = data.grupa || "";
-
-            ukryjWszystkie();
-            document.getElementById("platnosciView").classList.remove("hidden");
-
-            const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numerZalogowanego)}`)).json();
-            renderPlatnosci(platnosci);
-            return;
-          }
-
-          if (data.role === "trener") {
-            ukryjWszystkie();
-            document.getElementById("trainerPanelView").classList.remove("hidden");
-            window.grupyTrenera = data.grupa || "";
-            return;
-          }
-
-        } catch (e) {
-          komunikat.innerText = "Błąd połączenia.";
-        }
-      }
-
-      /* =================== PANEL TRENERA =================== */
-      function trainerPowrot() {
-        ukryjWszystkie();
-        document.getElementById("trainerPanelView").classList.remove("hidden");
-      }
-
-      async function trainerPokazZawodnicy() {
-        ukryjWszystkie();
-        document.getElementById("trainerZawodnicyView").classList.remove("hidden");
-        const box = document.getElementById("trainerListaZawodnikow");
-
-        box.innerHTML = "<div class='card' style='background:#222;'>⏳ Ładowanie...</div>";
-
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=statystykiSum`, { cache: "no-store" });
-          const lista = await res.json();
-
-          if (!Array.isArray(lista) || lista.length === 0) {
-            box.innerHTML = "<div class='card' style='background:#111;'>Brak danych</div>";
-            return;
-          }
-
-          box.innerHTML = lista.map(z => `
-            <div class="card" style="text-align:left;">
-              <b>#${z.nr}</b> — ${z.nazwisko}<br>
-              <span style="opacity:0.8;">${z.suma} treningów łącznie</span>
-            </div>
-          `).join('');
-
-        } catch (err) {
-          box.innerHTML = "<div class='card' style='background:#700;'>Błąd pobierania danych</div>";
-        }
-      }
-
-      async function trainerPokazWydarzenia() {
-        ukryjWszystkie();
-        document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
-
-        const grupa = encodeURIComponent(window.grupyTrenera || "");
-        const res = await fetch(`${SCRIPT_URL}?action=treningiTrener&grupa=${grupa}`);
-        const lista = await res.json();
-
-        renderTreningiTrainer(lista);
-      }
-
-      function renderTreningiTrainer(lista) {
-        const div = document.getElementById("trainerListaWydarzen");
-        if (!lista?.length) {
-          div.innerHTML = "<p>Brak wydarzeń</p>";
-          return;
-        }
-
-        div.innerHTML = lista.map(t => `
-          <div class="card">
-            <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
-            Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
-            Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
-            <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
-            <div id="trainer-zapisani-${t.id}" class="hidden"></div>
+          <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+            <button id="btn-${t.id}" ${t.zapisany ? 'disabled' : ''} onclick="zapiszSie('${t.id}')">
+              ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
+            </button>
+            <button id="wypisz-${t.id}" ${t.zapisany ? '' : 'disabled'} style="background:#444;" onclick="wypiszSie('${t.id}')">
+              Wypisz się
+            </button>
+            <button style="background:#333;" onclick="toggleZapisani('${t.id}')">👥 Zapisani</button>
           </div>
-        `).join('');
-      }
+          <div id="zapisani-${t.id}" class="hidden lista-zapisanych"></div>
+        </div>
+      `).join('');
+    }
 
-      async function trainerToggleZapisani(id) {
-        const box = document.getElementById(`trainer-zapisani-${id}`);
-        if (!box) return;
+    async function toggleZapisani(id) {
+      const box = document.getElementById(`zapisani-${id}`);
+      if (!box) return;
+      if (!box.classList.contains('hidden')) return box.classList.add('hidden');
 
-        if (!box.classList.contains('hidden')) {
-          box.classList.add('hidden');
-          return;
-        }
-
-        box.classList.remove('hidden');
-        box.innerHTML = '<div class="card" style="background:#222;">⏳ Ładowanie...</div>';
-
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
-          const lista = await res.json();
-
-          if (!Array.isArray(lista) || !lista.length) {
-            box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
-            return;
-          }
-
-          box.innerHTML = `<div class="card" style="background:#111;">
-            <b>Lista zapisanych:</b>
-            <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
-              ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
-            </ul>
-          </div>`;
-        } catch {
-          box.innerHTML = '<div class="card" style="background:#700;">Błąd pobierania listy</div>';
-        }
-      }
-
-      async function zaladujListeTrenerow() {
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=getTrenerzy`);
-          const lista = await res.json();
-
-          const t1 = document.getElementById("eventTrener1");
-          const t2 = document.getElementById("eventTrener2");
-
-          // Zostawiamy placeholdery
-          t1.innerHTML = "<option value=''>— wybierz —</option>";
-          t2.innerHTML = "<option value=''>— brak —</option>";
-
-          lista.forEach(nazw => {
-            t1.innerHTML += `<option value="${nazw}">${nazw}</option>`;
-            t2.innerHTML += `<option value="${nazw}">${nazw}</option>`;
-          });
-
-        } catch (err) {
-          console.error("Błąd pobierania trenerów:", err);
-        }
-      }
-
-      function pokazDodajWydarzenie() {
-        ukryjWszystkie();
-        document.getElementById("trainerDodajWydarzenieView").classList.remove("hidden");
-        zaladujListeTrenerow();
-      }
-
-      function validHour(hhmm) {
-        return /^\d{2}:\d{2}$/.test(hhmm);
-      }
-
-      async function wyslijNoweWydarzenie() {
-        const data = document.getElementById("eventData").value;
-        const start = document.getElementById("eventStart").value;
-        const end = document.getElementById("eventEnd").value;
-        const rodzaj = document.getElementById("eventRodzaj").value;
-        const trener1 = document.getElementById("eventTrener1").value;
-        const trener2 = document.getElementById("eventTrener2").value;
-
-        const grupy = [...document.querySelectorAll("#eventGrupy option:checked")]
-                        .map(o => o.value)
-                        .join(",");
-
-        const liczDoStat = document.getElementById("eventStat").checked;
-        const msg = document.getElementById("eventMsg");
-
-        if (!data || !start || !rodzaj || !trener1) {
-          msg.innerText = "Uzupełnij wymagane pola: Data, Godzina, Rodzaj, Trener 1.";
-          return;
-        }
-
-        if (!validHour(start) || !validHour(end)) {
-          msg.innerText = "❌ Niepoprawny format godziny. Wpisz w formacie HH:MM.";
-          return;
-        }
-
-        if (start >= end) {
-          msg.innerText = "❌ Godzina zakończenia musi być później niż rozpoczęcia.";
-          return;
-        }
-
-        msg.innerText = "⏳ Dodawanie wydarzenia...";
-
-        try {
-          const res = await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: new URLSearchParams({
-              action: "dodajWydarzenie",
-              data,
-              godzStart: start,
-              godzKoniec: end,
-              rodzaj,
-              trener1,
-              trener2,
-              grupy,
-              liczDoStatystyk: liczDoStat
-            })
-          });
-
-          const r = await res.json();
-          msg.innerText = r.message || "Nieznany wynik.";
-
-          if (r.success) {
-            document.querySelectorAll("#trainerDodajWydarzenieView input").forEach(i => {
-              if (i.type !== "checkbox") i.value = "";
-              else i.checked = false;
-            });
-
-            setTimeout(() => trainerPokazWydarzenia(), 800);
-          }
-
-        } catch (err) {
-          msg.innerText = "❌ Błąd połączenia: " + err;
-        }
-      }
-
-      /* =================== PŁATNOŚCI =================== */
-      function renderPlatnosci(lista) {
-        const div = document.getElementById("listaPlatnosci");
-        if (!lista?.length) {
-          div.innerHTML = "<p>Brak zaległości ✅</p><button class='full-btn' onclick='pokazTreningi()'>Dalej ➡</button>";
-          return;
-        }
-        div.innerHTML = `<h3>Zaległe płatności:</h3>` +
-          lista.map(p => `<div class='card' style='background:#a00;'>🔴 ${p.nazwa} – ${p.kwota} zł</div>`).join('') +
-          `<button class='full-btn' onclick='pokazTreningi()' style='margin-top:20px;'>Dalej ➡</button>`;
-      }
-
-      async function pokazTreningi() {
-        document.getElementById("platnosciView").classList.add("hidden");
-        document.getElementById("homeView").classList.remove("hidden");
-        const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${encodeURIComponent(numerZalogowanego)}`;
-        const lista = await (await fetch(url)).json();
-        renderTreningi(lista);
-      }
-
-      async function pokazTreningiTrener() {
-        ukryjWszystkie();
-        document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
-
-        const lista = await (await fetch(`${SCRIPT_URL}?action=treningiTrener`)).json();
-        renderTreningi(lista);
-
-        document.querySelectorAll("button[id^='btn-']").forEach(b => {
-          b.disabled = true;
-          b.innerText = "Podgląd";
-        });
-        document.querySelectorAll("button[id^='wypisz-']").forEach(b => {
-          b.disabled = true;
-        });
-      }
-
-      /* =================== WYDARZENIA (zawodnik) =================== */
-      function renderTreningi(lista) {
-        const div = document.getElementById('listaTreningow');
-        if (!lista?.length) {
-          div.innerHTML = "<p>Brak wydarzeń</p>";
-          return;
-        }
-        div.innerHTML = lista.map(t => `
-          <div class="card">
-            <p>
-              <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
-              Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
-              Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}
-            </p>
-            <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
-              <button id="btn-${t.id}" ${t.zapisany ? 'disabled' : ''} onclick="zapiszSie('${t.id}')">
-                ${t.zapisany ? 'Zapisano ✅' : 'Zapisz się'}
-              </button>
-              <button id="wypisz-${t.id}" ${t.zapisany ? '' : 'disabled'} style="background:#444;" onclick="wypiszSie('${t.id}')">
-                Wypisz się
-              </button>
-              <button style="background:#333;" onclick="toggleZapisani('${t.id}')">👥 Zapisani</button>
-            </div>
-            <div id="zapisani-${t.id}" class="hidden lista-zapisanych"></div>
-          </div>
-        `).join('');
-      }
-
-      async function toggleZapisani(id) {
-        const box = document.getElementById(`zapisani-${id}`);
-        if (!box) return;
-        if (!box.classList.contains('hidden')) return box.classList.add('hidden');
-
-        box.classList.remove('hidden');
-        box.innerHTML = '<div class="card" style="background:#222;">⏳ Ładowanie...</div>';
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
-          const lista = await res.json();
-          if (!Array.isArray(lista) || lista.length === 0) {
-            box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
-            return;
-          }
-          box.innerHTML = `<div class="card" style="background:#111;">
-            <b>Lista zapisanych:</b>
-            <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
-              ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
-            </ul>
-          </div>`;
-        } catch {
-          box.innerHTML = '<div class="card" style="background:#700;">Błąd pobierania listy</div>';
-        }
-      }
-
-      async function zapiszSie(id) {
-        const btn = document.getElementById(`btn-${id}`);
-        const wypiszBtn = document.getElementById(`wypisz-${id}`);
-        const box = document.getElementById(`zapisani-${id}`);
-
-        btn.classList.add("loading");
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${encodeURIComponent(numerZalogowanego)}&treningId=${encodeURIComponent(id)}`);
-          const r = await res.json();
-          if (r.ok) {
-            btn.innerText = "Zapisano ✅";
-            btn.disabled = true;
-            wypiszBtn.disabled = false;
-            if (box && !box.classList.contains("hidden")) await odswiezListeZapisanych(id);
-          } else {
-            alert(r.message);
-          }
-        } catch (err) {
-          alert("Błąd połączenia: " + err);
-        } finally {
-          btn.classList.remove("loading");
-        }
-      }
-
-      async function wypiszSie(id) {
-        const btn = document.getElementById(`wypisz-${id}`);
-        const zapiszBtn = document.getElementById(`btn-${id}`);
-        const box = document.getElementById(`zapisani-${id}`);
-
-        btn.classList.add("loading");
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${encodeURIComponent(numerZalogowanego)}&treningId=${encodeURIComponent(id)}`);
-          const r = await res.json();
-          if (r.ok) {
-            zapiszBtn.innerText = "Zapisz się";
-            zapiszBtn.disabled = false;
-            btn.disabled = true;
-            if (box && !box.classList.contains("hidden")) await odswiezListeZapisanych(id);
-          } else {
-            alert(r.message);
-          }
-        } catch (err) {
-          alert("Błąd połączenia: " + err);
-        } finally {
-          btn.classList.remove("loading");
-        }
-      }
-
-      async function odswiezListeZapisanych(id) {
-        const box = document.getElementById(`zapisani-${id}`);
-        if (!box) return;
-        box.innerHTML = '<div class="card" style="background:#222;">⏳ Odświeżanie...</div>';
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
-          const lista = await res.json();
-          if (!Array.isArray(lista) || lista.length === 0) {
-            box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
-            return;
-          }
-          box.innerHTML = `<div class="card" style="background:#111;">
-            <b>Lista zapisanych:</b>
-            <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
-              ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
-            </ul>
-          </div>`;
-        } catch {
-          box.innerHTML = '<div class="card" style="background:#700;">Błąd odświeżania</div>';
-        }
-      }
-
-      /* =================== STATYSTYKI =================== */
-      async function pokazStatystyki() {
-        document.getElementById("homeView").classList.add("hidden");
-        document.getElementById("statsView").classList.remove("hidden");
-        const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${encodeURIComponent(numerZalogowanego)}`);
+      box.classList.remove('hidden');
+      box.innerHTML = '<div class="card" style="background:#222;">⏳ Ładowanie...</div>';
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
         const lista = await res.json();
-        renderStatystyki(lista);
-      }
-
-      function renderStatystyki(lista) {
-        const div = document.getElementById("listaStatystyk");
-        if (!lista?.length) { div.innerHTML = "<p>Brak danych</p>"; return; }
-        const suma = lista.reduce((acc, s) => acc + (Number(s.treningi) || 0), 0);
-        div.innerHTML =
-          lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('') +
-          `<div class="card" style="background:#222;margin-top:20px;font-weight:bold;">
-            🔥 Łącznie: ${suma} treningów w sezonie
-          </div>`;
-      }
-
-      function powrotDoTreningow() {
-        document.getElementById("statsView").classList.add("hidden");
-        document.getElementById("homeView").classList.remove("hidden");
-      }
-      function powrotDoPlatnosci() {
-        document.getElementById("homeView").classList.add("hidden");
-        document.getElementById("platnosciView").classList.remove("hidden");
-      }
-
-      /* =================== REJESTRACJA =================== */
-      async function wyslijRejestracje() {
-        const numer = document.getElementById("regNumer").value.trim();
-        const nazwisko = document.getElementById("regNazwisko").value.trim();
-        const haslo = document.getElementById("regHaslo").value.trim();
-        const msg = document.getElementById("regMsg");
-
-        if (!numer || !nazwisko || !haslo) {
-          msg.innerText = "Wypełnij wszystkie pola.";
+        if (!Array.isArray(lista) || lista.length === 0) {
+          box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
           return;
         }
-
-        msg.innerText = "⏳ Rejestracja...";
-        try {
-          const res = await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: new URLSearchParams({ mode: "rejestracja", numer, nazwisko, haslo })
-          });
-          const data = await res.json();
-
-          if (data.ok) {
-            document.getElementById("regNumer").value = "";
-            document.getElementById("regNazwisko").value = "";
-            document.getElementById("regHaslo").value = "";
-
-            msg.innerText = "✅ Rejestracja zakończona!";
-            setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 1500);
-          } else {
-            msg.innerText = "❌ " + (data.msg || "Błąd");
-          }
-        } catch (e) {
-          msg.innerText = "Błąd połączenia.";
-        }
+        box.innerHTML = `<div class="card" style="background:#111;">
+          <b>Lista zapisanych:</b>
+          <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
+            ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
+          </ul>
+        </div>`;
+      } catch {
+        box.innerHTML = '<div class="card" style="background:#700;">Błąd pobierania listy</div>';
       }
+    }
 
-      async function wyslijRejestracjeTrener() {
-        const poleNazw = document.getElementById("regNazwiskoTrener");
-        const poleHaslo = document.getElementById("regHasloTrener");
-        const msg = document.getElementById("regMsgTrener");
+    async function zapiszSie(id) {
+      const btn = document.getElementById(`btn-${id}`);
+      const wypiszBtn = document.getElementById(`wypisz-${id}`);
+      const box = document.getElementById(`zapisani-${id}`);
 
-        const nazwisko = poleNazw.value.trim();
-        const haslo = poleHaslo.value.trim();
-        if (!nazwisko || !haslo) {
-          msg.innerText = "Wypełnij wszystkie pola.";
+      btn.classList.add("loading");
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=zapisz&numer=${encodeURIComponent(numerZalogowanego)}&treningId=${encodeURIComponent(id)}`);
+        const r = await res.json();
+        if (r.ok) {
+          btn.innerText = "Zapisano ✅";
+          btn.disabled = true;
+          wypiszBtn.disabled = false;
+          if (box && !box.classList.contains("hidden")) await odswiezListeZapisanych(id);
+        } else {
+          alert(r.message);
+        }
+      } catch (err) {
+        alert("Błąd połączenia: " + err);
+      } finally {
+        btn.classList.remove("loading");
+      }
+    }
+
+    async function wypiszSie(id) {
+      const btn = document.getElementById(`wypisz-${id}`);
+      const zapiszBtn = document.getElementById(`btn-${id}`);
+      const box = document.getElementById(`zapisani-${id}`);
+
+      btn.classList.add("loading");
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=wypisz&numer=${encodeURIComponent(numerZalogowanego)}&treningId=${encodeURIComponent(id)}`);
+        const r = await res.json();
+        if (r.ok) {
+          zapiszBtn.innerText = "Zapisz się";
+          zapiszBtn.disabled = false;
+          btn.disabled = true;
+          if (box && !box.classList.contains("hidden")) await odswiezListeZapisanych(id);
+        } else {
+          alert(r.message);
+        }
+      } catch (err) {
+        alert("Błąd połączenia: " + err);
+      } finally {
+        btn.classList.remove("loading");
+      }
+    }
+
+    async function odswiezListeZapisanych(id) {
+      const box = document.getElementById(`zapisani-${id}`);
+      if (!box) return;
+      box.innerHTML = '<div class="card" style="background:#222;">⏳ Odświeżanie...</div>';
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
+        const lista = await res.json();
+        if (!Array.isArray(lista) || lista.length === 0) {
+          box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
           return;
         }
-
-        msg.innerText = "⏳ Rejestracja...";
-        try {
-          const res = await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: new URLSearchParams({ mode: "rejestracjaTrener", nazwisko, haslo })
-          });
-          const data = await res.json();
-
-          if (data.ok) {
-            const inic = data.inic || "(?)";
-
-            msg.innerHTML = `
-              ✅ <b>Zarejestrowano trenera!</b><br>
-              Login do systemu: <b>${inic}</b><br><br>
-              <button class="full-btn" onclick="navigator.clipboard.writeText('${inic}')">📋 Skopiuj login</button>
-            `;
-
-            poleNazw.value = "";
-            poleHaslo.value = "";
-
-            setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 8000);
-
-          } else {
-            msg.innerText = "❌ " + (data.msg || "Błąd";
-          }
-        } catch (e) {
-          msg.innerText = "Błąd połączenia.";
-        }
+        box.innerHTML = `<div class="card" style="background:#111;">
+          <b>Lista zapisanych:</b>
+          <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
+            ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
+          </ul>
+        </div>`;
+      } catch {
+        box.innerHTML = '<div class="card" style="background:#700;">Błąd odświeżania</div>';
       }
-    </script>
-  </div>
+    }
+
+    /* =================== STATYSTYKI =================== */
+    async function pokazStatystyki() {
+      document.getElementById("homeView").classList.add("hidden");
+      document.getElementById("statsView").classList.remove("hidden");
+      const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${encodeURIComponent(numerZalogowanego)}`);
+      const lista = await res.json();
+      renderStatystyki(lista);
+    }
+    function renderStatystyki(lista) {
+      const div = document.getElementById("listaStatystyk");
+      if (!lista?.length) { div.innerHTML = "<p>Brak danych</p>"; return; }
+      const suma = lista.reduce((acc, s) => acc + (Number(s.treningi) || 0), 0);
+      div.innerHTML =
+        lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('') +
+        `<div class="card" style="background:#222;margin-top:20px;font-weight:bold;">
+          🔥 Łącznie: ${suma} treningów w sezonie
+        </div>`;
+    }
+    function powrotDoTreningow() {
+      document.getElementById("statsView").classList.add("hidden");
+      document.getElementById("homeView").classList.remove("hidden");
+    }
+    function powrotDoPlatnosci() {
+      document.getElementById("homeView").classList.add("hidden");
+      document.getElementById("platnosciView").classList.remove("hidden");
+    }
+
+    /* =================== REJESTRACJA =================== */
+    async function wyslijRejestracje() {
+      const numer = document.getElementById("regNumer").value.trim();
+      const nazwisko = document.getElementById("regNazwisko").value.trim();
+      const haslo = document.getElementById("regHaslo").value.trim();
+      const msg = document.getElementById("regMsg");
+
+      if (!numer || !nazwisko || !haslo) {
+        msg.innerText = "Wypełnij wszystkie pola.";
+        return;
+      }
+
+      msg.innerText = "⏳ Rejestracja...";
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: new URLSearchParams({ mode: "rejestracja", numer, nazwisko, haslo })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          // Czyść pola
+          document.getElementById("regNumer").value = "";
+          document.getElementById("regNazwisko").value = "";
+          document.getElementById("regHaslo").value = "";
+
+          msg.innerText = "✅ Rejestracja zakończona!";
+          // Zniknij komunikat i wróć do logowania
+          setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 1500);
+        } else {
+          msg.innerText = "❌ " + (data.msg || "Błąd");
+        }
+      } catch (e) {
+        msg.innerText = "Błąd połączenia.";
+      }
+    }
+async function wyslijRejestracjeTrener() {
+  const poleNazw = document.getElementById("regNazwiskoTrener");
+  const poleHaslo = document.getElementById("regHasloTrener");
+  const msg = document.getElementById("regMsgTrener");
+
+  const nazwisko = poleNazw.value.trim();
+  const haslo = poleHaslo.value.trim();
+  if (!nazwisko || !haslo) {
+    msg.innerText = "Wypełnij wszystkie pola.";
+    return;
+  }
+
+  msg.innerText = "⏳ Rejestracja...";
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({ mode: "rejestracjaTrener", nazwisko, haslo })
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      const inic = data.inic || "(?)";
+
+      msg.innerHTML = `
+        ✅ <b>Zarejestrowano trenera!</b><br>
+        Login do systemu: <b>${inic}</b><br><br>
+        <button class="full-btn" onclick="navigator.clipboard.writeText('${inic}')">📋 Skopiuj login</button>
+      `;
+
+      // Czyścimy pola
+      poleNazw.value = "";
+      poleHaslo.value = "";
+
+      // po 3s wracamy do logowania
+      setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 8000);
+
+    } else {
+      msg.innerText = "❌ " + (data.msg || "Błąd");
+    }
+  } catch (e) {
+    msg.innerText = "Błąd połączenia.";
+  }
+}
+
+  </script>
 </body>
 </html>

@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.50.62';
+    const WERSJA_APKI = '1.51.63';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -188,7 +188,14 @@
     <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
     <input id="eventTrener1" type="text" placeholder="Trener 1">
     <input id="eventTrener2" type="text" placeholder="Trener 2 (opcjonalnie)">
-    <input id="eventGrupy" type="text" placeholder="Grupy (np. G1,G2)">
+    <select id="eventGrupy" multiple size="5" style="width:200px;">
+  <option value="G1">G1</option>
+  <option value="G2">G2</option>
+  <option value="G3">G3</option>
+  <option value="G4">G4</option>
+  <option value="G5">G5</option>
+</select>
+
     <label style="display:block;margin-top:10px;">
       <input id="eventStat" type="checkbox"> Liczyć do statystyk
     </label>
@@ -277,7 +284,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycK4-243xUoSHhEVY7IOso1bM-G7Y9lw8v1y9zTufwhx2YR7TTuXpju5y6q475KzvH/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8fW026DVgjt4b_xwzvgyGyLlWedonFz6GxVjTmcqTKT7sqGpAFsNdf7gC025UtiCU/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -458,13 +465,35 @@ function renderTreningiTrainer(lista) {
   }
 }
 
-    function trainerPokazDodajWydarzenie() {
+async function zaladujListeTrenerow() {
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getTrenerzy`);
+    const lista = await res.json();
+
+    const t1 = document.getElementById("eventTrener1");
+    const t2 = document.getElementById("eventTrener2");
+
+    t1.innerHTML = "";
+    t2.innerHTML = "<option value=''>— Brak —</option>";
+
+    lista.forEach(nazw => {
+      t1.innerHTML += `<option value="${nazw}">${nazw}</option>`;
+      t2.innerHTML += `<option value="${nazw}">${nazw}</option>`;
+    });
+
+  } catch (err) {
+    console.error("Błąd pobierania trenerów:", err);
+  }
+}
+   
+    function pokazDodajWydarzenie() {
   ukryjWszystkie();
   document.getElementById("trainerDodajWydarzenieView").classList.remove("hidden");
+  zaladujListeTrenerow();    // ← automatyczne załadowanie trenerów
 }
-    
-function validHour(hhmm) {
-  return /^\d{2}:\d{2}$/.test(hhmm);
+
+    function validHour(hhmm) {
+    return /^\d{2}:\d{2}$/.test(hhmm);
 }
 
 async function wyslijNoweWydarzenie() {
@@ -474,9 +503,16 @@ async function wyslijNoweWydarzenie() {
   const rodzaj = document.getElementById("eventRodzaj").value;
   const trener1 = document.getElementById("eventTrener1").value;
   const trener2 = document.getElementById("eventTrener2").value;
-  const grupy = document.getElementById("eventGrupy").value;
+
+  // ⬇⬇⬇ TUTAJ poprawiona obsługa grup ⬇⬇⬇
+  const grupy = [...document.querySelectorAll("#eventGrupy option:checked")]
+                  .map(o => o.value)
+                  .join(",");
+  // ⬆⬆⬆ KONIEC poprawki ⬆⬆⬆
+
   const liczDoStat = document.getElementById("eventStat").checked;
   const msg = document.getElementById("eventMsg");
+
 
   // ❗ Pola wymagane
   if (!data || !start || !rodzaj || !trener1) {

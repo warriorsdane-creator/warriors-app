@@ -107,7 +107,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.51.63';
+    const WERSJA_APKI = '1.52.63';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -182,27 +182,35 @@
   <h1>Dodaj wydarzenie</h1>
 
   <div class="login-box">
-    <input id="eventData" type="date" placeholder="Data">
-    <input id="eventStart" type="time" placeholder="Godzina startu">
-    <input id="eventEnd" type="time" placeholder="Godzina zakończenia">
-    <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
-    <select id="eventTrener1" style="width:200px;">
+    <input id="eventData" type="date" placeholder="Data" style="width:200px;">
+    <input id="eventStart" type="time" placeholder="Godzina startu" style="width:200px;">
+    <input id="eventEnd" type="time" placeholder="Godzina zakończenia" style="width:200px;">
+    <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia" style="width:200px;">
+
+    <!-- TRENER 1 -->
+    <select id="eventTrener1" style="width:200px; height:38px;">
       <option value="">— wybierz —</option>
-        </select>
-    <select id="eventTrener2" style="width:200px;">
+    </select>
+
+    <!-- TRENER 2 -->
+    <select id="eventTrener2" style="width:200px; height:38px;">
       <option value="">— brak —</option>
-        </select>
-    <select id="eventGrupy" multiple style="width:200px; height:110px;">
-  <option value="G1">G1</option>
-  <option value="G2">G2</option>
-  <option value="G3">G3</option>
-  <option value="G4">G4</option>
-  <option value="G5">G5</option>
-</select>
+    </select>
 
+    <!-- GRUPY -->
+    <select id="eventGrupy" multiple 
+            style="width:200px; height:110px; border-radius:6px; padding:6px;">
+      <option value="G1">G1</option>
+      <option value="G2">G2</option>
+      <option value="G3">G3</option>
+      <option value="G4">G4</option>
+      <option value="G5">G5</option>
+    </select>
 
-    <label style="display:block;margin-top:10px;">
-      <input id="eventStat" type="checkbox"> Liczyć do statystyk
+    <!-- LICZYĆ DO STATYSTYK -->
+    <label style="display:block;margin-top:10px;width:200px;margin-left:auto;margin-right:auto;">
+      <input id="eventStat" type="checkbox" style="transform:scale(1.3);margin-right:8px;">
+      Liczyć do statystyk
     </label>
   </div>
 
@@ -211,6 +219,7 @@
 
   <p id="eventMsg" style="margin-top:10px;"></p>
 </div>
+
 
     
     <!-- ✅ PŁATNOŚCI -->

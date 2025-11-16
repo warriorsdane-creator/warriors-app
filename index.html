@@ -130,13 +130,26 @@ w<!DOCTYPE html>
   font-size: 14px;
   display: block;
 }
+.grupy-wrap {
+  width: 200px;
+  margin: 10px auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.grupy-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
 
 
     .full-btn.alt { background: #333; }
   </style>
 
   <script>
-    const WERSJA_APKI = '1.56.63';
+    const WERSJA_APKI = '1.57.63';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -233,12 +246,30 @@ w<!DOCTYPE html>
   margin:10px auto;
   width:200px;
   font-size:0.9rem;
-">
-  <label><input type="checkbox" class="eventGrupa" value="G1"> G1</label>
-  <label><input type="checkbox" class="eventGrupa" value="G2"> G2</label>
-  <label><input type="checkbox" class="eventGrupa" value="G3"> G3</label>
-  <label><input type="checkbox" class="eventGrupa" value="G4"> G4</label>
-  <label><input type="checkbox" class="eventGrupa" value="G5"> G5</label>
+  <div class="grupy-col">
+    <input type="checkbox" class="eventGrupa" value="G1">
+    <label>G1</label>
+  </div>
+
+  <div class="grupy-col">
+    <input type="checkbox" class="eventGrupa" value="G2">
+    <label>G2</label>
+  </div>
+
+  <div class="grupy-col">
+    <input type="checkbox" class="eventGrupa" value="G3">
+    <label>G3</label>
+  </div>
+
+  <div class="grupy-col">
+    <input type="checkbox" class="eventGrupa" value="G4">
+    <label>G4</label>
+  </div>
+
+  <div class="grupy-col">
+    <input type="checkbox" class="eventGrupa" value="G5">
+    <label>G5</label>
+  </div>
 </div>
 
     <label style="display:block;margin-top:15px;">

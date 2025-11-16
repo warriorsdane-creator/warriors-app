@@ -144,12 +144,34 @@
   gap: 6px;
 }
 
+.select-like-input {
+  width: 200px;
+  margin: 10px auto;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  display: block;
+  font-size: 14px;
+}
+
+.grupa-check {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  color: white;
+}
+
+.grupa-check input {
+  margin-bottom: 4px;
+  transform: scale(1.3);
+}
 
     .full-btn.alt { background: #333; }
   </style>
 
   <script>
-    const WERSJA_APKI = '1.58.63';
+    const WERSJA_APKI = '1.59.63';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -220,62 +242,70 @@
 </div>
 
     <!-- ✅ DODAJ WYDARZENIE -->
-<!-- DODAJ WYDARZENIE -->
 <div id="trainerDodajWydarzenieView" class="container hidden">
   <h1>Dodaj wydarzenie</h1>
 
   <div class="login-box">
+
     <input id="eventData" type="date" placeholder="Data">
+
     <input id="eventStart" type="time" placeholder="Godzina startu">
+
     <input id="eventEnd" type="time" placeholder="Godzina zakończenia">
+
     <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
-    
-<select id="eventTrener1" class="select-like-input">
-  <option value="">— wybierz —</option>
-</select>
 
-<select id="eventTrener2" class="select-like-input">
-  <option value="">— brak —</option>
-</select>
-    
-<!-- CHECKBOXY grup – poziomo -->
-<div style="
-  display:flex;
-  justify-content:center;
-  gap:14px;
-  margin:10px auto;
-  width:200px;
-  font-size:0.9rem;
-">
-  <div class="grupy-col">
-    <input type="checkbox" class="eventGrupa" value="G1">
-    <label>G1</label>
+    <!-- TRENER 1 -->
+    <select id="eventTrener1" class="select-like-input">
+      <option value="">— wybierz trenera —</option>
+    </select>
+
+    <!-- TRENER 2 -->
+    <select id="eventTrener2" class="select-like-input">
+      <option value="">— brak —</option>
+    </select>
+
   </div>
 
-  <div class="grupy-col">
-    <input type="checkbox" class="eventGrupa" value="G2">
-    <label>G2</label>
+  <!-- CHECKBOXY GRUP – RÓWNO, CENTRALNIE, W JEDNYM RZĘDZIE -->
+  <div style="
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    margin:20px auto 10px auto;
+    width: 260px;
+  ">
+    <label class="grupa-check">
+      <input type="checkbox" class="eventGrupa" value="G1">
+      <span>G1</span>
+    </label>
+
+    <label class="grupa-check">
+      <input type="checkbox" class="eventGrupa" value="G2">
+      <span>G2</span>
+    </label>
+
+    <label class="grupa-check">
+      <input type="checkbox" class="eventGrupa" value="G3">
+      <span>G3</span>
+    </label>
+
+    <label class="grupa-check">
+      <input type="checkbox" class="eventGrupa" value="G4">
+      <span>G4</span>
+    </label>
+
+    <label class="grupa-check">
+      <input type="checkbox" class="eventGrupa" value="G5">
+      <span>G5</span>
+    </label>
   </div>
 
-  <div class="grupy-col">
-    <input type="checkbox" class="eventGrupa" value="G3">
-    <label>G3</label>
-  </div>
-
-  <div class="grupy-col">
-    <input type="checkbox" class="eventGrupa" value="G4">
-    <label>G4</label>
-  </div>
-
-  <div class="grupy-col">
-    <input type="checkbox" class="eventGrupa" value="G5">
-    <label>G5</label>
-  </div>
-</div>
-
-
-    <label style="display:block;margin-top:15px;">
-      <input id="eventStat" type="checkbox"> Liczyć do statystyk
+  <!-- LICZ DO STATYSTYK -->
+  <div style="margin-top:10px;">
+    <label>
+      <input id="eventStat" type="checkbox">
+      Liczyć do statystyk
     </label>
   </div>
 

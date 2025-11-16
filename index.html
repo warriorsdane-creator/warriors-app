@@ -103,11 +103,28 @@
       color: white;
       cursor: pointer;
     }
+    .grupy-box {
+  width: 200px;
+  margin: 10px auto;
+  padding: 8px;
+  background: #fff;
+  color: #000;
+  border-radius: 6px;
+  text-align: left;
+}
+
+.grupy-box label {
+  display: block;
+  margin: 5px 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
     .full-btn.alt { background: #333; }
   </style>
 
   <script>
-    const WERSJA_APKI = '1.52.63';
+    const WERSJA_APKI = '1.53.63';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -198,13 +215,16 @@
     </select>
 
     <!-- GRUPY -->
-    <select id="eventGrupy" multiple 
+    <select id="eventGrupy"
             style="width:200px; height:110px; border-radius:6px; padding:6px;">
-      <option value="G1">G1</option>
-      <option value="G2">G2</option>
-      <option value="G3">G3</option>
-      <option value="G4">G4</option>
-      <option value="G5">G5</option>
+<div id="eventGrupyBox" class="grupy-box">
+  <label><input type="checkbox" value="G1" class="grp"> G1</label>
+  <label><input type="checkbox" value="G2" class="grp"> G2</label>
+  <label><input type="checkbox" value="G3" class="grp"> G3</label>
+  <label><input type="checkbox" value="G4" class="grp"> G4</label>
+  <label><input type="checkbox" value="G5" class="grp"> G5</label>
+</div>
+
     </select>
 
     <!-- LICZYĆ DO STATYSTYK -->
@@ -519,9 +539,10 @@ async function wyslijNoweWydarzenie() {
   const trener2 = document.getElementById("eventTrener2").value;
 
   // ⬇⬇⬇ TUTAJ poprawiona obsługa grup ⬇⬇⬇
-  const grupy = [...document.querySelectorAll("#eventGrupy option:checked")]
-                  .map(o => o.value)
-                  .join(",");
+const grupy = [...document.querySelectorAll(".grp:checked")]
+  .map(c => c.value)
+  .join(",");
+
   // ⬆⬆⬆ KONIEC poprawki ⬆⬆⬆
 
   const liczDoStat = document.getElementById("eventStat").checked;

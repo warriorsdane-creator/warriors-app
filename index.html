@@ -1,4 +1,4 @@
-w<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
   <base target="_top">
@@ -149,7 +149,7 @@ w<!DOCTYPE html>
   </style>
 
   <script>
-    const WERSJA_APKI = '1.57.63';
+    const WERSJA_APKI = '1.58.63';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -246,6 +246,7 @@ w<!DOCTYPE html>
   margin:10px auto;
   width:200px;
   font-size:0.9rem;
+">
   <div class="grupy-col">
     <input type="checkbox" class="eventGrupa" value="G1">
     <label>G1</label>
@@ -271,6 +272,7 @@ w<!DOCTYPE html>
     <label>G5</label>
   </div>
 </div>
+
 
     <label style="display:block;margin-top:15px;">
       <input id="eventStat" type="checkbox"> Liczyć do statystyk
@@ -329,10 +331,10 @@ w<!DOCTYPE html>
   <div id="trainerListaWydarzen">Ładowanie...</div>
 
   <!-- PRZYCISK DODAJ WYDARZENIE NA DOLE -->
-<button class="full-btn" style="margin-top:20px;"
-          onclick="pokazDodajWydarzenie()"
-    ➕ Dodaj wydarzenie
+<button class="full-btn" style="margin-top:20px;" onclick="pokazDodajWydarzenie()">
+  ➕ Dodaj wydarzenie
 </button>
+
 
   <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
 </div>

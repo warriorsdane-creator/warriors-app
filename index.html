@@ -124,7 +124,7 @@ w<!DOCTYPE html>
   </style>
 
   <script>
-    const WERSJA_APKI = '1.54.63';
+    const WERSJA_APKI = '1.55.63';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -205,21 +205,23 @@ w<!DOCTYPE html>
     <input id="eventEnd" type="time" placeholder="Godzina zakończenia">
     <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
 
-    <select id="eventTrener1" style="width:200px;">
-      <option value="">— wybierz —</option>
-    </select>
+<select id="eventTrener1" style="width:200px; margin:5px auto; display:block;">
+  <option value="">— wybierz —</option>
+</select>
 
-    <select id="eventTrener2" style="width:200px;">
-      <option value="">— brak —</option>
-    </select>
+<select id="eventTrener2" style="width:200px; margin:5px auto; display:block;">
+  <option value="">— brak —</option>
+</select>
+
 
 <!-- CHECKBOXY grup – poziomo -->
 <div style="
   display:flex;
   justify-content:center;
-  gap:25px;
-  margin:18px 0;
-  font-size:1rem;
+  gap:18px;
+  margin:15px 0 5px 0;
+  flex-wrap:nowrap;
+  font-size:0.9rem;
 ">
   <label><input type="checkbox" class="eventGrupa" value="G1"> G1</label>
   <label><input type="checkbox" class="eventGrupa" value="G2"> G2</label>
@@ -227,6 +229,7 @@ w<!DOCTYPE html>
   <label><input type="checkbox" class="eventGrupa" value="G4"> G4</label>
   <label><input type="checkbox" class="eventGrupa" value="G5"> G5</label>
 </div>
+
 
 
     <label style="display:block;margin-top:15px;">

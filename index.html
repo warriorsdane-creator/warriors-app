@@ -171,7 +171,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.59.69';
+    const WERSJA_APKI = '1.60.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -364,11 +364,8 @@
 <button class="full-btn" style="margin-top:20px;" onclick="pokazDodajWydarzenie()">
   ➕ Dodaj wydarzenie
 </button>
-
-
   <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
 </div>
-
 
   <script>
     // 🎧 Dźwięk intra
@@ -392,7 +389,7 @@
     });
 
     /* =================== KONFIG =================== */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTzq53cElUdbnDRhEPYJvxfd-x0BR27F-DdQlTtg9c8RoHkUJe2TkfkqEYIfVXe8dd/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhSYtraxCJnbYVCt_6lwDmyYTRofqN1WLHu-b0vblDZjdB-K39LaMz7ARGjFU8kx-m/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
 
@@ -534,13 +531,19 @@ function renderTreningiTrainer(lista) {
       <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
       Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
       Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
-       <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
+
+      <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
+
+      <button class="btn danger" 
+              onclick="usunWydarzenie('${t.miesiac}', ${t.czasCol})">
+        🗑️ Usuń
+      </button>
+
       <div id="trainer-zapisani-${t.id}" class="hidden"></div>
     </div>
   `).join('');
 }
-
-
+    
     async function trainerToggleZapisani(id) {
   const box = document.getElementById(`trainer-zapisani-${id}`);
   if (!box) return;
@@ -944,6 +947,21 @@ async function wyslijRejestracjeTrener() {
   } catch (e) {
     msg.innerText = "Błąd połączenia.";
   }
+}
+
+    function usunWydarzenie(miesiac, czasCol) {
+  if (!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;
+
+  fetch(`${API_URL}?action=usunWydarzenie&miesiac=${miesiac}&czasCol=${czasCol}`)
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) {
+        alert("Wydarzenie zostało usunięte.");
+        trainerPokazWydarzenia(); // <- u Ciebie to jest poprawna funkcja odświeżania
+      } else {
+        alert("Błąd: " + d.error);
+      }
+    });
 }
 
   </script>

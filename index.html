@@ -952,7 +952,8 @@ async function wyslijRejestracjeTrener() {
     function usunWydarzenie(miesiac, czasCol) {
   if (!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;
 
-  fetch(`${API_URL}?action=usunWydarzenie&miesiac=${miesiac}&czasCol=${czasCol}`)
+  fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${miesiac}&czasCol=${czasCol}`)
+
     .then(r => r.json())
     .then(d => {
       if (d.success) {

@@ -171,7 +171,7 @@
   </style>
 
   <script>
-    const WERSJA_APKI = '1.60.70';
+    const WERSJA_APKI = '1.61.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -534,10 +534,11 @@ function renderTreningiTrainer(lista) {
 
       <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
 
-      <button class="btn danger" 
-              onclick="usunWydarzenie('${t.miesiac}', ${t.czasCol})">
-        🗑️ Usuń
-      </button>
+      <button class="btn danger"
+        onclick='usunWydarzenie(${JSON.stringify(t.miesiac)}, ${t.czasCol})'>
+  🗑️ Usuń
+</button>
+
 
       <div id="trainer-zapisani-${t.id}" class="hidden"></div>
     </div>

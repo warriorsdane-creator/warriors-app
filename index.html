@@ -17,14 +17,16 @@
     }
     .hidden { display: none; }
     .container { margin-top: 40px; }
+
     .login-box input {
       display: block;
       margin: 10px auto;
       padding: 8px;
-      width: 200px;          /* referencja szerokości dla przycisków */
+      width: 200px;
       border-radius: 6px;
       border: none;
     }
+
     button {
       padding: 8px 16px;
       border: none;
@@ -37,6 +39,20 @@
       background: gray !important;
       cursor: default;
     }
+
+    .full-btn {
+      display: block;
+      width: 200px;
+      margin: 10px auto;
+      padding: 8px;
+      border-radius: 6px;
+      background: red;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .full-btn.alt { background: #333; }
+
     .card {
       border: 1px solid #555;
       border-radius: 10px;
@@ -44,6 +60,7 @@
       margin: 10px;
       background: #111;
     }
+
     .lista-zapisanych {
       background: rgba(255,255,255,0.05);
       border-radius: 6px;
@@ -53,6 +70,7 @@
       font-size: 0.9rem;
       line-height: 1.4;
     }
+
     #wersjaApki {
       position: fixed;
       top: 8px;
@@ -62,6 +80,7 @@
       user-select: none;
       z-index: 1000;
     }
+
     button.loading {
       background: #222 !important;
       opacity: 0.6;
@@ -91,87 +110,76 @@
       100% { opacity: 0;   transform: scale(1);   filter: brightness(50%) blur(2px); }
     }
 
-    /* Przyciski o szerokości jak input */
-    .full-btn {
-      display: block;
-      width: 200px;   /* identycznie jak .login-box input */
+    .grupy-box {
+      width: 200px;
       margin: 10px auto;
       padding: 8px;
+      background: #fff;
+      color: #000;
       border-radius: 6px;
-      background: red;
-      border: none;
-      color: white;
-      cursor: pointer;
+      text-align: left;
     }
-    .grupy-box {
-  width: 200px;
-  margin: 10px auto;
-  padding: 8px;
-  background: #fff;
-  color: #000;
-  border-radius: 6px;
-  text-align: left;
-}
-
-.grupy-box label {
-  display: block;
-  margin: 5px 0;
-  cursor: pointer;
-  font-size: 14px;
-}
+    .grupy-box label {
+      display: block;
+      margin: 5px 0;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
     .select-like-input {
-  width: 200px;
-  height: 36px;
-  margin: 10px auto;
-  border-radius: 6px;
-  border: none;
-  padding: 6px;
-  font-size: 14px;
-  display: block;
-}
-.grupy-wrap {
-  width: 200px;
-  margin: 10px auto;
-  display: flex;
-  justify-content: space-between;
-}
+      width: 200px;
+      height: 36px;
+      margin: 10px auto;
+      border-radius: 6px;
+      border: none;
+      padding: 6px;
+      font-size: 14px;
+      display: block;
+    }
 
-.grupy-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
+    .grupy-wrap {
+      width: 200px;
+      margin: 10px auto;
+      display: flex;
+      justify-content: space-between;
+    }
+    .grupy-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
 
-.select-like-input {
-  width: 200px;
-  margin: 10px auto;
-  padding: 8px;
-  border-radius: 6px;
-  border: none;
-  display: block;
-  font-size: 14px;
-}
+    .grupa-check {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 14px;
+      color: white;
+    }
+    .grupa-check input {
+      margin-bottom: 4px;
+      transform: scale(1.3);
+    }
 
-.grupa-check {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 14px;
-  color: white;
-}
-
-.grupa-check input {
-  margin-bottom: 4px;
-  transform: scale(1.3);
-}
-
-    .full-btn.alt { background: #333; }
+    /* Przyciski w kartach trenera */
+    .btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      background: #444;
+      color: #fff;
+      cursor: pointer;
+      margin: 2px;
+    }
+    .btn.danger {
+      background: #800;
+    }
   </style>
 
+  <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.61.70';
+    const WERSJA_APKI = '1.62.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -189,13 +197,15 @@
 <body>
   <div id="wersjaApki">v<span id="wersjaNum"></span></div>
 
+  <!-- Splash -->
   <div id="splash">
     <img src="icon-512.png" class="logo-fadein" alt="Logo Warriors">
   </div>
 
+  <!-- Główna aplikacja -->
   <div id="app" class="hidden">
 
-    <!-- ✅ LOGOWANIE -->
+    <!-- LOGOWANIE -->
     <div id="loginView" class="container">
       <img src="https://i.imgur.com/41PSyW5.jpeg" class="logo" style="width:200px;margin-bottom:20px;">
       <h1>Logowanie</h1>
@@ -208,7 +218,7 @@
       <p id="komunikat"></p>
     </div>
 
-    <!-- ✅ WYBÓR TYP REJESTRACJI -->
+    <!-- WYBÓR TYP REJESTRACJI -->
     <div id="registerSelectView" class="container hidden">
       <h1>Rejestracja</h1>
       <button class="full-btn" onclick="pokazRejestracjaZawodnik()">Zawodnik</button>
@@ -216,7 +226,7 @@
       <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Powrót</button>
     </div>
 
-    <!-- ✅ REJESTRACJA ZAWODNIKA (funkcjonalna) -->
+    <!-- REJESTRACJA ZAWODNIKA -->
     <div id="registerZawodnikView" class="container hidden">
       <h1>Rejestracja zawodnika</h1>
       <div class="login-box">
@@ -229,100 +239,79 @@
       <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
     </div>
 
-    <!-- ✅ REJESTRACJA TRENERA (placeholder) -->
-<div id="rejestracjaTrenerView" class="container hidden">
-  <h1>Rejestracja trenera</h1>
-  <div class="login-box">
-    <input id="regNazwiskoTrener" type="text" placeholder="Imię i nazwisko">
-    <input id="regHasloTrener" type="password" placeholder="Ustaw hasło">
-    <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
-    <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
-  </div>
-  <p id="regMsgTrener"></p>
-</div>
+    <!-- REJESTRACJA TRENERA -->
+    <div id="rejestracjaTrenerView" class="container hidden">
+      <h1>Rejestracja trenera</h1>
+      <div class="login-box">
+        <input id="regNazwiskoTrener" type="text" placeholder="Imię i nazwisko">
+        <input id="regHasloTrener" type="password" placeholder="Ustaw hasło">
+        <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
+        <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+      </div>
+      <p id="regMsgTrener"></p>
+    </div>
 
-    <!-- ✅ DODAJ WYDARZENIE -->
-<div id="trainerDodajWydarzenieView" class="container hidden">
-  <h1>Dodaj wydarzenie</h1>
+    <!-- DODAJ WYDARZENIE (TRENER) -->
+    <div id="trainerDodajWydarzenieView" class="container hidden">
+      <h1>Dodaj wydarzenie</h1>
 
-  <div class="login-box">
+      <div class="login-box">
+        <input id="eventData" type="date" placeholder="Data">
+        <input id="eventStart" type="time" placeholder="Godzina startu">
+        <input id="eventEnd" type="time" placeholder="Godzina zakończenia">
+        <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
 
-    <input id="eventData" type="date" placeholder="Data">
+        <!-- TRENER 1 -->
+        <select id="eventTrener1" class="select-like-input">
+          <option value="">— wybierz trenera —</option>
+        </select>
 
-    <input id="eventStart" type="time" placeholder="Godzina startu">
+        <!-- TRENER 2 -->
+        <select id="eventTrener2" class="select-like-input">
+          <option value="">— brak —</option>
+        </select>
+      </div>
 
-    <input id="eventEnd" type="time" placeholder="Godzina zakończenia">
+      <!-- CHECKBOXY GRUP -->
+      <div style="display:flex; justify-content:center; gap:25px; margin:20px auto 10px auto; width:260px;">
+        <label class="grupa-check">
+          <input type="checkbox" class="eventGrupa" value="G1"><span>G1</span>
+        </label>
+        <label class="grupa-check">
+          <input type="checkbox" class="eventGrupa" value="G2"><span>G2</span>
+        </label>
+        <label class="grupa-check">
+          <input type="checkbox" class="eventGrupa" value="G3"><span>G3</span>
+        </label>
+        <label class="grupa-check">
+          <input type="checkbox" class="eventGrupa" value="G4"><span>G4</span>
+        </label>
+        <label class="grupa-check">
+          <input type="checkbox" class="eventGrupa" value="G5"><span>G5</span>
+        </label>
+      </div>
 
-    <input id="eventRodzaj" type="text" placeholder="Rodzaj wydarzenia">
+      <!-- LICZ DO STATYSTYK -->
+      <div style="margin-top:10px;">
+        <label>
+          <input id="eventStat" type="checkbox">
+          Liczyć do statystyk
+        </label>
+      </div>
 
-    <!-- TRENER 1 -->
-    <select id="eventTrener1" class="select-like-input">
-      <option value="">— wybierz trenera —</option>
-    </select>
+      <button class="full-btn" onclick="wyslijNoweWydarzenie()">💾 Dodaj wydarzenie</button>
+      <button class="full-btn alt" onclick="trainerPokazWydarzenia()">⬅ Powrót</button>
 
-    <!-- TRENER 2 -->
-    <select id="eventTrener2" class="select-like-input">
-      <option value="">— brak —</option>
-    </select>
+      <p id="eventMsg" style="margin-top:10px;"></p>
+    </div>
 
-  </div>
-
-  <!-- CHECKBOXY GRUP – RÓWNO, CENTRALNIE, W JEDNYM RZĘDZIE -->
-  <div style="
-    display:flex;
-    justify-content:center;
-    gap:25px;
-    margin:20px auto 10px auto;
-    width: 260px;
-  ">
-    <label class="grupa-check">
-      <input type="checkbox" class="eventGrupa" value="G1">
-      <span>G1</span>
-    </label>
-
-    <label class="grupa-check">
-      <input type="checkbox" class="eventGrupa" value="G2">
-      <span>G2</span>
-    </label>
-
-    <label class="grupa-check">
-      <input type="checkbox" class="eventGrupa" value="G3">
-      <span>G3</span>
-    </label>
-
-    <label class="grupa-check">
-      <input type="checkbox" class="eventGrupa" value="G4">
-      <span>G4</span>
-    </label>
-
-    <label class="grupa-check">
-      <input type="checkbox" class="eventGrupa" value="G5">
-      <span>G5</span>
-    </label>
-  </div>
-
-  <!-- LICZ DO STATYSTYK -->
-  <div style="margin-top:10px;">
-    <label>
-      <input id="eventStat" type="checkbox">
-      Liczyć do statystyk
-    </label>
-  </div>
-
-  <button class="full-btn" onclick="wyslijNoweWydarzenie()">💾 Dodaj wydarzenie</button>
-  <button class="full-btn alt" onclick="trainerPokazWydarzenia()">⬅ Powrót</button>
-
-  <p id="eventMsg" style="margin-top:10px;"></p>
-</div>
-
-    
-    <!-- ✅ PŁATNOŚCI -->
+    <!-- PŁATNOŚCI (ZAWODNIK) -->
     <div id="platnosciView" class="container hidden">
       <h1>Płatności</h1>
       <div id="listaPlatnosci">Ładowanie...</div>
     </div>
 
-    <!-- ✅ WYDARZENIA -->
+    <!-- WYDARZENIA (ZAWODNIK) -->
     <div id="homeView" class="container hidden">
       <h1 id="tytulTreningow">TWOJE WYDARZENIA</h1>
       <div id="listaTreningow">Ładowanie...</div>
@@ -330,45 +319,42 @@
       <button onclick="powrotDoPlatnosci()" style="margin-top:10px;background:#333;">⬅ Powrót do płatności</button>
     </div>
 
-    <!-- ✅ STATYSTYKI -->
+    <!-- STATYSTYKI (ZAWODNIK) -->
     <div id="statsView" class="container hidden">
       <h1>Moje statystyki</h1>
       <div id="listaStatystyk">Ładowanie...</div>
       <button onclick="powrotDoTreningow()" style="margin-top:20px;">⬅ Powrót</button>
     </div>
 
-    <!-- ✅ PANEL TRENERA -->
-      <div id="trainerPanelView" class="container hidden">
-        <h1>Panel trenera</h1>
-
+    <!-- PANEL TRENERA -->
+    <div id="trainerPanelView" class="container hidden">
+      <h1>Panel trenera</h1>
       <button class="full-btn" onclick="trainerPokazZawodnicy()">👥 Zawodnicy</button>
       <button class="full-btn" onclick="trainerPokazWydarzenia()">🏒 Wydarzenia</button>
-      
       <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Wyloguj</button>
     </div>
 
-    <!-- WIDOK LISTY ZAWODNIKÓW -->
-      <div id="trainerZawodnicyView" class="container hidden">
-        <h1>Lista zawodników</h1>
-        <div id="trainerListaZawodnikow">Ładowanie...</div>
+    <!-- LISTA ZAWODNIKÓW (TRENER) -->
+    <div id="trainerZawodnicyView" class="container hidden">
+      <h1>Lista zawodników</h1>
+      <div id="trainerListaZawodnikow">Ładowanie...</div>
       <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
     </div>
 
-<!-- WIDOK WYDARZEŃ TRENERA -->
-<div id="trainerWydarzeniaView" class="container hidden">
-  <h1>Wydarzenia</h1>
+    <!-- WYDARZENIA (TRENER) -->
+    <div id="trainerWydarzeniaView" class="container hidden">
+      <h1>Wydarzenia</h1>
+      <div id="trainerListaWydarzen">Ładowanie...</div>
+      <button class="full-btn" style="margin-top:20px;" onclick="pokazDodajWydarzenie()">➕ Dodaj wydarzenie</button>
+      <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
+    </div>
 
-  <div id="trainerListaWydarzen">Ładowanie...</div>
+  </div><!-- /app -->
 
-  <!-- PRZYCISK DODAJ WYDARZENIE NA DOLE -->
-<button class="full-btn" style="margin-top:20px;" onclick="pokazDodajWydarzenie()">
-  ➕ Dodaj wydarzenie
-</button>
-  <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
-</div>
-
+  <!-- LOGIKA APLIKACJI -->
   <script>
-    // 🎧 Dźwięk intra
+    /* =================== START / INTRO =================== */
+
     function odtworzIntroSound() {
       try {
         const audio = new Audio("sound.mp3");
@@ -388,351 +374,334 @@
       }, 5000);
     });
 
-    /* =================== KONFIG =================== */
+    /* =================== KONFIG / GLOBALNE =================== */
+
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhSYtraxCJnbYVCt_6lwDmyYTRofqN1WLHu-b0vblDZjdB-K39LaMz7ARGjFU8kx-m/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
+    window.grupyTrenera = "";
 
-    /* =================== NAWIGACJA =================== */
+    /* =================== NAWIGACJA WIDOKAMI =================== */
+
     function ukryjWszystkie() {
       document.querySelectorAll(".container").forEach(v => v.classList.add("hidden"));
     }
+
     function pokazLogowanie() {
       ukryjWszystkie();
       document.getElementById("loginView").classList.remove("hidden");
     }
+
     function pokazRejestracjaSelect() {
       ukryjWszystkie();
       document.getElementById("registerSelectView").classList.remove("hidden");
     }
+
     function pokazRejestracjaZawodnik() {
       ukryjWszystkie();
       document.getElementById("registerZawodnikView").classList.remove("hidden");
     }
+
     function pokazRejestracjaTrener() {
       ukryjWszystkie();
       document.getElementById("rejestracjaTrenerView").classList.remove("hidden");
-}
-
+    }
 
     /* =================== LOGOWANIE =================== */
+
     async function zaloguj() {
-      const login = document.getElementById("numer").value.trim();  // ← teraz login, nie numer
+      const login = document.getElementById("numer").value.trim();
       const haslo = document.getElementById("haslo").value.trim();
       const komunikat = document.getElementById("komunikat");
 
-  if (!login || !haslo) {
-    komunikat.innerText = "Podaj login i hasło.";
-    return;
-  }
+      if (!login || !haslo) {
+        komunikat.innerText = "Podaj login i hasło.";
+        return;
+      }
 
-  komunikat.innerText = "Trwa logowanie...";
+      komunikat.innerText = "Trwa logowanie...";
 
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: new URLSearchParams({ mode:"login", numer:login, haslo })
-    });
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: new URLSearchParams({ mode: "login", numer: login, haslo })
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    if (!data.success) {
-      komunikat.innerText = "❌ " + (data.message || "Błąd logowania");
-      return;
+        if (!data.success) {
+          komunikat.innerText = "❌ " + (data.message || "Błąd logowania");
+          return;
+        }
+
+        komunikat.innerText = "✅ Zalogowano";
+
+        if (data.role === "zawodnik") {
+          numerZalogowanego = data.login;
+          grupaZalogowanego = data.grupa || "";
+
+          ukryjWszystkie();
+          document.getElementById("platnosciView").classList.remove("hidden");
+
+          const platnosci = await (await fetch(
+            `${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numerZalogowanego)}`
+          )).json();
+          renderPlatnosci(platnosci);
+          return;
+        }
+
+        if (data.role === "trener") {
+          ukryjWszystkie();
+          document.getElementById("trainerPanelView").classList.remove("hidden");
+          window.grupyTrenera = data.grupa || "";
+          return;
+        }
+
+      } catch (e) {
+        komunikat.innerText = "Błąd połączenia.";
+      }
     }
 
-    // ✅ Sukces logowania
-    komunikat.innerText = "✅ Zalogowano";
+    /* =================== PANEL TRENERA – NAWIGACJA =================== */
 
-    if (data.role === "zawodnik") {
-      // Zapamiętujemy dane zawodnika
-      numerZalogowanego = data.login;
-      grupaZalogowanego = data.grupa || "";
-
-      ukryjWszystkie();
-      document.getElementById("platnosciView").classList.remove("hidden");
-
-      const platnosci = await (await fetch(`${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numerZalogowanego)}`)).json();
-      renderPlatnosci(platnosci);
-      return;
-    }
-      
-      if (data.role === "trener") {
+    function trainerPowrot() {
       ukryjWszystkie();
       document.getElementById("trainerPanelView").classList.remove("hidden");
-
-          // 🔹 zapisz grupy trenera z backendu
-      window.grupyTrenera = data.grupa || "";
-
-      return;
     }
 
-  } catch (e) {
-    komunikat.innerText = "Błąd połączenia.";
-  }
-}
+    async function trainerPokazZawodnicy() {
+      ukryjWszystkie();
+      document.getElementById("trainerZawodnicyView").classList.remove("hidden");
+      const box = document.getElementById("trainerListaZawodnikow");
 
-   /* =================== PANEL TRENERA =================== */
+      box.innerHTML = "<div class='card' style='background:#222;'>⏳ Ładowanie...</div>";
 
-function trainerPowrot() {
-  ukryjWszystkie();
-  document.getElementById("trainerPanelView").classList.remove("hidden");
-}
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=statystykiSum`, { cache: "no-store" });
+        const lista = await res.json();
 
-async function trainerPokazZawodnicy() {
-  ukryjWszystkie();
-  document.getElementById("trainerZawodnicyView").classList.remove("hidden");
-  const box = document.getElementById("trainerListaZawodnikow");
+        if (!Array.isArray(lista) || lista.length === 0) {
+          box.innerHTML = "<div class='card' style='background:#111;'>Brak danych</div>";
+          return;
+        }
 
-  box.innerHTML = "<div class='card' style='background:#222;'>⏳ Ładowanie...</div>";
+        box.innerHTML = lista.map(z => `
+          <div class="card" style="text-align:left;">
+            <b>#${z.nr}</b> — ${z.nazwisko}<br>
+            <span style="opacity:0.8;">${z.suma} treningów łącznie</span>
+          </div>
+        `).join('');
 
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=statystykiSum`, { cache: "no-store" });
-    const lista = await res.json();
-
-    if (!Array.isArray(lista) || lista.length === 0) {
-      box.innerHTML = "<div class='card' style='background:#111;'>Brak danych</div>";
-      return;
+      } catch (err) {
+        box.innerHTML = "<div class='card' style='background:#700;'>Błąd pobierania danych</div>";
+      }
     }
 
-    box.innerHTML = lista.map(z => `
-      <div class="card" style="text-align:left;">
-        <b>#${z.nr}</b> — ${z.nazwisko}<br>
-        <span style="opacity:0.8;">${z.suma} treningów łącznie</span>
-      </div>
-    `).join('');
+    async function trainerPokazWydarzenia() {
+      ukryjWszystkie();
+      document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
 
-  } catch (err) {
-    box.innerHTML = "<div class='card' style='background:#700;'>Błąd pobierania danych</div>";
-  }
-}
+      const grupa = encodeURIComponent(window.grupyTrenera || "");
+      const res = await fetch(`${SCRIPT_URL}?action=treningiTrener&grupa=${grupa}`);
+      const lista = await res.json();
 
+      renderTreningiTrainer(lista);
+    }
 
-async function trainerPokazWydarzenia() {
-  ukryjWszystkie();
-  document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
+    function renderTreningiTrainer(lista) {
+      const div = document.getElementById("trainerListaWydarzen");
+      if (!lista?.length) {
+        div.innerHTML = "<p>Brak wydarzeń</p>";
+        return;
+      }
 
-  const grupa = encodeURIComponent(window.grupyTrenera || "");
-  const res = await fetch(`${SCRIPT_URL}?action=treningiTrener&grupa=${grupa}`);
-  const lista = await res.json();
+      div.innerHTML = lista.map(t => `
+        <div class="card">
+          <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
+          Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
+          Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
 
-  renderTreningiTrainer(lista);
-}
+          <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
+          <button class="btn danger" onclick="usunWydarzenie('${t.miesiac}', ${t.czasCol})">🗑️ Usuń</button>
 
-function renderTreningiTrainer(lista) {
-  const div = document.getElementById("trainerListaWydarzen");
-  if (!lista?.length) { 
-    div.innerHTML = "<p>Brak wydarzeń</p>"; 
-    return; 
-  }
+          <div id="trainer-zapisani-${t.id}" class="hidden"></div>
+        </div>
+      `).join('');
+    }
 
-  div.innerHTML = lista.map(t => `
-    <div class="card">
-      <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
-      Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
-      Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
-
-      <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
-
-      <button class="btn danger"
-        onclick='usunWydarzenie(${JSON.stringify(t.miesiac)}, ${t.czasCol})'>
-  🗑️ Usuń
-</button>
-
-
-      <div id="trainer-zapisani-${t.id}" class="hidden"></div>
-    </div>
-  `).join('');
-}
-    
     async function trainerToggleZapisani(id) {
-  const box = document.getElementById(`trainer-zapisani-${id}`);
-  if (!box) return;
+      const box = document.getElementById(`trainer-zapisani-${id}`);
+      if (!box) return;
 
-  if (!box.classList.contains('hidden')) {
-    box.classList.add('hidden');
-    return;
-  }
+      if (!box.classList.contains('hidden')) {
+        box.classList.add('hidden');
+        return;
+      }
 
-  box.classList.remove('hidden');
-  box.innerHTML = '<div class="card" style="background:#222;">⏳ Ładowanie...</div>';
+      box.classList.remove('hidden');
+      box.innerHTML = '<div class="card" style="background:#222;">⏳ Ładowanie...</div>';
 
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
-    const lista = await res.json();
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
+        const lista = await res.json();
 
-    if (!Array.isArray(lista) || !lista.length) {
-      box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
-      return;
+        if (!Array.isArray(lista) || !lista.length) {
+          box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
+          return;
+        }
+
+        box.innerHTML = `<div class="card" style="background:#111;">
+          <b>Lista zapisanych:</b>
+          <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
+            ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
+          </ul>
+        </div>`;
+      } catch {
+        box.innerHTML = '<div class="card" style="background:#700;">Błąd pobierania listy</div>';
+      }
     }
 
-    box.innerHTML = `<div class="card" style="background:#111;">
-      <b>Lista zapisanych:</b>
-      <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
-        ${lista.map(p => `<li>${p.nazwisko}</li>`).join('')}
-      </ul>
-    </div>`;
-  } catch {
-    box.innerHTML = '<div class="card" style="background:#700;">Błąd pobierania listy</div>';
-  }
-}
+    /* =================== DODAWANIE WYDARZENIA (TRENER) =================== */
 
-async function zaladujListeTrenerow() {
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=getTrenerzy`);
-    const lista = await res.json();
+    async function zaladujListeTrenerow() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getTrenerzy`);
+        const lista = await res.json();
 
-    const t1 = document.getElementById("eventTrener1");
-    const t2 = document.getElementById("eventTrener2");
+        const t1 = document.getElementById("eventTrener1");
+        const t2 = document.getElementById("eventTrener2");
 
-    t1.innerHTML = "";
-    t2.innerHTML = "<option value=''>— Brak —</option>";
+        t1.innerHTML = "<option value=''>— wybierz trenera —</option>";
+        t2.innerHTML = "<option value=''>— Brak —</option>";
 
-    lista.forEach(nazw => {
-      t1.innerHTML += `<option value="${nazw}">${nazw}</option>`;
-      t2.innerHTML += `<option value="${nazw}">${nazw}</option>`;
-    });
+        lista.forEach(nazw => {
+          t1.innerHTML += `<option value="${nazw}">${nazw}</option>`;
+          t2.innerHTML += `<option value="${nazw}">${nazw}</option>`;
+        });
 
-  } catch (err) {
-    console.error("Błąd pobierania trenerów:", err);
-  }
-}
-   
+      } catch (err) {
+        console.error("Błąd pobierania trenerów:", err);
+      }
+    }
+
     function pokazDodajWydarzenie() {
-  ukryjWszystkie();
-  document.getElementById("trainerDodajWydarzenieView").classList.remove("hidden");
-  zaladujListeTrenerow();    // ← automatyczne załadowanie trenerów
-}
+      ukryjWszystkie();
+      document.getElementById("trainerDodajWydarzenieView").classList.remove("hidden");
+      zaladujListeTrenerow();
+    }
 
     function validHour(hhmm) {
-    return /^\d{2}:\d{2}$/.test(hhmm);
-}
-
-async function wyslijNoweWydarzenie() {
-  const data = document.getElementById("eventData").value;
-  const start = document.getElementById("eventStart").value;
-  const end = document.getElementById("eventEnd").value;
-  const rodzaj = document.getElementById("eventRodzaj").value;
-  const trener1 = document.getElementById("eventTrener1").value;
-  const trener2 = document.getElementById("eventTrener2").value;
-
-  // ⬇⬇⬇ TUTAJ poprawiona obsługa grup ⬇⬇⬇
-const grupy = [...document.querySelectorAll(".eventGrupa:checked")]
-  .map(c => c.value)
-  .join(",");
-
-
-  // ⬆⬆⬆ KONIEC poprawki ⬆⬆⬆
-
-  const liczDoStat = document.getElementById("eventStat").checked;
-  const msg = document.getElementById("eventMsg");
-
-
-  // ❗ Pola wymagane
-  if (!data || !start || !rodzaj || !trener1) {
-    msg.innerText = "Uzupełnij wymagane pola: Data, Godzina, Rodzaj, Trener 1.";
-    return;
-  }
-
-  // ⏱ Walidacja godzin
-  if (!validHour(start) || !validHour(end)) {
-    msg.innerText = "❌ Niepoprawny format godziny. Wpisz w formacie HH:MM.";
-    return;
-  }
-
-  if (start >= end) {
-    msg.innerText = "❌ Godzina zakończenia musi być później niż rozpoczęcia.";
-    return;
-  }
-
-  msg.innerText = "⏳ Dodawanie wydarzenia...";
-
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "dodajWydarzenie",
-        data,
-        godzStart: start,
-        godzKoniec: end,
-        rodzaj,
-        trener1,
-        trener2,
-        grupy,
-        liczDoStatystyk: liczDoStat
-      })
-    });
-
-    const r = await res.json();
-    msg.innerText = r.message || "Nieznany wynik.";
-
-    if (r.success) {
-      // 🧹 Czyścimy form
-      document.querySelectorAll("#trainerDodajWydarzenieView input").forEach(i => {
-        if (i.type !== "checkbox") i.value = "";
-        else i.checked = false;
-      });
-
-      // 🔄 odświeżenie listy
-      setTimeout(() => trainerPokazWydarzenia(), 800);
+      return /^\d{2}:\d{2}$/.test(hhmm);
     }
 
-  } catch (err) {
-    msg.innerText = "❌ Błąd połączenia: " + err;
-  }
-}
-    
-    /* =================== PŁATNOŚCI =================== */
+    async function wyslijNoweWydarzenie() {
+      const data = document.getElementById("eventData").value;
+      const start = document.getElementById("eventStart").value;
+      const end = document.getElementById("eventEnd").value;
+      const rodzaj = document.getElementById("eventRodzaj").value;
+      const trener1 = document.getElementById("eventTrener1").value;
+      const trener2 = document.getElementById("eventTrener2").value;
+
+      const grupy = [...document.querySelectorAll(".eventGrupa:checked")]
+        .map(c => c.value)
+        .join(",");
+
+      const liczDoStat = document.getElementById("eventStat").checked;
+      const msg = document.getElementById("eventMsg");
+
+      if (!data || !start || !rodzaj || !trener1) {
+        msg.innerText = "Uzupełnij wymagane pola: Data, Godzina, Rodzaj, Trener 1.";
+        return;
+      }
+
+      if (!validHour(start) || !validHour(end)) {
+        msg.innerText = "❌ Niepoprawny format godziny. Wpisz w formacie HH:MM.";
+        return;
+      }
+
+      if (start >= end) {
+        msg.innerText = "❌ Godzina zakończenia musi być później niż rozpoczęcia.";
+        return;
+      }
+
+      msg.innerText = "⏳ Dodawanie wydarzenia...";
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "dodajWydarzenie",
+            data,
+            godzStart: start,
+            godzKoniec: end,
+            rodzaj,
+            trener1,
+            trener2,
+            grupy,
+            liczDoStatystyk: liczDoStat
+          })
+        });
+
+        const r = await res.json();
+        msg.innerText = r.message || "Nieznany wynik.";
+
+        if (r.success) {
+          document.querySelectorAll("#trainerDodajWydarzenieView input").forEach(i => {
+            if (i.type !== "checkbox") i.value = "";
+            else i.checked = false;
+          });
+
+          setTimeout(() => trainerPokazWydarzenia(), 800);
+        }
+
+      } catch (err) {
+        msg.innerText = "❌ Błąd połączenia: " + err;
+      }
+    }
+
+    /* =================== PŁATNOŚCI (ZAWODNIK) =================== */
+
     function renderPlatnosci(lista) {
       const div = document.getElementById("listaPlatnosci");
       if (!lista?.length) {
-        div.innerHTML = "<p>Brak zaległości ✅</p><button class='full-btn' onclick='pokazTreningi()'>Dalej ➡</button>";
+        div.innerHTML = "<p>Brak zaległości ✅</p>" +
+          "<button class='full-btn' onclick='pokazTreningi()'>Dalej ➡</button>";
         return;
       }
-      div.innerHTML = `<h3>Zaległe płatności:</h3>` +
-        lista.map(p => `<div class='card' style='background:#a00;'>🔴 ${p.nazwa} – ${p.kwota} zł</div>`).join('') +
+
+      div.innerHTML =
+        "<h3>Zaległe płatności:</h3>" +
+        lista.map(p =>
+          `<div class='card' style='background:#a00;'>🔴 ${p.nazwa} – ${p.kwota} zł</div>`
+        ).join('') +
         `<button class='full-btn' onclick='pokazTreningi()' style='margin-top:20px;'>Dalej ➡</button>`;
     }
 
     async function pokazTreningi() {
       document.getElementById("platnosciView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
+
       const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${encodeURIComponent(numerZalogowanego)}`;
       const lista = await (await fetch(url)).json();
       renderTreningi(lista);
     }
 
-    async function pokazTreningiTrener() {
-      ukryjWszystkie();
-      document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
+    /* =================== WYDARZENIA (ZAWODNIK) =================== */
 
-      const lista = await (await fetch(`${SCRIPT_URL}?action=treningiTrener`)).json();
-      renderTreningi(lista);
-
-  // Zablokuj przyciski zapisu i wypisu
-  document.querySelectorAll("button[id^='btn-']").forEach(b => {
-    b.disabled = true;
-    b.innerText = "Podgląd";
-  });
-  document.querySelectorAll("button[id^='wypisz-']").forEach(b => {
-    b.disabled = true;
-  });
-}
-
-    /* =================== WYDARZENIA =================== */
     function renderTreningi(lista) {
       const div = document.getElementById('listaTreningow');
       if (!lista?.length) {
         div.innerHTML = "<p>Brak wydarzeń</p>";
         return;
       }
+
       div.innerHTML = lista.map(t => `
         <div class="card">
-        <p>
-          <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
-          Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
-          Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}
-        </p>
+          <p>
+            <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
+            Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
+            Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}
+          </p>
 
           <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
             <button id="btn-${t.id}" ${t.zapisany ? 'disabled' : ''} onclick="zapiszSie('${t.id}')">
@@ -743,6 +712,7 @@ const grupy = [...document.querySelectorAll(".eventGrupa:checked")]
             </button>
             <button style="background:#333;" onclick="toggleZapisani('${t.id}')">👥 Zapisani</button>
           </div>
+
           <div id="zapisani-${t.id}" class="hidden lista-zapisanych"></div>
         </div>
       `).join('');
@@ -751,17 +721,24 @@ const grupy = [...document.querySelectorAll(".eventGrupa:checked")]
     async function toggleZapisani(id) {
       const box = document.getElementById(`zapisani-${id}`);
       if (!box) return;
-      if (!box.classList.contains('hidden')) return box.classList.add('hidden');
+
+      if (!box.classList.contains('hidden')) {
+        box.classList.add('hidden');
+        return;
+      }
 
       box.classList.remove('hidden');
       box.innerHTML = '<div class="card" style="background:#222;">⏳ Ładowanie...</div>';
+
       try {
         const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
         const lista = await res.json();
+
         if (!Array.isArray(lista) || lista.length === 0) {
           box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
           return;
         }
+
         box.innerHTML = `<div class="card" style="background:#111;">
           <b>Lista zapisanych:</b>
           <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
@@ -824,14 +801,17 @@ const grupy = [...document.querySelectorAll(".eventGrupa:checked")]
     async function odswiezListeZapisanych(id) {
       const box = document.getElementById(`zapisani-${id}`);
       if (!box) return;
+
       box.innerHTML = '<div class="card" style="background:#222;">⏳ Odświeżanie...</div>';
       try {
         const res = await fetch(`${SCRIPT_URL}?action=zapisani&treningId=${encodeURIComponent(id)}`);
         const lista = await res.json();
+
         if (!Array.isArray(lista) || lista.length === 0) {
           box.innerHTML = '<div class="card" style="background:#111;">Brak zapisanych</div>';
           return;
         }
+
         box.innerHTML = `<div class="card" style="background:#111;">
           <b>Lista zapisanych:</b>
           <ul style="margin:6px 0 0 20px; padding:0; list-style-type:none;">
@@ -843,34 +823,46 @@ const grupy = [...document.querySelectorAll(".eventGrupa:checked")]
       }
     }
 
-    /* =================== STATYSTYKI =================== */
+    /* =================== STATYSTYKI (ZAWODNIK) =================== */
+
     async function pokazStatystyki() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("statsView").classList.remove("hidden");
+
       const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${encodeURIComponent(numerZalogowanego)}`);
       const lista = await res.json();
       renderStatystyki(lista);
     }
+
     function renderStatystyki(lista) {
       const div = document.getElementById("listaStatystyk");
-      if (!lista?.length) { div.innerHTML = "<p>Brak danych</p>"; return; }
+      if (!lista?.length) {
+        div.innerHTML = "<p>Brak danych</p>";
+        return;
+      }
+
       const suma = lista.reduce((acc, s) => acc + (Number(s.treningi) || 0), 0);
       div.innerHTML =
-        lista.map(s => `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`).join('') +
+        lista.map(s =>
+          `<div class="card">📅 ${s.miesiac} — 🏒 ${s.treningi} treningów</div>`
+        ).join('') +
         `<div class="card" style="background:#222;margin-top:20px;font-weight:bold;">
           🔥 Łącznie: ${suma} treningów w sezonie
         </div>`;
     }
+
     function powrotDoTreningow() {
       document.getElementById("statsView").classList.add("hidden");
       document.getElementById("homeView").classList.remove("hidden");
     }
+
     function powrotDoPlatnosci() {
       document.getElementById("homeView").classList.add("hidden");
       document.getElementById("platnosciView").classList.remove("hidden");
     }
 
     /* =================== REJESTRACJA =================== */
+
     async function wyslijRejestracje() {
       const numer = document.getElementById("regNumer").value.trim();
       const nazwisko = document.getElementById("regNazwisko").value.trim();
@@ -891,13 +883,10 @@ const grupy = [...document.querySelectorAll(".eventGrupa:checked")]
         const data = await res.json();
 
         if (data.ok) {
-          // Czyść pola
           document.getElementById("regNumer").value = "";
           document.getElementById("regNazwisko").value = "";
           document.getElementById("regHaslo").value = "";
-
           msg.innerText = "✅ Rejestracja zakończona!";
-          // Zniknij komunikat i wróć do logowania
           setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 1500);
         } else {
           msg.innerText = "❌ " + (data.msg || "Błąd");
@@ -906,65 +895,84 @@ const grupy = [...document.querySelectorAll(".eventGrupa:checked")]
         msg.innerText = "Błąd połączenia.";
       }
     }
-async function wyslijRejestracjeTrener() {
-  const poleNazw = document.getElementById("regNazwiskoTrener");
-  const poleHaslo = document.getElementById("regHasloTrener");
-  const msg = document.getElementById("regMsgTrener");
 
-  const nazwisko = poleNazw.value.trim();
-  const haslo = poleHaslo.value.trim();
-  if (!nazwisko || !haslo) {
-    msg.innerText = "Wypełnij wszystkie pola.";
-    return;
-  }
+    async function wyslijRejestracjeTrener() {
+      const poleNazw = document.getElementById("regNazwiskoTrener");
+      const poleHaslo = document.getElementById("regHasloTrener");
+      const msg = document.getElementById("regMsgTrener");
 
-  msg.innerText = "⏳ Rejestracja...";
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: new URLSearchParams({ mode: "rejestracjaTrener", nazwisko, haslo })
-    });
-    const data = await res.json();
+      const nazwisko = poleNazw.value.trim();
+      const haslo = poleHaslo.value.trim();
+      if (!nazwisko || !haslo) {
+        msg.innerText = "Wypełnij wszystkie pola.";
+        return;
+      }
 
-    if (data.ok) {
-      const inic = data.inic || "(?)";
+      msg.innerText = "⏳ Rejestracja...";
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: new URLSearchParams({ mode: "rejestracjaTrener", nazwisko, haslo })
+        });
+        const data = await res.json();
 
-      msg.innerHTML = `
-        ✅ <b>Zarejestrowano trenera!</b><br>
-        Login do systemu: <b>${inic}</b><br><br>
-        <button class="full-btn" onclick="navigator.clipboard.writeText('${inic}')">📋 Skopiuj login</button>
-      `;
+        if (data.ok) {
+          const inic = data.inic || "(?)";
+          msg.innerHTML = `
+            ✅ <b>Zarejestrowano trenera!</b><br>
+            Login do systemu: <b>${inic}</b><br><br>
+            <button class="full-btn" onclick="navigator.clipboard.writeText('${inic}')">📋 Skopiuj login</button>
+          `;
 
-      // Czyścimy pola
-      poleNazw.value = "";
-      poleHaslo.value = "";
+          poleNazw.value = "";
+          poleHaslo.value = "";
 
-      // po 3s wracamy do logowania
-      setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 8000);
-
-    } else {
-      msg.innerText = "❌ " + (data.msg || "Błąd");
+          setTimeout(() => { msg.innerText = ""; pokazLogowanie(); }, 8000);
+        } else {
+          msg.innerText = "❌ " + (data.msg || "Błąd");
+        }
+      } catch (e) {
+        msg.innerText = "Błąd połączenia.";
+      }
     }
-  } catch (e) {
-    msg.innerText = "Błąd połączenia.";
-  }
-}
+
+    /* =================== USUWANIE WYDARZENIA (TRENER) =================== */
 
     function usunWydarzenie(miesiac, czasCol) {
-  if (!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;
+      if (!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;
 
-  fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${miesiac}&czasCol=${czasCol}`)
+      fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(miesiac)}&czasCol=${encodeURIComponent(czasCol)}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) {
+            alert("Wydarzenie zostało usunięte.");
+            trainerPokazWydarzenia();
+          } else {
+            alert("Błąd: " + (d.error || "nieznany błąd"));
+          }
+        })
+        .catch(err => {
+          alert("Błąd połączenia: " + err);
+        });
+    }
 
-    .then(r => r.json())
-    .then(d => {
-      if (d.success) {
-        alert("Wydarzenie zostało usunięte.");
-        trainerPokazWydarzenia(); // <- u Ciebie to jest poprawna funkcja odświeżania
-      } else {
-        alert("Błąd: " + d.error);
-      }
-    });
-}
+    /* =================== PODGLĄDOWE (opcjonalne) =================== */
+    // Zostawiam starą funkcję, jeśli jej kiedyś używałeś ręcznie.
+    async function pokazTreningiTrener() {
+      ukryjWszystkie();
+      document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
+
+      const lista = await (await fetch(`${SCRIPT_URL}?action=treningiTrener`)).json();
+      renderTreningi(lista);
+
+      document.querySelectorAll("button[id^='btn-']").forEach(b => {
+        b.disabled = true;
+        b.innerText = "Podgląd";
+      });
+      document.querySelectorAll("button[id^='wypisz-']").forEach(b => {
+        b.disabled = true;
+      });
+    }
 
   </script>
 </body>

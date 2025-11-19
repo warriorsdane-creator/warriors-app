@@ -179,7 +179,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.67.72';
+    const WERSJA_APKI = '1.68.72';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -1009,12 +1009,6 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("❌ Błąd połączenia.");
     }
   };
-});
-
-// 🔹 4. Podpinamy przycisk „TAK, usuń” po załadowaniu DOM
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("usunPotwierdz");
-  if (btn) btn.addEventListener("click", potwierdzUsuniecie);
 });
 
     /* =================== PODGLĄDOWE (opcjonalne) =================== */

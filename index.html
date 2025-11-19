@@ -198,7 +198,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.63.70';
+    const WERSJA_APKI = '1.64.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -367,6 +367,9 @@
       <button class="full-btn" style="margin-top:20px;" onclick="pokazDodajWydarzenie()">➕ Dodaj wydarzenie</button>
       <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
     </div>
+
+  </div><!-- /app -->
+  
     <!-- 🔔 Popup potwierdzenia usunięcia (na razie tylko komunikat) -->
     <div id="trainerDeletePopup" class="hidden">
     <div class="popup-card">
@@ -378,9 +381,6 @@
   </div>
 </div>
   
-
-  </div><!-- /app -->
-
   <!-- LOGIKA APLIKACJI -->
   <script>
     /* =================== START / INTRO =================== */

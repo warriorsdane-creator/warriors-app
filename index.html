@@ -179,7 +179,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.66.72';
+    const WERSJA_APKI = '1.67.72';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -960,47 +960,56 @@
       }
     }
 
- /* =================== USUWANIE WYDARZENIA (TRENER) =================== */
+/* =================== USUWANIE WYDARZENIA (TRENER) =================== */
 
-// Centralny bufor parametrów do usunięcia
 let usunParams = null;
 
-// 🔹 1. Kliknięcie w przycisk „Usuń” przy wydarzeniu
+// pokazuje popup
 function pokazPotwierdzenie(miesiac, czasCol) {
   usunParams = { miesiac, czasCol };
-  const box = document.getElementById("usunWarning");
-  box.classList.remove("hidden");
+  document.getElementById("usunWarning").classList.remove("hidden");
 }
 
-// 🔹 2. Kliknięcie „Anuluj”
+// zamyka popup
 function anulujUsun() {
   document.getElementById("usunWarning").classList.add("hidden");
   usunParams = null;
 }
 
-// 🔹 3. Kliknięcie „TAK, usuń”
-function potwierdzUsuniecie() {
-  if (!usunParams) return;
+/* 🔥 PODPINANIE PRZYCISKU "TAK USUŃ" – działające pewnie */
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("usunPotwierdz");
 
-  const { miesiac, czasCol } = usunParams;
-  document.getElementById("usunWarning").classList.add("hidden");
+  if (!btn) {
+    console.error("❌ Błąd: nie znaleziono #usunPotwierdz w HTML");
+    return;
+  }
 
-  // 👉 wysyłamy żądanie do backendu
-  fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${miesiac}&czasCol=${czasCol}`)
-    .then(r => r.json())
-    .then(d => {
+  btn.onclick = async () => {
+    if (!usunParams) return;
+
+    const { miesiac, czasCol } = usunParams;
+
+    document.getElementById("usunWarning").classList.add("hidden");
+
+    try {
+      const res = await fetch(
+        `${SCRIPT_URL}?action=usunWydarzenie&miesiac=${miesiac}&czasCol=${czasCol}`
+      );
+
+      const d = await res.json();
+
       if (d.success) {
-        alert("Wydarzenie usunięte.");
         trainerPokazWydarzenia();
       } else {
-        alert("❌ Błąd: " + (d.error || "Backend nie podał szczegółów."));
+        alert("❌ Błąd: " + (d.error || "Brak szczegółów backendu"));
       }
-    })
-    .catch(() => alert("❌ Błąd połączenia."));
 
-  // czyścimy parametry
-  usunParams = null;
-}
+    } catch (e) {
+      alert("❌ Błąd połączenia.");
+    }
+  };
+});
 
 // 🔹 4. Podpinamy przycisk „TAK, usuń” po załadowaniu DOM
 document.addEventListener("DOMContentLoaded", () => {

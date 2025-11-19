@@ -179,7 +179,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.68.72. test';
+    const WERSJA_APKI = '1.62.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -344,27 +344,6 @@
     <!-- WYDARZENIA (TRENER) -->
     <div id="trainerWydarzeniaView" class="container hidden">
       <h1>Wydarzenia</h1>
-      <!-- 🔥 Komunikat potwierdzenia usunięcia -->
-<div id="usunWarning" class="hidden" style="
-  background:#222;
-  border:1px solid #444;
-  padding:15px;
-  border-radius:8px;
-  margin:10px 0;
-">
-  <div style="margin-bottom:10px; font-weight:bold;">
-    Czy na pewno chcesz usunąć to wydarzenie?
-  </div>
-
-  <button id="usunPotwierdz" class="btn danger" style="width:100%;margin-bottom:6px;">
-    🗑️ Tak, usuń
-  </button>
-
-  <button onclick="anulujUsun()" class="btn" style="width:100%;background:#333;">
-    Anuluj
-  </button>
-</div>
-
       <div id="trainerListaWydarzen">Ładowanie...</div>
       <button class="full-btn" style="margin-top:20px;" onclick="pokazDodajWydarzenie()">➕ Dodaj wydarzenie</button>
       <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
@@ -397,7 +376,7 @@
 
     /* =================== KONFIG / GLOBALNE =================== */
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOY85Z-77bIxn1aNioeeIfuI_imXnYycFd-WaAp3vJJCvdN8z8nfO1VBAnxzug2i1U/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhSYtraxCJnbYVCt_6lwDmyYTRofqN1WLHu-b0vblDZjdB-K39LaMz7ARGjFU8kx-m/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
     window.grupyTrenera = "";
@@ -543,10 +522,7 @@
           Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
 
           <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
-          <button class="btn danger" onclick="pokazPotwierdzenie('${t.miesiac}', ${t.czasCol})">
-        🗑️ Usuń
-      </button>
-
+          <button class="btn danger" onclick="usunWydarzenie('${t.miesiac}', ${t.czasCol})">🗑️ Usuń</button>
 
           <div id="trainer-zapisani-${t.id}" class="hidden"></div>
         </div>
@@ -960,75 +936,26 @@
       }
     }
 
-/* =================== USUWANIE WYDARZENIA (TRENER) =================== */
+    /* =================== USUWANIE WYDARZENIA (TRENER) =================== */
 
-let usunParams = null;
+    function usunWydarzenie(miesiac, czasCol) {
+      if (!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;
 
-// pokazuje popup
-function pokazPotwierdzenie(miesiac, czasCol) {
-  usunParams = { miesiac, czasCol };
-  document.getElementById("usunWarning").classList.remove("hidden");
-}
-
-// zamyka popup
-function anulujUsun() {
-  document.getElementById("usunWarning").classList.add("hidden");
-  usunParams = null;
-}
-
-/* 🔥 PODPINANIE PRZYCISKU "TAK USUŃ" – działające pewnie */
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("usunPotwierdz");
-
-  if (!btn) {
-    console.error("❌ Błąd: nie znaleziono #usunPotwierdz w HTML");
-    return;
-  }
-
-  btn.onclick = async () => {
-    if (!usunParams) return;
-
-    const { miesiac, czasCol } = usunParams;
-
-    document.getElementById("usunWarning").classList.add("hidden");
-
-    try {
-      const res = await fetch(
-        `${SCRIPT_URL}?action=usunWydarzenie&miesiac=${miesiac}&czasCol=${czasCol}`
-      );
-
-      const d = await res.json();
-
-      if (d.success) {
-        trainerPokazWydarzenia();
-      } else {
-        alert("❌ Błąd: " + (d.error || "Brak szczegółów backendu"));
-      }
-
-    } catch (e) {
-      alert("❌ Błąd połączenia.");
+      fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(miesiac)}&czasCol=${encodeURIComponent(czasCol)}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) {
+            alert("Wydarzenie zostało usunięte.");
+            trainerPokazWydarzenia();
+          } else {
+            alert("Błąd: " + (d.error || "nieznany błąd"));
+          }
+        })
+        .catch(err => {
+          alert("Błąd połączenia: " + err);
+        });
     }
-  };
-});
 
-console.log("=== TEST 1: START SKRYPTU USUWANIA ===");
-
-console.log("usunWarning =", document.getElementById("usunWarning"));
-console.log("usunPotwierdz =", document.getElementById("usunPotwierdz"));
-
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("=== TEST 2: DOMContentLoaded ===");
-  console.log("usunWarning =", document.getElementById("usunWarning"));
-  console.log("usunPotwierdz =", document.getElementById("usunPotwierdz"));
-});
-
-setTimeout(() => {
-  console.log("=== TEST 3: Po 2 sekundach ===");
-  console.log("usunWarning =", document.getElementById("usunWarning"));
-  console.log("usunPotwierdz =", document.getElementById("usunPotwierdz"));
-}, 2000);
-
-    
     /* =================== PODGLĄDOWE (opcjonalne) =================== */
     // Zostawiam starą funkcję, jeśli jej kiedyś używałeś ręcznie.
     async function pokazTreningiTrener() {

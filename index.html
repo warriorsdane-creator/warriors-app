@@ -175,11 +175,30 @@
     .btn.danger {
       background: #800;
     }
+        #trainerDeletePopup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    #trainerDeletePopup .popup-card {
+      background: #111;
+      border: 1px solid #555;
+      border-radius: 10px;
+      padding: 16px 20px;
+      max-width: 260px;
+      text-align: center;
+    }
+
   </style>
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.62.70';
+    const WERSJA_APKI = '1.63.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -348,6 +367,17 @@
       <button class="full-btn" style="margin-top:20px;" onclick="pokazDodajWydarzenie()">➕ Dodaj wydarzenie</button>
       <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
     </div>
+    <!-- 🔔 Popup potwierdzenia usunięcia (na razie tylko komunikat) -->
+    <div id="trainerDeletePopup" class="hidden">
+    <div class="popup-card">
+    <p style="margin-bottom:15px;">
+      Czy napewno chcesz usunąć wydarzenie ?
+    </p>
+    <button class="full-btn" onclick="trainerConfirmDeleteOk()">OK</button>
+    <button class="full-btn alt" style="margin-top:8px;" onclick="trainerHideDeletePopup()">Anuluj</button>
+  </div>
+</div>
+  
 
   </div><!-- /app -->
 
@@ -522,7 +552,7 @@
           Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
 
           <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
-          <button class="btn danger" onclick="usunWydarzenie('${t.miesiac}', ${t.czasCol})">🗑️ Usuń</button>
+          <button class="btn danger" onclick="trainerShowDeletePopup('${t.miesiac}', ${t.czasCol})">🗑️ Usuń</button>
 
           <div id="trainer-zapisani-${t.id}" class="hidden"></div>
         </div>
@@ -935,8 +965,33 @@
         msg.innerText = "Błąd połączenia.";
       }
     }
+        // =================== USUWANIE WYDARZENIA – KROK 1: TYLKO POPUP ===================
+
+    let deleteMiesiac = null;
+    let deleteCzasCol = null;
+
+    function trainerShowDeletePopup(miesiac, czasCol) {
+      // zapamiętujemy dane – przydadzą się w kroku 2
+      deleteMiesiac = miesiac;
+      deleteCzasCol = czasCol;
+
+      const popup = document.getElementById("trainerDeletePopup");
+      if (popup) popup.classList.remove("hidden");
+    }
+
+    function trainerHideDeletePopup() {
+      const popup = document.getElementById("trainerDeletePopup");
+      if (popup) popup.classList.add("hidden");
+    }
+
+    function trainerConfirmDeleteOk() {
+      // KROK 1: na razie TYLKO zamykamy okno.
+      // W KROKU 2 tutaj podepniemy usuwanie wydarzenia w arkuszu.
+      trainerHideDeletePopup();
+    }
 
     /* =================== USUWANIE WYDARZENIA (TRENER) =================== */
+    
 
     function usunWydarzenie(miesiac, czasCol) {
       if (!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;

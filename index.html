@@ -175,15 +175,19 @@
     .btn.danger {
       background: #800;
     }
-        #trainerDeletePopup {
+      #trainerDeletePopup {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.7);
-      display: flex;
       justify-content: center;
       align-items: center;
       z-index: 2000;
+      display: none;   /* 🔥 POPRAWKA */
     }
+
+#trainerDeletePopup.show {
+  display: flex;  /* 🔥 włączamy, gdy trzeba */
+}
 
     #trainerDeletePopup .popup-card {
       background: #111;
@@ -198,7 +202,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.64.70';
+    const WERSJA_APKI = '1.65.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -971,18 +975,15 @@
     let deleteCzasCol = null;
 
     function trainerShowDeletePopup(miesiac, czasCol) {
-      // zapamiętujemy dane – przydadzą się w kroku 2
-      deleteMiesiac = miesiac;
-      deleteCzasCol = czasCol;
-
-      const popup = document.getElementById("trainerDeletePopup");
-      if (popup) popup.classList.remove("hidden");
-    }
+    deleteMiesiac = miesiac;
+    deleteCzasCol = czasCol;
+    document.getElementById("trainerDeletePopup").classList.add("show");
+}
 
     function trainerHideDeletePopup() {
-      const popup = document.getElementById("trainerDeletePopup");
-      if (popup) popup.classList.add("hidden");
-    }
+    document.getElementById("trainerDeletePopup").classList.remove("show");
+}
+
 
     function trainerConfirmDeleteOk() {
       // KROK 1: na razie TYLKO zamykamy okno.

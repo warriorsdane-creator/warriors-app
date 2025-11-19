@@ -179,7 +179,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.62.70';
+    const WERSJA_APKI = '1.63.71';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -376,7 +376,7 @@
 
     /* =================== KONFIG / GLOBALNE =================== */
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhSYtraxCJnbYVCt_6lwDmyYTRofqN1WLHu-b0vblDZjdB-K39LaMz7ARGjFU8kx-m/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4BEIGcbDLPK3gkL3j2s313QlqHdIuwrDGAq2QWYMlZdWph-8f5AcScHQltjbyS90A/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
     window.grupyTrenera = "";
@@ -939,22 +939,31 @@
     /* =================== USUWANIE WYDARZENIA (TRENER) =================== */
 
     function usunWydarzenie(miesiac, czasCol) {
-      if (!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;
+  const msg = document.getElementById("trainerDeleteMsg");
 
-      fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(miesiac)}&czasCol=${encodeURIComponent(czasCol)}`)
-        .then(r => r.json())
-        .then(d => {
-          if (d.success) {
-            alert("Wydarzenie zostało usunięte.");
-            trainerPokazWydarzenia();
-          } else {
-            alert("Błąd: " + (d.error || "nieznany błąd"));
-          }
-        })
-        .catch(err => {
-          alert("Błąd połączenia: " + err);
-        });
+  msg.innerText = "Kliknij ponownie, aby potwierdzić usunięcie.";
+
+  // ZAMIANA onClick na potwierdzony wariant
+  const btn = event.target;
+  btn.onclick = async () => {
+    msg.innerText = "⏳ Usuwanie...";
+
+    try {
+      const res = await fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${miesiac}&czasCol=${czasCol}`);
+      const d = await res.json();
+
+      if (d.success) {
+        msg.innerText = "✅ Usunięto — odświeżam...";
+        setTimeout(() => trainerPokazWydarzenia(), 500);
+      } else {
+        msg.innerText = "❌ Błąd: " + (d.error || "Nieznany");
+      }
+
+    } catch (err) {
+      msg.innerText = "❌ Błąd połączenia.";
     }
+  };
+}
 
     /* =================== PODGLĄDOWE (opcjonalne) =================== */
     // Zostawiam starą funkcję, jeśli jej kiedyś używałeś ręcznie.

@@ -179,7 +179,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.68.72';
+    const WERSJA_APKI = '1.68.72. test';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -1011,6 +1011,24 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 });
 
+console.log("=== TEST 1: START SKRYPTU USUWANIA ===");
+
+console.log("usunWarning =", document.getElementById("usunWarning"));
+console.log("usunPotwierdz =", document.getElementById("usunPotwierdz"));
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("=== TEST 2: DOMContentLoaded ===");
+  console.log("usunWarning =", document.getElementById("usunWarning"));
+  console.log("usunPotwierdz =", document.getElementById("usunPotwierdz"));
+});
+
+setTimeout(() => {
+  console.log("=== TEST 3: Po 2 sekundach ===");
+  console.log("usunWarning =", document.getElementById("usunWarning"));
+  console.log("usunPotwierdz =", document.getElementById("usunPotwierdz"));
+}, 2000);
+
+    
     /* =================== PODGLĄDOWE (opcjonalne) =================== */
     // Zostawiam starą funkcję, jeśli jej kiedyś używałeś ręcznie.
     async function pokazTreningiTrener() {

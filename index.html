@@ -202,7 +202,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.66.70 test';
+    const WERSJA_APKI = '1.66.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -984,9 +984,9 @@
     document.getElementById("trainerDeletePopup").classList.remove("show");
 }
 
-function trainerConfirmDeleteYes() {
-  alert("Klik działa – funkcja podłączona!");
-}
+   async function trainerConfirmDeleteYes() {
+
+  console.log("🔥 TAK - funkcja działa");
 
   // zamykamy popup
   trainerHideDeletePopup();

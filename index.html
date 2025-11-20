@@ -202,7 +202,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.66.72';
+    const WERSJA_APKI = '1.67.72';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -984,27 +984,30 @@
     document.getElementById("trainerDeletePopup").classList.remove("show");
 }
 
-   async function trainerConfirmDeleteYes() {
+  async function trainerConfirmDeleteYes() {
 
   console.log("🔥 TAK - funkcja działa");
 
-  // zamykamy popup
   trainerHideDeletePopup();
 
-  // musi istnieć deleteMiesiac + deleteCzasCol
   if (!deleteMiesiac || !deleteCzasCol) {
     alert("Brak danych wydarzenia do usunięcia.");
     return;
   }
 
+  // 🔥 tworzymy treningId w formacie "Listopad-5"
+  const treningId = `${deleteMiesiac}-${deleteCzasCol}`;
+
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`);
+    const res = await fetch(
+      `${SCRIPT_URL}?action=usunWydarzenie&treningId=${encodeURIComponent(treningId)}`
+    );
+
     const data = await res.json();
 
     if (data.success) {
-      // komunikat z apki
       alert("Wydarzenie zostało usunięte.");
-      trainerPokazWydarzenia(); // odświeżamy listę
+      trainerPokazWydarzenia();
     } else {
       alert("Błąd usuwania: " + (data.error || "Nieznany błąd"));
     }
@@ -1013,7 +1016,6 @@
     alert("Błąd połączenia: " + err);
   }
 }
-
 
     /* =================== PODGLĄDOWE (opcjonalne) =================== */
     // Zostawiam starą funkcję, jeśli jej kiedyś używałeś ręcznie.

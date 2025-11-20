@@ -202,7 +202,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.66.70';
+    const WERSJA_APKI = '1.67.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -413,6 +413,8 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhSYtraxCJnbYVCt_6lwDmyYTRofqN1WLHu-b0vblDZjdB-K39LaMz7ARGjFU8kx-m/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
+    let deleteTrainingId = null;
+
     window.grupyTrenera = "";
 
     /* =================== NAWIGACJA WIDOKAMI =================== */
@@ -556,7 +558,7 @@
           Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
 
           <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
-          <button class="btn danger" onclick="trainerShowDeletePopup('${t.miesiac}', ${t.czasCol})">🗑️ Usuń</button>
+          <button class="btn danger" onclick="trainerShowDeletePopup('${t.id}')">🗑️ Usuń</button>
 
           <div id="trainer-zapisani-${t.id}" class="hidden"></div>
         </div>
@@ -974,10 +976,11 @@
     let deleteMiesiac = null;
     let deleteCzasCol = null;
 
-    function trainerShowDeletePopup(miesiac, czasCol) {
-    deleteMiesiac = miesiac;
-    deleteCzasCol = czasCol;
+    function trainerShowDeletePopup(trainingId) {
+    deleteTrainingId = trainingId;
     document.getElementById("trainerDeletePopup").classList.add("show");
+}
+
 }
 
     function trainerHideDeletePopup() {
@@ -986,23 +989,20 @@
 
     async function trainerConfirmDeleteYes() {
 
-  // zamykamy popup
-  trainerHideDeletePopup();
+    trainerHideDeletePopup();
 
-  // musi istnieć deleteMiesiac + deleteCzasCol
-  if (!deleteMiesiac || !deleteCzasCol) {
-    alert("Brak danych wydarzenia do usunięcia.");
+    if (!deleteTrainingId) {
+    alert("Brak ID wydarzenia.");
     return;
   }
 
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`);
+    try {
+    const res = await fetch(`${SCRIPT_URL}?action=usunWydarzenie&treningId=${encodeURIComponent(deleteTrainingId)}`);
     const data = await res.json();
 
     if (data.success) {
-      // komunikat z apki
       alert("Wydarzenie zostało usunięte.");
-      trainerPokazWydarzenia(); // odświeżamy listę
+      trainerPokazWydarzenia();
     } else {
       alert("Błąd usuwania: " + (data.error || "Nieznany błąd"));
     }

@@ -202,7 +202,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.66.70';
+    const WERSJA_APKI = '1.66.70 test';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -380,7 +380,7 @@
     <p style="margin-bottom:15px;">
       Czy napewno chcesz usunąć wydarzenie ?
     </p>
-    <button class="full-btn" onclick="trainerConfirmDeleteOk()">TAK</button>
+    <button class="full-btn" onclick="trainerConfirmDeleteYes()">TAK</button>
     <button class="full-btn alt" style="margin-top:8px;" onclick="trainerHideDeletePopup()">Anuluj</button>
   </div>
 </div>
@@ -984,9 +984,9 @@
     document.getElementById("trainerDeletePopup").classList.remove("show");
 }
 
-   async function trainerConfirmDeleteYes() {
-
-  console.log("🔥 TAK - funkcja działa");
+function trainerConfirmDeleteYes() {
+  alert("Klik działa – funkcja podłączona!");
+}
 
   // zamykamy popup
   trainerHideDeletePopup();

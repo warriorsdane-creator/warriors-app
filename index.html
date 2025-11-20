@@ -202,7 +202,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.65.70';
+    const WERSJA_APKI = '1.66.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -984,33 +984,34 @@
     document.getElementById("trainerDeletePopup").classList.remove("show");
 }
 
+    async function trainerConfirmDeleteYes() {
 
-    function trainerConfirmDeleteOk() {
-      // KROK 1: na razie TYLKO zamykamy okno.
-      // W KROKU 2 tutaj podepniemy usuwanie wydarzenia w arkuszu.
-      trainerHideDeletePopup();
+  // zamykamy popup
+  trainerHideDeletePopup();
+
+  // musi istnieć deleteMiesiac + deleteCzasCol
+  if (!deleteMiesiac || !deleteCzasCol) {
+    alert("Brak danych wydarzenia do usunięcia.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`);
+    const data = await res.json();
+
+    if (data.success) {
+      // komunikat z apki
+      alert("Wydarzenie zostało usunięte.");
+      trainerPokazWydarzenia(); // odświeżamy listę
+    } else {
+      alert("Błąd usuwania: " + (data.error || "Nieznany błąd"));
     }
 
-    /* =================== USUWANIE WYDARZENIA (TRENER) =================== */
-    
+  } catch (err) {
+    alert("Błąd połączenia: " + err);
+  }
+}
 
-    function usunWydarzenie(miesiac, czasCol) {
-      if (!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;
-
-      fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(miesiac)}&czasCol=${encodeURIComponent(czasCol)}`)
-        .then(r => r.json())
-        .then(d => {
-          if (d.success) {
-            alert("Wydarzenie zostało usunięte.");
-            trainerPokazWydarzenia();
-          } else {
-            alert("Błąd: " + (d.error || "nieznany błąd"));
-          }
-        })
-        .catch(err => {
-          alert("Błąd połączenia: " + err);
-        });
-    }
 
     /* =================== PODGLĄDOWE (opcjonalne) =================== */
     // Zostawiam starą funkcję, jeśli jej kiedyś używałeś ręcznie.

@@ -652,10 +652,11 @@
       const liczDoStat = document.getElementById("eventStat").checked;
       const msg = document.getElementById("eventMsg");
 
-      if (!data || !start || !rodzaj || !trener1) {
-        msg.innerText = "Uzupełnij wymagane pola: Data, Godzina, Rodzaj, Trener 1.";
-        return;
+      if (!data || !start || !rodzaj) {
+      msg.innerText = "Uzupełnij pola: Data, Godzina, Rodzaj.";
+      return;
       }
+
 
       if (!validHour(start) || !validHour(end)) {
         msg.innerText = "❌ Niepoprawny format godziny. Wpisz w formacie HH:MM.";

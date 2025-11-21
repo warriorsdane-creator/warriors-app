@@ -202,7 +202,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.67.80';
+    const WERSJA_APKI = '1.68.80';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -366,6 +366,7 @@
 
     <!-- WYDARZENIA (TRENER) -->
     <div id="trainerWydarzeniaView" class="container hidden">
+      <div id="trainerMsg" class="msg"></div>
       <h1>Wydarzenia</h1>
       <div id="trainerListaWydarzen">Ładowanie...</div>
       <button class="full-btn" style="margin-top:20px;" onclick="pokazDodajWydarzenie()">➕ Dodaj wydarzenie</button>
@@ -974,46 +975,48 @@
     let deleteMiesiac = null;
     let deleteCzasCol = null;
 
-    function trainerShowDeletePopup(miesiac, czasCol) {
-    deleteMiesiac = miesiac;
-    deleteCzasCol = czasCol;
-    document.getElementById("trainerDeletePopup").classList.add("show");
+ function trainerShowDeletePopup(miesiac, czasCol) {
+  deleteMiesiac = miesiac;
+  deleteCzasCol = czasCol;
+  document.getElementById("trainerDeletePopup").classList.add("show");
 }
 
-    function trainerHideDeletePopup() {
-    document.getElementById("trainerDeletePopup").classList.remove("show");
+function trainerHideDeletePopup() {
+  document.getElementById("trainerDeletePopup").classList.remove("show");
 }
 
-    async function trainerConfirmDeleteYes() {
+async function trainerConfirmDeleteYes() {
 
-    console.log("DELETE:", deleteMiesiac, deleteCzasCol);
-      
-  // zamykamy popup
+  const msg = document.getElementById("trainerMsg");
+
+  // 👉 komunikat w stylu apki
+  msg.innerText = "⏳ Usuwam wydarzenie…";
+
   trainerHideDeletePopup();
 
-  // musi istnieć deleteMiesiac + deleteCzasCol
   if (!deleteMiesiac || !deleteCzasCol) {
-    alert("Brak danych wydarzenia do usunięcia.");
+    msg.innerText = "❌ Brak danych wydarzenia do usunięcia.";
     return;
   }
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`);
+    const res = await fetch(
+      `${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`
+    );
     const data = await res.json();
 
     if (data.success) {
-      // komunikat z apki
-      alert("Wydarzenie zostało usunięte.");
-      trainerPokazWydarzenia(); // odświeżamy listę
+      msg.innerText = "🗑️ Wydarzenie zostało usunięte.";
+      trainerPokazWydarzenia();
     } else {
-      alert("Błąd usuwania: " + (data.error || "Nieznany błąd"));
+      msg.innerText = "❌ Błąd usuwania: " + (data.error || "Nieznany błąd");
     }
 
   } catch (err) {
-    alert("Błąd połączenia: " + err);
+    msg.innerText = "❌ Błąd połączenia: " + err;
   }
 }
-
+  
 
 
 

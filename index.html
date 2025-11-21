@@ -175,34 +175,11 @@
     .btn.danger {
       background: #800;
     }
-      #trainerDeletePopup {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-      display: none;   /* 🔥 POPRAWKA */
-    }
-
-#trainerDeletePopup.show {
-  display: flex;  /* 🔥 włączamy, gdy trzeba */
-}
-
-    #trainerDeletePopup .popup-card {
-      background: #111;
-      border: 1px solid #555;
-      border-radius: 10px;
-      padding: 16px 20px;
-      max-width: 260px;
-      text-align: center;
-    }
-
   </style>
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.67.73';
+    const WERSJA_APKI = '1.62.70';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -373,18 +350,7 @@
     </div>
 
   </div><!-- /app -->
-  
-    <!-- 🔔 Popup potwierdzenia usunięcia (na razie tylko komunikat) -->
-    <div id="trainerDeletePopup" class="hidden">
-    <div class="popup-card">
-    <p style="margin-bottom:15px;">
-      Czy napewno chcesz usunąć wydarzenie ?
-    </p>
-    <button class="full-btn" onclick="trainerConfirmDeleteYes()">TAK</button>
-    <button class="full-btn alt" style="margin-top:8px;" onclick="trainerHideDeletePopup()">Anuluj</button>
-  </div>
-</div>
-  
+
   <!-- LOGIKA APLIKACJI -->
   <script>
     /* =================== START / INTRO =================== */
@@ -410,7 +376,7 @@
 
     /* =================== KONFIG / GLOBALNE =================== */
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCAnUAH9luT0iYs0G4ApvE5P0bW8I7sscs5pH5Ylgdla06eh22qj-UZPUhTJAubJrX/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhSYtraxCJnbYVCt_6lwDmyYTRofqN1WLHu-b0vblDZjdB-K39LaMz7ARGjFU8kx-m/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
     window.grupyTrenera = "";
@@ -556,7 +522,7 @@
           Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
 
           <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
-          <button class="btn danger" onclick="trainerShowDeletePopup('${t.miesiac}', ${t.czasCol})">🗑️ Usuń</button>
+          <button class="btn danger" onclick="usunWydarzenie('${t.miesiac}', ${t.czasCol})">🗑️ Usuń</button>
 
           <div id="trainer-zapisani-${t.id}" class="hidden"></div>
         </div>
@@ -969,71 +935,28 @@
         msg.innerText = "Błąd połączenia.";
       }
     }
-        // =================== USUWANIE WYDARZENIA – KROK 1: TYLKO POPUP ===================
 
-    let deleteMiesiac = null;
-    let deleteCzasCol = null;
+    /* =================== USUWANIE WYDARZENIA (TRENER) =================== */
 
-    function trainerShowDeletePopup(miesiac, czasCol) {
-    deleteMiesiac = miesiac;
-    deleteCzasCol = czasCol;
-    document.getElementById("trainerDeletePopup").classList.add("show");
-}
+    function usunWydarzenie(miesiac, czasCol) {
+      if (!confirm("Czy na pewno chcesz usunąć to wydarzenie?")) return;
 
-    function trainerHideDeletePopup() {
-    document.getElementById("trainerDeletePopup").classList.remove("show");
-}
-
-  async function trainerConfirmDeleteYes() {
-
-  console.log("🔥 TAK - funkcja działa");
-
-  trainerHideDeletePopup();
-
-  if (!deleteMiesiac || !deleteCzasCol) {
-    alert("Brak danych wydarzenia do usunięcia.");
-    return;
-  }
-
-  // 🔥 tworzymy treningId w formacie "Listopad-5"
-  const treningId = `${deleteMiesiac}-${deleteCzasCol}`;
-
-  try {
-    const res = await fetch(
-      `${SCRIPT_URL}?action=usunWydarzenie&treningId=${encodeURIComponent(treningId)}`
-    );
-
-    const data = await res.json();
-
-    if (data.success) {
-      alert("Wydarzenie zostało usunięte.");
-      trainerPokazWydarzenia();
-    } else {
-      alert("Błąd usuwania: " + (data.error || "Nieznany błąd"));
+      fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(miesiac)}&czasCol=${encodeURIComponent(czasCol)}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) {
+            alert("Wydarzenie zostało usunięte.");
+            trainerPokazWydarzenia();
+          } else {
+            alert("Błąd: " + (d.error || "nieznany błąd"));
+          }
+        })
+        .catch(err => {
+          alert("Błąd połączenia: " + err);
+        });
     }
 
-  } catch (err) {
-    alert("Błąd połączenia: " + err);
-  }
-}
 
-    /* =================== PODGLĄDOWE (opcjonalne) =================== */
-    // Zostawiam starą funkcję, jeśli jej kiedyś używałeś ręcznie.
-    async function pokazTreningiTrener() {
-      ukryjWszystkie();
-      document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
-
-      const lista = await (await fetch(`${SCRIPT_URL}?action=treningiTrener`)).json();
-      renderTreningi(lista);
-
-      document.querySelectorAll("button[id^='btn-']").forEach(b => {
-        b.disabled = true;
-        b.innerText = "Podgląd";
-      });
-      document.querySelectorAll("button[id^='wypisz-']").forEach(b => {
-        b.disabled = true;
-      });
-    }
 
   </script>
 </body>

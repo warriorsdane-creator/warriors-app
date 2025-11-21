@@ -210,7 +210,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.71.84';
+    const WERSJA_APKI = '1.72.84';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -1021,8 +1021,9 @@ async function trainerConfirmDeleteYes() {
 
     // 🔥 Wysyłamy TERAZ dobry parametr
     const res = await fetch(
-      `${SCRIPT_URL}?action=usunWydarzenie&treningId=${encodeURIComponent(treningId)}`
-    );
+      `${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`
+      );
+
 
     const data = await res.json();
 

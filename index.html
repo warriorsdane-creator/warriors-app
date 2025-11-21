@@ -210,7 +210,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.69.80';
+    const WERSJA_APKI = '1.70.80';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -997,45 +997,50 @@ function trainerHideDeletePopup() {
 
 async function trainerConfirmDeleteYes() {
 
+  const msg = document.getElementById("trainerMsg");
+
+  // 🔥 Komunikat apki — znika po 6 sekundach
+  msg.innerText = "⏳ Usuwam wydarzenie…";
+  setTimeout(() => { msg.innerText = ""; }, 6000);
+
+  // Zamykamy popup
   trainerHideDeletePopup();
 
-  if (!deleteMiesiac || !deleteCzasCol || !deleteId) return;
-
-  const msgBox = document.getElementById(`msg-${deleteId}`);
-  if (msgBox) {
-    msgBox.innerText = "⏳ Usuwam wydarzenie…";
-    msgBox.style.opacity = 1;
+  // Dane muszą być
+  if (!deleteMiesiac || !deleteCzasCol) {
+    msg.innerText = "❌ Brak danych wydarzenia do usunięcia.";
+    return;
   }
 
+  // 🔥 Prawidłowy treningId dla Apps Script:
+  const treningId = `${deleteMiesiac}-${deleteCzasCol}`;
+
+  console.log("DELETE treningId:", treningId);
+
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`);
+
+    // 🔥 Wysyłamy TERAZ dobry parametr
+    const res = await fetch(
+      `${SCRIPT_URL}?action=usunWydarzenie&treningId=${encodeURIComponent(treningId)}`
+    );
+
     const data = await res.json();
 
     if (data.success) {
-      if (msgBox) {
-        msgBox.innerText = "🗑️ Wydarzenie usunięte";
-        setTimeout(() => {
-          msgBox.style.opacity = 0;
-        }, 6000);
-      }
+      msg.innerText = "🗑️ Wydarzenie zostało usunięte.";
+      setTimeout(() => { msg.innerText = ""; }, 6000);
 
-      // odśwież listę PO animacji 6 sekund
-      setTimeout(() => trainerPokazWydarzenia(), 6000);
-
+      trainerPokazWydarzenia();  // odświeżenie
     } else {
-      msgBox.innerText = "❌ Błąd usuwania";
-      setTimeout(() => (msgBox.style.opacity = 0), 6000);
+      msg.innerText = "❌ Błąd usuwania: " + (data.error || "Nieznany błąd");
+      setTimeout(() => { msg.innerText = ""; }, 6000);
     }
 
-  } catch (e) {
-    msgBox.innerText = "❌ Błąd połączenia";
-    setTimeout(() => (msgBox.style.opacity = 0), 6000);
+  } catch (err) {
+    msg.innerText = "❌ Błąd połączenia: " + err;
+    setTimeout(() => { msg.innerText = ""; }, 6000);
   }
 }
-
-
-
-
   </script>
 </body>
 </html>

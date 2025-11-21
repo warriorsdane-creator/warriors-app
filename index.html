@@ -202,7 +202,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.66.70';
+    const WERSJA_APKI = '1.67.80';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -380,7 +380,7 @@
     <p style="margin-bottom:15px;">
       Czy napewno chcesz usunąć wydarzenie ?
     </p>
-    <button class="full-btn" onclick="trainerConfirmDeleteOk()">TAK</button>
+    <button class="full-btn" onclick="trainerConfirmDeleteYes()">TAK</button>
     <button class="full-btn alt" style="margin-top:8px;" onclick="trainerHideDeletePopup()">Anuluj</button>
   </div>
 </div>
@@ -410,7 +410,7 @@
 
     /* =================== KONFIG / GLOBALNE =================== */
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhSYtraxCJnbYVCt_6lwDmyYTRofqN1WLHu-b0vblDZjdB-K39LaMz7ARGjFU8kx-m/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxotTaZp6Sdn2XPaeqPYEbfhDZvuHuPupg6FeuQ8hJjjtPDm3XvsvvjNpuglIUYdgQz/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
     window.grupyTrenera = "";
@@ -986,6 +986,8 @@
 
     async function trainerConfirmDeleteYes() {
 
+    console.log("DELETE:", deleteMiesiac, deleteCzasCol);
+      
   // zamykamy popup
   trainerHideDeletePopup();
 

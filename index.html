@@ -198,11 +198,19 @@
       text-align: center;
     }
 
+    .localMsg {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #ffd800;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
   </style>
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.68.80';
+    const WERSJA_APKI = '1.69.80';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -558,7 +566,7 @@
 
           <button class="btn" onclick="trainerToggleZapisani('${t.id}')">👥 Zapisani</button>
           <button class="btn danger" onclick="trainerShowDeletePopup('${t.miesiac}', ${t.czasCol})">🗑️ Usuń</button>
-
+          <div id="msg-${t.id}" class="localMsg"></div>
           <div id="trainer-zapisani-${t.id}" class="hidden"></div>
         </div>
       `).join('');
@@ -972,12 +980,14 @@
     }
         // =================== USUWANIE WYDARZENIA – KROK 1: TYLKO POPUP ===================
 
-    let deleteMiesiac = null;
-    let deleteCzasCol = null;
+let deleteMiesiac = null;
+let deleteCzasCol = null;
+let deleteId = null;
 
- function trainerShowDeletePopup(miesiac, czasCol) {
+function trainerShowDeletePopup(miesiac, czasCol, id) {
   deleteMiesiac = miesiac;
   deleteCzasCol = czasCol;
+  deleteId = id;
   document.getElementById("trainerDeletePopup").classList.add("show");
 }
 
@@ -987,36 +997,42 @@ function trainerHideDeletePopup() {
 
 async function trainerConfirmDeleteYes() {
 
-  const msg = document.getElementById("trainerMsg");
-
-  // 👉 komunikat w stylu apki
-  msg.innerText = "⏳ Usuwam wydarzenie…";
-
   trainerHideDeletePopup();
 
-  if (!deleteMiesiac || !deleteCzasCol) {
-    msg.innerText = "❌ Brak danych wydarzenia do usunięcia.";
-    return;
+  if (!deleteMiesiac || !deleteCzasCol || !deleteId) return;
+
+  const msgBox = document.getElementById(`msg-${deleteId}`);
+  if (msgBox) {
+    msgBox.innerText = "⏳ Usuwam wydarzenie…";
+    msgBox.style.opacity = 1;
   }
 
   try {
-    const res = await fetch(
-      `${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`
-    );
+    const res = await fetch(`${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`);
     const data = await res.json();
 
     if (data.success) {
-      msg.innerText = "🗑️ Wydarzenie zostało usunięte.";
-      trainerPokazWydarzenia();
+      if (msgBox) {
+        msgBox.innerText = "🗑️ Wydarzenie usunięte";
+        setTimeout(() => {
+          msgBox.style.opacity = 0;
+        }, 6000);
+      }
+
+      // odśwież listę PO animacji 6 sekund
+      setTimeout(() => trainerPokazWydarzenia(), 6000);
+
     } else {
-      msg.innerText = "❌ Błąd usuwania: " + (data.error || "Nieznany błąd");
+      msgBox.innerText = "❌ Błąd usuwania";
+      setTimeout(() => (msgBox.style.opacity = 0), 6000);
     }
 
-  } catch (err) {
-    msg.innerText = "❌ Błąd połączenia: " + err;
+  } catch (e) {
+    msgBox.innerText = "❌ Błąd połączenia";
+    setTimeout(() => (msgBox.style.opacity = 0), 6000);
   }
 }
-  
+
 
 
 

@@ -210,7 +210,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.73.85';
+    const WERSJA_APKI = '1.74.85';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -559,7 +559,7 @@
       }
 
       div.innerHTML = lista.map(t => `
-        <div class="card">
+        <div class="card" data-event-id="${t.miesiac}-${t.czasCol}">
           <b>${t.rodzaj}</b> &nbsp;&nbsp; ${t.data} (${t.dzien})<br>
           Godzina: <b>${t.godzStart}</b> &nbsp;&nbsp;–&nbsp;&nbsp; <b>${t.godzKoniec}</b><br>
           Trener: <b>${t.trener}</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Zapisanych: ${t.zapisanych}<br><br>
@@ -997,18 +997,15 @@ function trainerHideDeletePopup() {
 
 async function trainerConfirmDeleteYes() {
 
-  // zamykamy popup
+  // ukrywamy popup
   trainerHideDeletePopup();
 
-  if (!deleteMiesiac || !deleteCzasCol || !deleteId) {
-    alert("Brak danych wydarzenia do usunięcia.");
-    return;
-  }
+  // pobieramy kafel wydarzenia:
+  // id jest w formacie `${miesiac}-${czasCol}`
+  const eventId = `${deleteMiesiac}-${deleteCzasCol}`;
+  const card = document.querySelector(`[data-event-id='${eventId}']`);
 
-  // 🔥 znacznik karty wydarzenia
-  const card = document.getElementById(`event-${deleteId}`);
-
-  // 🔥 komunikat lokalnie w karcie
+  // PODŚWIETLAMY KARTĘ INFORMACJĄ
   if (card) {
     card.innerHTML = `
       <div class="card" style="background:#222; text-align:center;">
@@ -1017,32 +1014,36 @@ async function trainerConfirmDeleteYes() {
     `;
   }
 
-  const treningId = `${deleteMiesiac}-${deleteCzasCol}`;
+  // muszą być dane
+  if (!deleteMiesiac || !deleteCzasCol) {
+    if (card) {
+      card.innerHTML = `
+        <div class="card" style="background:#522; text-align:center;">
+          ❌ Brak danych wydarzenia do usunięcia.
+        </div>
+      `;
+    }
+    return;
+  }
 
   try {
     const res = await fetch(
-      `${SCRIPT_URL}?action=usunWydarzenie&treningId=${encodeURIComponent(treningId)}`
+      `${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`
     );
-
     const data = await res.json();
 
     if (data.success) {
 
       if (card) {
         card.innerHTML = `
-          <div class="card" style="background:#252; text-align:center;">
-            🗑️ Wydarzenie usunięte
+          <div class="card" style="background:#152; text-align:center;">
+            🗑️ Wydarzenie zostało usunięte
           </div>
         `;
-
-        // zniknie po chwili
-        setTimeout(() => {
-           card.remove();
-        }, 1500);
       }
 
-      // odśwież listę po małej przerwie
-      setTimeout(() => trainerPokazWydarzenia(), 200);
+      // po chwili odświeżamy
+      setTimeout(() => trainerPokazWydarzenia(), 800);
 
     } else {
 
@@ -1052,8 +1053,8 @@ async function trainerConfirmDeleteYes() {
             ❌ Błąd usuwania: ${data.error || "Nieznany błąd"}
           </div>
         `;
-        setTimeout(() => trainerPokazWydarzenia(), 2000);
       }
+
     }
 
   } catch (err) {
@@ -1065,8 +1066,10 @@ async function trainerConfirmDeleteYes() {
         </div>
       `;
     }
+
   }
 }
+
   </script>
 </body>
 </html>

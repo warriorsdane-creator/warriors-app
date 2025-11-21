@@ -210,7 +210,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.72.85';
+    const WERSJA_APKI = '1.73.85';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -997,49 +997,74 @@ function trainerHideDeletePopup() {
 
 async function trainerConfirmDeleteYes() {
 
-  const msg = document.getElementById("trainerMsg");
-
-  // 🔥 Komunikat apki — znika po 6 sekundach
-  msg.innerText = "⏳ Usuwam wydarzenie…";
-  setTimeout(() => { msg.innerText = ""; }, 6000);
-
-  // Zamykamy popup
+  // zamykamy popup
   trainerHideDeletePopup();
 
-  // Dane muszą być
-  if (!deleteMiesiac || !deleteCzasCol) {
-    msg.innerText = "❌ Brak danych wydarzenia do usunięcia.";
+  if (!deleteMiesiac || !deleteCzasCol || !deleteId) {
+    alert("Brak danych wydarzenia do usunięcia.");
     return;
   }
 
-  // 🔥 Prawidłowy treningId dla Apps Script:
+  // 🔥 znacznik karty wydarzenia
+  const card = document.getElementById(`event-${deleteId}`);
+
+  // 🔥 komunikat lokalnie w karcie
+  if (card) {
+    card.innerHTML = `
+      <div class="card" style="background:#222; text-align:center;">
+        ⏳ Usuwam wydarzenie…
+      </div>
+    `;
+  }
+
   const treningId = `${deleteMiesiac}-${deleteCzasCol}`;
 
-  console.log("DELETE treningId:", treningId);
-
   try {
-
-    // 🔥 Wysyłamy TERAZ dobry parametr
     const res = await fetch(
-      `${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`
-      );
-
+      `${SCRIPT_URL}?action=usunWydarzenie&treningId=${encodeURIComponent(treningId)}`
+    );
 
     const data = await res.json();
 
     if (data.success) {
-      msg.innerText = "🗑️ Wydarzenie zostało usunięte.";
-      setTimeout(() => { msg.innerText = ""; }, 6000);
 
-      trainerPokazWydarzenia();  // odświeżenie
+      if (card) {
+        card.innerHTML = `
+          <div class="card" style="background:#252; text-align:center;">
+            🗑️ Wydarzenie usunięte
+          </div>
+        `;
+
+        // zniknie po chwili
+        setTimeout(() => {
+           card.remove();
+        }, 1500);
+      }
+
+      // odśwież listę po małej przerwie
+      setTimeout(() => trainerPokazWydarzenia(), 200);
+
     } else {
-      msg.innerText = "❌ Błąd usuwania: " + (data.error || "Nieznany błąd");
-      setTimeout(() => { msg.innerText = ""; }, 6000);
+
+      if (card) {
+        card.innerHTML = `
+          <div class="card" style="background:#522; text-align:center;">
+            ❌ Błąd usuwania: ${data.error || "Nieznany błąd"}
+          </div>
+        `;
+        setTimeout(() => trainerPokazWydarzenia(), 2000);
+      }
     }
 
   } catch (err) {
-    msg.innerText = "❌ Błąd połączenia: " + err;
-    setTimeout(() => { msg.innerText = ""; }, 6000);
+
+    if (card) {
+      card.innerHTML = `
+        <div class="card" style="background:#522; text-align:center;">
+          ❌ Błąd połączenia: ${err}
+        </div>
+      `;
+    }
   }
 }
   </script>

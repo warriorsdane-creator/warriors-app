@@ -210,7 +210,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.74.86';
+    const WERSJA_APKI = '1.75.86';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -480,18 +480,26 @@
         komunikat.innerText = "✅ Zalogowano";
 
         if (data.role === "zawodnik") {
-          numerZalogowanego = data.login;
-          grupaZalogowanego = data.grupa || "";
+        numerZalogowanego = data.login;
+        grupaZalogowanego = data.grupa || "";
 
+        // 🔽 Pobierz zaległości
+        const platnosci = await (await fetch(
+          `${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numerZalogowanego)}`
+              )).json();
+
+        // 🔽 Jeśli są zaległości → pokazujemy ekran płatności
+          if (Array.isArray(platnosci) && platnosci.length > 0) {
           ukryjWszystkie();
           document.getElementById("platnosciView").classList.remove("hidden");
-
-          const platnosci = await (await fetch(
-            `${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numerZalogowanego)}`
-          )).json();
           renderPlatnosci(platnosci);
           return;
         }
+
+        // 🔽 Jeśli NIE MA żadnych zaległości → od razu lista treningów
+          await pokazTreningi();
+          return;
+
 
         if (data.role === "trener") {
           ukryjWszystkie();

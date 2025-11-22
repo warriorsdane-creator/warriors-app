@@ -210,7 +210,7 @@
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.75.86';
+    const WERSJA_APKI = '1.76.86';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -730,14 +730,17 @@
         `<button class='full-btn' onclick='pokazTreningi()' style='margin-top:20px;'>Dalej ➡</button>`;
     }
 
-    async function pokazTreningi() {
-      document.getElementById("platnosciView").classList.add("hidden");
-      document.getElementById("homeView").classList.remove("hidden");
+       async function pokazTreningi() {
 
-      const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${encodeURIComponent(numerZalogowanego)}`;
-      const lista = await (await fetch(url)).json();
-      renderTreningi(lista);
+        ukryjWszystkie();  // 🔥 BEZWZGLĘDNIE MUSI BYĆ
+
+        document.getElementById("homeView").classList.remove("hidden");
+
+        const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${encodeURIComponent(numerZalogowanego)}`;
+        const lista = await (await fetch(url)).json();
+        renderTreningi(lista);
     }
+
 
     /* =================== WYDARZENIA (ZAWODNIK) =================== */
 

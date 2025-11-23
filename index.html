@@ -175,19 +175,20 @@
     .btn.danger {
       background: #800;
     }
-      #trainerDeletePopup {
+
+    #trainerDeletePopup {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.7);
       justify-content: center;
       align-items: center;
       z-index: 2000;
-      display: none;   /* 🔥 POPRAWKA */
+      display: none;
     }
 
-#trainerDeletePopup.show {
-  display: flex;  /* 🔥 włączamy, gdy trzeba */
-}
+    #trainerDeletePopup.show {
+      display: flex;
+    }
 
     #trainerDeletePopup .popup-card {
       background: #111;
@@ -199,18 +200,17 @@
     }
 
     .localMsg {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #ffd800;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
+      margin-top: 10px;
+      font-size: 14px;
+      color: #ffd800;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
   </style>
 
   <!-- Wersja apki + Service Worker -->
   <script>
-    const WERSJA_APKI = '1.76.86';
+    const WERSJA_APKI = '1.77.86';
     const poprzednia = localStorage.getItem('wersjaApki');
     if (poprzednia !== WERSJA_APKI) {
       localStorage.setItem('wersjaApki', WERSJA_APKI);
@@ -254,7 +254,7 @@
       <h1>Rejestracja</h1>
       <button class="full-btn" onclick="pokazRejestracjaZawodnik()">Zawodnik</button>
       <button class="full-btn" onclick="pokazRejestracjaTrener()">Trener</button>
-      <button class="full-btn alt" onclick="pokazLogowanie()">⬅ Powrót</button>
+      <button class="full-btn alt" onclick="appBack()">⬅ Powrót</button>
     </div>
 
     <!-- REJESTRACJA ZAWODNIKA -->
@@ -267,7 +267,7 @@
         <button class="full-btn" onclick="wyslijRejestracje()">Zarejestruj</button>
       </div>
       <p id="regMsg"></p>
-      <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+      <button class="full-btn alt" onclick="appBack()">⬅ Powrót</button>
     </div>
 
     <!-- REJESTRACJA TRENERA -->
@@ -277,7 +277,7 @@
         <input id="regNazwiskoTrener" type="text" placeholder="Imię i nazwisko">
         <input id="regHasloTrener" type="password" placeholder="Ustaw hasło">
         <button class="full-btn" onclick="wyslijRejestracjeTrener()">Zarejestruj</button>
-        <button class="full-btn alt" onclick="pokazRejestracjaSelect()">⬅ Powrót</button>
+        <button class="full-btn alt" onclick="appBack()">⬅ Powrót</button>
       </div>
       <p id="regMsgTrener"></p>
     </div>
@@ -331,7 +331,7 @@
       </div>
 
       <button class="full-btn" onclick="wyslijNoweWydarzenie()">💾 Dodaj wydarzenie</button>
-      <button class="full-btn alt" onclick="trainerPokazWydarzenia()">⬅ Powrót</button>
+      <button class="full-btn alt" onclick="appBack()">⬅ Powrót</button>
 
       <p id="eventMsg" style="margin-top:10px;"></p>
     </div>
@@ -381,20 +381,18 @@
       <button class="full-btn alt" onclick="trainerPowrot()">⬅ Powrót</button>
     </div>
 
-  
-  
-    <!-- 🔔 Popup potwierdzenia usunięcia (na razie tylko komunikat) -->
-    <div id="trainerDeletePopup" class="hidden">
-    <div class="popup-card">
-    <p style="margin-bottom:15px;">
-      Czy napewno chcesz usunąć wydarzenie ?
-    </p>
-    <button class="full-btn" onclick="trainerConfirmDeleteYes()">TAK</button>
-    <button class="full-btn alt" style="margin-top:8px;" onclick="trainerHideDeletePopup()">Anuluj</button>
-  </div>
-</div>
-    </div><!-- /app -->
-  
+    <!-- 🔔 Popup potwierdzenia usunięcia -->
+    <div id="trainerDeletePopup">
+      <div class="popup-card">
+        <p style="margin-bottom:15px;">
+          Czy napewno chcesz usunąć wydarzenie ?
+        </p>
+        <button class="full-btn" onclick="trainerConfirmDeleteYes()">TAK</button>
+        <button class="full-btn alt" style="margin-top:8px;" onclick="trainerHideDeletePopup()">Anuluj</button>
+      </div>
+    </div>
+  </div><!-- /app -->
+
   <!-- LOGIKA APLIKACJI -->
   <script>
     /* =================== START / INTRO =================== */
@@ -409,46 +407,96 @@
       }
     }
 
-    window.addEventListener('load', () => {
-      odtworzIntroSound();
-      setTimeout(() => {
-        document.getElementById('splash').style.display = 'none';
-        document.getElementById('app').classList.remove('hidden');
-        document.getElementById("wersjaNum").textContent = WERSJA_APKI;
-      }, 5000);
-    });
-
     /* =================== KONFIG / GLOBALNE =================== */
 
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby9zekkeNtOkH4lu3KfzG9ESCfgHd7equg9HRgo0EBVK2or19NTRudSUHQ5THEHZB0a/exec";
     let numerZalogowanego = null;
     let grupaZalogowanego = null;
     window.grupyTrenera = "";
-
-    /* =================== NAWIGACJA WIDOKAMI =================== */
+    let currentView = "loginView";
 
     function ukryjWszystkie() {
       document.querySelectorAll(".container").forEach(v => v.classList.add("hidden"));
     }
 
-    function pokazLogowanie() {
+    // centralna nawigacja – dodaje wpis do historii
+    function goToView(viewId, options = {}) {
+      const { replace = false } = options;
       ukryjWszystkie();
-      document.getElementById("loginView").classList.remove("hidden");
+      const el = document.getElementById(viewId);
+      if (el) el.classList.remove("hidden");
+      currentView = viewId;
+      const state = { view: viewId };
+
+      try {
+        if (replace) {
+          history.replaceState(state, "", "");
+        } else {
+          history.pushState(state, "", "");
+        }
+      } catch (e) {
+        console.warn("History API error:", e);
+      }
+    }
+
+    // używane przy cofaniu (popstate) – bez pushState
+    function showViewFromHistory(viewId) {
+      ukryjWszystkie();
+      const el = document.getElementById(viewId);
+      if (el) el.classList.remove("hidden");
+      currentView = viewId;
+    }
+
+    function appBack() {
+      // przyciski "Powrót" działają tak samo jak klawisz "<"
+      history.back();
+    }
+
+    window.addEventListener("popstate", (event) => {
+      const state = event.state;
+      if (state && state.view) {
+        showViewFromHistory(state.view);
+      } else {
+        showViewFromHistory("loginView");
+      }
+    });
+
+    window.addEventListener('load', () => {
+      odtworzIntroSound();
+      setTimeout(() => {
+        document.getElementById('splash').style.display = 'none';
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById("wersjaNum").textContent = WERSJA_APKI;
+
+        // ustaw stan startowy – login
+        try {
+          history.replaceState({ view: "loginView" }, "", "");
+        } catch (e) {
+          console.warn("History replace error:", e);
+        }
+        showViewFromHistory("loginView");
+      }, 5000);
+    });
+
+    /* =================== NAWIGACJA WIDOKAMI =================== */
+
+    function pokazLogowanie() {
+      numerZalogowanego = null;
+      grupaZalogowanego = null;
+      window.grupyTrenera = "";
+      goToView("loginView");
     }
 
     function pokazRejestracjaSelect() {
-      ukryjWszystkie();
-      document.getElementById("registerSelectView").classList.remove("hidden");
+      goToView("registerSelectView");
     }
 
     function pokazRejestracjaZawodnik() {
-      ukryjWszystkie();
-      document.getElementById("registerZawodnikView").classList.remove("hidden");
+      goToView("registerZawodnikView");
     }
 
     function pokazRejestracjaTrener() {
-      ukryjWszystkie();
-      document.getElementById("rejestracjaTrenerView").classList.remove("hidden");
+      goToView("rejestracjaTrenerView");
     }
 
     /* =================== LOGOWANIE =================== */
@@ -481,31 +529,29 @@
         komunikat.innerText = "✅ Zalogowano";
 
         if (data.role === "zawodnik") {
-        numerZalogowanego = data.login;
-        grupaZalogowanego = data.grupa || "";
+          numerZalogowanego = data.login;
+          grupaZalogowanego = data.grupa || "";
 
-        // 🔽 Pobierz zaległości
-        const platnosci = await (await fetch(
-          `${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numerZalogowanego)}`
-              )).json();
+          // 🔽 Pobierz zaległości
+          const platnosci = await (await fetch(
+            `${SCRIPT_URL}?action=platnosci&numer=${encodeURIComponent(numerZalogowanego)}`
+          )).json();
 
-        // 🔽 Jeśli są zaległości → pokazujemy ekran płatności
+          // 🔽 Jeśli są zaległości → pokazujemy ekran płatności
           if (Array.isArray(platnosci) && platnosci.length > 0) {
-          ukryjWszystkie();
-          document.getElementById("platnosciView").classList.remove("hidden");
-          renderPlatnosci(platnosci);
-          return;
-        }
+            goToView("platnosciView");
+            renderPlatnosci(platnosci);
+            return;
+          }
 
-        // 🔽 Jeśli NIE MA żadnych zaległości → od razu lista treningów
+          // 🔽 Jeśli NIE MA żadnych zaległości → od razu lista treningów
           await pokazTreningi();
           return;
         }
 
         if (data.role === "trener") {
-          ukryjWszystkie();
-          document.getElementById("trainerPanelView").classList.remove("hidden");
           window.grupyTrenera = data.grupa || "";
+          goToView("trainerPanelView");
           return;
         }
 
@@ -517,13 +563,11 @@
     /* =================== PANEL TRENERA – NAWIGACJA =================== */
 
     function trainerPowrot() {
-      ukryjWszystkie();
-      document.getElementById("trainerPanelView").classList.remove("hidden");
+      appBack();
     }
 
     async function trainerPokazZawodnicy() {
-      ukryjWszystkie();
-      document.getElementById("trainerZawodnicyView").classList.remove("hidden");
+      goToView("trainerZawodnicyView");
       const box = document.getElementById("trainerListaZawodnikow");
 
       box.innerHTML = "<div class='card' style='background:#222;'>⏳ Ładowanie...</div>";
@@ -550,8 +594,7 @@
     }
 
     async function trainerPokazWydarzenia() {
-      ukryjWszystkie();
-      document.getElementById("trainerWydarzeniaView").classList.remove("hidden");
+      goToView("trainerWydarzeniaView");
 
       const grupa = encodeURIComponent(window.grupyTrenera || "");
       const res = await fetch(`${SCRIPT_URL}?action=treningiTrener&grupa=${grupa}`);
@@ -637,8 +680,7 @@
     }
 
     function pokazDodajWydarzenie() {
-      ukryjWszystkie();
-      document.getElementById("trainerDodajWydarzenieView").classList.remove("hidden");
+      goToView("trainerDodajWydarzenieView");
       zaladujListeTrenerow();
     }
 
@@ -662,10 +704,9 @@
       const msg = document.getElementById("eventMsg");
 
       if (!data || !start || !rodzaj) {
-      msg.innerText = "Uzupełnij pola: Data, Godzina, Rodzaj.";
-      return;
+        msg.innerText = "Uzupełnij pola: Data, Godzina, Rodzaj.";
+        return;
       }
-
 
       if (!validHour(start) || !validHour(end)) {
         msg.innerText = "❌ Niepoprawny format godziny. Wpisz w formacie HH:MM.";
@@ -730,17 +771,13 @@
         `<button class='full-btn' onclick='pokazTreningi()' style='margin-top:20px;'>Dalej ➡</button>`;
     }
 
-       async function pokazTreningi() {
+    async function pokazTreningi() {
+      goToView("homeView");
 
-        ukryjWszystkie();  // 🔥 BEZWZGLĘDNIE MUSI BYĆ
-
-        document.getElementById("homeView").classList.remove("hidden");
-
-        const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${encodeURIComponent(numerZalogowanego)}`;
-        const lista = await (await fetch(url)).json();
-        renderTreningi(lista);
+      const url = `${SCRIPT_URL}?action=treningi&grupa=${encodeURIComponent(grupaZalogowanego)}&numer=${encodeURIComponent(numerZalogowanego)}`;
+      const lista = await (await fetch(url)).json();
+      renderTreningi(lista);
     }
-
 
     /* =================== WYDARZENIA (ZAWODNIK) =================== */
 
@@ -882,8 +919,7 @@
     /* =================== STATYSTYKI (ZAWODNIK) =================== */
 
     async function pokazStatystyki() {
-      document.getElementById("homeView").classList.add("hidden");
-      document.getElementById("statsView").classList.remove("hidden");
+      goToView("statsView");
 
       const res = await fetch(`${SCRIPT_URL}?action=statystyki&numer=${encodeURIComponent(numerZalogowanego)}`);
       const lista = await res.json();
@@ -908,13 +944,11 @@
     }
 
     function powrotDoTreningow() {
-      document.getElementById("statsView").classList.add("hidden");
-      document.getElementById("homeView").classList.remove("hidden");
+      appBack();
     }
 
     function powrotDoPlatnosci() {
-      document.getElementById("homeView").classList.add("hidden");
-      document.getElementById("platnosciView").classList.remove("hidden");
+      appBack();
     }
 
     /* =================== REJESTRACJA =================== */
@@ -991,98 +1025,83 @@
         msg.innerText = "Błąd połączenia.";
       }
     }
-        // =================== USUWANIE WYDARZENIA – KROK 1: TYLKO POPUP ===================
 
-let deleteMiesiac = null;
-let deleteCzasCol = null;
-let deleteId = null;
+    // =================== USUWANIE WYDARZENIA ===================
 
-function trainerShowDeletePopup(miesiac, czasCol, id) {
-  deleteMiesiac = miesiac;
-  deleteCzasCol = czasCol;
-  deleteId = id;
-  document.getElementById("trainerDeletePopup").classList.add("show");
-}
+    let deleteMiesiac = null;
+    let deleteCzasCol = null;
+    let deleteId = null;
 
-function trainerHideDeletePopup() {
-  document.getElementById("trainerDeletePopup").classList.remove("show");
-}
-
-async function trainerConfirmDeleteYes() {
-
-  // ukrywamy popup
-  trainerHideDeletePopup();
-
-  // pobieramy kafel wydarzenia:
-  // id jest w formacie `${miesiac}-${czasCol}`
-  const eventId = `${deleteMiesiac}-${deleteCzasCol}`;
-  const card = document.querySelector(`[data-event-id='${eventId}']`);
-
-  // PODŚWIETLAMY KARTĘ INFORMACJĄ
-  if (card) {
-    card.innerHTML = `
-      <div class="card" style="background:#222; text-align:center;">
-        ⏳ Usuwam wydarzenie…
-      </div>
-    `;
-  }
-
-  // muszą być dane
-  if (!deleteMiesiac || !deleteCzasCol) {
-    if (card) {
-      card.innerHTML = `
-        <div class="card" style="background:#522; text-align:center;">
-          ❌ Brak danych wydarzenia do usunięcia.
-        </div>
-      `;
+    function trainerShowDeletePopup(miesiac, czasCol, id) {
+      deleteMiesiac = miesiac;
+      deleteCzasCol = czasCol;
+      deleteId = id;
+      document.getElementById("trainerDeletePopup").classList.add("show");
     }
-    return;
-  }
 
-  try {
-    const res = await fetch(
-      `${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`
-    );
-    const data = await res.json();
+    function trainerHideDeletePopup() {
+      document.getElementById("trainerDeletePopup").classList.remove("show");
+    }
 
-    if (data.success) {
+    async function trainerConfirmDeleteYes() {
+      trainerHideDeletePopup();
+
+      const eventId = `${deleteMiesiac}-${deleteCzasCol}`;
+      const card = document.querySelector(`[data-event-id='${eventId}']`);
 
       if (card) {
         card.innerHTML = `
-          <div class="card" style="background:#152; text-align:center;">
-            🗑️ Wydarzenie zostało usunięte
+          <div class="card" style="background:#222; text-align:center;">
+            ⏳ Usuwam wydarzenie…
           </div>
         `;
       }
 
-      // po chwili odświeżamy
-      setTimeout(() => trainerPokazWydarzenia(), 800);
-
-    } else {
-
-      if (card) {
-        card.innerHTML = `
-          <div class="card" style="background:#522; text-align:center;">
-            ❌ Błąd usuwania: ${data.error || "Nieznany błąd"}
-          </div>
-        `;
+      if (!deleteMiesiac || !deleteCzasCol) {
+        if (card) {
+          card.innerHTML = `
+            <div class="card" style="background:#522; text-align:center;">
+              ❌ Brak danych wydarzenia do usunięcia.
+            </div>
+          `;
+        }
+        return;
       }
 
+      try {
+        const res = await fetch(
+          `${SCRIPT_URL}?action=usunWydarzenie&miesiac=${encodeURIComponent(deleteMiesiac)}&czasCol=${deleteCzasCol}`
+        );
+        const data = await res.json();
+
+        if (data.success) {
+          if (card) {
+            card.innerHTML = `
+              <div class="card" style="background:#152; text-align:center;">
+                🗑️ Wydarzenie zostało usunięte
+              </div>
+            `;
+          }
+          setTimeout(() => trainerPokazWydarzenia(), 800);
+        } else {
+          if (card) {
+            card.innerHTML = `
+              <div class="card" style="background:#522; text-align:center;">
+                ❌ Błąd usuwania: ${data.error || "Nieznany błąd"}
+              </div>
+            `;
+          }
+        }
+      } catch (err) {
+        if (card) {
+          card.innerHTML = `
+            <div class="card" style="background:#522; text-align:center;">
+              ❌ Błąd połączenia: ${err}
+            </div>
+          `;
+        }
+      }
     }
-
-  } catch (err) {
-
-    if (card) {
-      card.innerHTML = `
-        <div class="card" style="background:#522; text-align:center;">
-          ❌ Błąd połączenia: ${err}
-        </div>
-      `;
-    }
-
-  }
-}
-
   </script>
 </body>
 </html>
